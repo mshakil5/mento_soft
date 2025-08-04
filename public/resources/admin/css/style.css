@@ -1,0 +1,9 @@
+.select2-selection{
+  height: 37px !important;
+}
+
+input[type="checkbox"] {
+    width: 25px;
+    height: 25px;
+    margin-top: 8px;
+}
