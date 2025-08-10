@@ -312,8 +312,8 @@
         });
       //Delete  
       function populateForm(data){
-        $("#name").val(data.name);
-        $("#softcode_id").val(data.softcode_id);
+        $("#name").val(data.name).prop('readonly', true);
+        $("#softcode_id").val(data.softcode_id).prop('disabled', true);
         $("#short_title").val(data.short_title);
         $("#long_title").val(data.long_title);
         $("#short_description").val(data.short_description);
@@ -340,6 +340,8 @@
         $("#long_description").summernote('code', '');
         $('#meta_image_preview').attr('src', '#').hide();
         $("#cardTitle").html('Add new');
+        $("#name").prop('readonly', false);
+        $("#softcode_id").prop('disabled', false);
       }
   });
 </script>

@@ -78,10 +78,6 @@ class MasterController extends Controller
             return response()->json(['status'=> 303,'message'=>$message]);
             exit();
         }
-        if (empty($request->softcode_id)) {
-            $message = "<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Soft Code\" field..!</b></div>";
-            return response()->json(['error' => $message], 422);
-        }
         if (empty($request->short_title)) {
             $message = "<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Short Title\" field..!</b></div>";
             return response()->json(['status' => 303, 'message' => $message]);
@@ -102,7 +98,6 @@ class MasterController extends Controller
         }
 
         $data->name = $request->name;
-        $data->softcode_id = $request->softcode_id;
         $data->short_title = $request->short_title;
         $data->long_title = $request->long_title;
         $data->short_description = $request->short_description;
