@@ -195,6 +195,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/client-projects/{id}', [ClientProjectController::class, 'destroy']);
     Route::post('/client-projects/status', [ClientProjectController::class, 'toggleStatus'])->name('client-projects.status');
 
+    // Project Tasks
+    Route::get('/client-projects/{project}/tasks', [ProjectTaskController::class, 'index'])->name('client-projects.tasks');
+    Route::post('/client-projects/{project}/tasks', [ProjectTaskController::class, 'store']);
+    Route::get('/client-projects-task/{task}/edit', [ProjectTaskController::class, 'edit']);
+    Route::post('/client-projects-task/{task}', [ProjectTaskController::class, 'update']);
+    Route::delete('/client-projects-task/{task}', [ProjectTaskController::class, 'destroy']);
+    Route::post('/client-projects-task/{task}/toggle-status', [ProjectTaskController::class, 'toggleStatus']);
+
     // Employees
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
     Route::post('/employees', [EmployeeController::class, 'store']);

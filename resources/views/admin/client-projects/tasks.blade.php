@@ -5,11 +5,9 @@
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-2">
-                  @if(request()->client_type_id)
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
-                  @endif
-                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
+            <div class="d-flex gap-2 my-3">
+              <a href="{{ url()->previous() }}" class="btn btn-secondary mr-2">Back to Projects</a>
+              <button type="button" class="btn btn-secondary" id="newBtn">Add new Task</button>
             </div>
         </div>
     </div>
@@ -21,24 +19,34 @@
             <div class="col-md-10">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="cardTitle">Add new Client</h3>
+                        <h3 class="card-title" id="cardTitle">Add new Task for {{ $project->title }}</h3>
                     </div>
                     <div class="card-body">
                         <form id="createThisForm">
                             @csrf
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
+                            <input type="hidden" name="client_project_id" value="{{ $project->id }}">
                             
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Business Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="business_name" name="business_name" placeholder="Enter business name">
+                                        <label>Assigned To <span class="text-danger">*</span></label>
+                                        <select class="form-control select2" id="employee_id" name="employee_id" required>
+                                            <option value="">Select Employee</option>
+                                            @foreach($employees as $employee)
+                                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+                                        <label>Priority <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="priority" name="priority" required>
+                                            <option value="high">High</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -46,51 +54,15 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Phone 1 <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="phone1" name="phone1" placeholder="Enter primary phone">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Phone 2</label>
-                                        <input type="text" class="form-control" id="phone2" name="phone2" placeholder="Enter secondary phone">
+                                        <label>Due Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="due_date" name="due_date" min="{{ date('Y-m-d') }}" required>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-control">
-                                        <input type="checkbox" class="form-control-input" id="on_going" name="on_going" value="1">
-                                        <label>On Going</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-control">
-                                        <input type="checkbox" class="form-control-input" id="one_of" name="one_of" value="1">
-                                        <label>One Of</label>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div class="form-group">
-                                <label>Address</label>
-                                <textarea class="form-control" id="address" name="address" rows="2" placeholder="Enter address"></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Additional Fields</label>
-                                <textarea class="form-control summernote" id="additional_fields" name="additional_fields" rows="5" placeholder="Enter additional information"></textarea>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Client Image (400x400 recommended)</label>
-                                        <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
-                                        <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
-                                    </div>
-                                </div>
+                                <label>Task Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control summernote" id="task" name="task" rows="5" placeholder="Enter task description"></textarea>
                             </div>
                         </form>
                     </div>
@@ -110,7 +82,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Clients</h3>
+                        <h3 class="card-title">Tasks for Project: {{ $project->title }}</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table cell-border table-striped">
@@ -118,10 +90,10 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Date</th>
-                                    <th>Business Name</th>
-                                    <th>Image</th>
-                                    {{-- <th>Name</th> --}}
-                                    {{-- <th>Client Type</th> --}}
+                                    <th>Task</th>
+                                    <th>Assigned To</th>
+                                    <th>Priority</th>
+                                    <th>Due Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -153,27 +125,16 @@
 
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
         
-        var url = "{{URL::to('/admin/clients')}}";
-        var upurl = "{{URL::to('/admin/clients/update')}}";
+        var url = "/admin/client-projects/{{ $project->id }}/tasks";
+        var upurl = "/admin/client-projects-task/:id";
 
         $("#addBtn").click(function(){
             var form_data = new FormData();
-            // form_data.append("name", $("#name").val());
-            form_data.append("email", $("#email").val());
-            form_data.append("phone1", $("#phone1").val());
-            form_data.append("phone2", $("#phone2").val());
-            form_data.append("on_going", $("#on_going").is(":checked") ? 1 : 0);
-            form_data.append("one_of", $("#one_of").is(":checked") ? 1 : 0);
-            form_data.append("address", $("#address").val());
-            form_data.append("business_name", $("#business_name").val());
-            // form_data.append("client_type_id", $("#client_type_id").val());
-            form_data.append("additional_fields", $("#additional_fields").val());
-
-            // Handle image upload
-            var imageInput = document.getElementById('image');
-            if(imageInput.files && imageInput.files[0]) {
-                form_data.append("image", imageInput.files[0]);
-            }
+            form_data.append("client_project_id", "{{ $project->id }}");
+            form_data.append("task", $("#task").val());
+            form_data.append("employee_id", $("#employee_id").val());
+            form_data.append("priority", $("#priority").val());
+            form_data.append("due_date", $("#due_date").val());
 
             if($(this).val() == 'Create') {
                 // Create
@@ -201,9 +162,10 @@
             } else {
                 // Update
                 form_data.append("codeid", $("#codeid").val());
+                var updateUrl = upurl.replace(':id', $("#codeid").val());
                 
                 $.ajax({
-                    url: upurl,
+                    url: updateUrl,
                     type: "POST",
                     dataType: 'json',
                     contentType: false,
@@ -229,31 +191,20 @@
 
         //Edit
         $("#contentContainer").on('click','.edit', function(){
-            $("#cardTitle").text('Update this client');
+            $("#cardTitle").text('Update this task');
             codeid = $(this).data('id');
-            info_url = url + '/'+codeid+'/edit';
+            info_url = "/admin/client-projects-task/"+codeid+"/edit";
             $.get(info_url,{},function(d){
                 populateForm(d);
             });
         });
 
         function populateForm(data){
-            // $("#name").val(data.name);
-            $("#email").val(data.email);
-            $("#phone1").val(data.phone1);
-            $("#phone2").val(data.phone2);
-            $("#on_going").prop("checked", data.on_going == 1);
-            $("#one_of").prop("checked", data.one_of == 1);
-            $("#address").val(data.address);
-            $("#business_name").val(data.business_name);
-            // $("#client_type_id").val(data.client_type_id);
-            $("#additional_fields").summernote('code', data.additional_fields);
+            $("#employee_id").val(data.employee_id).trigger('change');
+            $("#task").summernote('code', data.task);
+            $("#priority").val(data.priority);
+            $("#due_date").val(data.due_date);
             $("#codeid").val(data.id);
-            
-            // Set preview image
-            if (data.image) {
-                $("#preview-image").attr("src", '/images/clients/' + data.image).show();
-            }
 
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');
@@ -268,22 +219,21 @@
             $("#addThisFormContainer").slideUp(200);
             $("#newBtn").slideDown(200);
             $('.summernote').summernote('reset');
-            $('#preview-image').attr('src', '#');
-            $("#cardTitle").text('Add new client');
+            $("#employee_id").val(null).trigger('change');
+            $("#cardTitle").text('Add new Task for {{ $project->title }}');
         }
         
-        previewImage('#image', '#preview-image');
-
         // Status toggle
         $(document).on('change', '.toggle-status', function() {
-            var client_id = $(this).data('id');
+            var task_id = $(this).data('id');
             var status = $(this).prop('checked') ? 1 : 0;
+            var toggleUrl = "/admin/client-projects-task/" + task_id + "/toggle-status";
+
 
             $.ajax({
-                url: '/admin/clients/status',
+                url: toggleUrl,
                 method: "POST",
                 data: {
-                    client_id: client_id,
                     status: status,
                     _token: "{{ csrf_token() }}"
                 },
@@ -300,12 +250,15 @@
 
         //Delete
         $("#contentContainer").on('click','.delete', function(){
-            if(!confirm('Are you sure you want to delete this client?')) return;
+            if(!confirm('Are you sure you want to delete this task?')) return;
             codeid = $(this).data('id');
-            info_url = url + '/'+codeid;
+            var info_url = "/admin/client-projects-task/" + codeid;
             $.ajax({
                 url: info_url,
-                method: "GET",
+                method: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
                 success: function(res) {
                   clearform();
                   success(res.message);
@@ -327,7 +280,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('clients.index') }}" + window.location.search,
+                url: "{{ route('client-projects.tasks', $project->id) }}" + window.location.search,
                 type: "GET",
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -336,10 +289,10 @@
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'date', name: 'date'},
-                {data: 'business_name', name: 'business_name'},
-                {data: 'image', name: 'image', orderable: false, searchable: false},
-                // {data: 'name', name: 'name'},
-                //{data: 'client_type', name: 'client_type'},
+                {data: 'task', name: 'task'},
+                {data: 'employee_name', name: 'employee_name'},
+                {data: 'priority', name: 'priority', orderable: false, searchable: false},
+                {data: 'due_date', name: 'due_date'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],

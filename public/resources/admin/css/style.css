@@ -3,7 +3,7 @@
 }
 
 input[type="checkbox"] {
-    width: 25px;
-    height: 25px;
-    margin-top: 8px;
+    transform: scale(1.8);
+    margin-right: 8px;
+    vertical-align: middle;
 }

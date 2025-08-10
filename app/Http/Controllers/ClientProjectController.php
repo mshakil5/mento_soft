@@ -36,7 +36,7 @@ class ClientProjectController extends Controller
                     return Carbon::parse($row->created_at)->format('d-m-Y');
                 })
                 ->addColumn('client_name', function($row) {
-                    return $row->client->name ?? 'N/A';
+                    return $row->client->business_name ?? 'N/A';
                 })
                 ->addColumn('status', function($row) {
                     $statuses = [
@@ -73,10 +73,10 @@ class ClientProjectController extends Controller
                     }
 
                     return '
-                      <button class="btn btn-sm '.$badgeClass.' tasks-btn" data-id="'.$row->id.'">
+                      <a href="'.route('client-projects.tasks', $row->id).'" class="btn btn-sm '.$badgeClass.'">
                         Tasks
                         <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
-                      </button>
+                      </a>
                       <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
                       <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
                     ';

@@ -13,7 +13,7 @@
     </a>
 
     <li class="nav-item">
-        <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') ? 'active' : '' }}">
+        <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') ? 'active' : '' }}">
             <i class="fas fa-project-diagram nav-icon"></i>
             <p>Client Projects</p>
         </a>
@@ -26,27 +26,11 @@
         </a>
     </li>
 
-    <li class="nav-item dropdown {{ Route::is('client-types.index') || Route::is('clients.index') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('client-types.index') || Route::is('clients.index') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-cog"></i>
-            <p>
-                Client <i class="fas fa-angle-left right"></i>
-            </p>
+    <li class="nav-item">
+        <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
+            <i class="fas fa-user nav-icon"></i>
+            <p>Clients</p>
         </a>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
-                <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
-                    <i class="fas fa-user nav-icon"></i>
-                    <p>Clients</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('client-types.index') }}" class="nav-link {{ Route::is('client-types.index') ? 'active' : '' }}">
-                    <i class="fas fa-user-tag nav-icon"></i>
-                    <p>Client Types</p>
-                </a>
-            </li>
-        </ul>
     </li>
 
     <li class="nav-item dropdown {{ Route::is('invoices.index') ? 'menu-open' : '' }}">

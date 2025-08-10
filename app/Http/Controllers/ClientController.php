@@ -34,9 +34,9 @@ class ClientController extends Controller
                 ->addColumn('date', function($row) {
                     return Carbon::parse($row->created_at)->format('d-m-Y');
                 })
-                ->addColumn('client_type', function($row) {
-                    return $row->clientType->name ?? 'N/A';
-                })
+                // ->addColumn('client_type', function($row) {
+                //     return $row->clientType->name ?? 'N/A';
+                // })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">
@@ -74,11 +74,11 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'business_name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone1' => 'required|string|max:20',
             'phone2' => 'nullable|string|max:20',
-            'client_type_id' => 'nullable|exists:client_types,id',
+            // 'client_type_id' => 'nullable|exists:client_types,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -94,6 +94,8 @@ class ClientController extends Controller
         $data->email = $request->email;
         $data->phone1 = $request->phone1;
         $data->phone2 = $request->phone2;
+        $data->on_going = $request->on_going;
+        $data->one_of = $request->one_of;
         $data->address = $request->address;
         $data->business_name = $request->business_name;
         $data->client_type_id = $request->client_type_id;
@@ -150,11 +152,11 @@ class ClientController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'business_name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone1' => 'required|string|max:20',
             'phone2' => 'nullable|string|max:20',
-            'client_type_id' => 'nullable|exists:client_types,id',
+            // 'client_type_id' => 'nullable|exists:client_types,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -177,6 +179,8 @@ class ClientController extends Controller
         $client->email = $request->email;
         $client->phone1 = $request->phone1;
         $client->phone2 = $request->phone2;
+        $client->on_going = $request->on_going;
+        $client->one_of = $request->one_of;
         $client->address = $request->address;
         $client->business_name = $request->business_name;
         $client->client_type_id = $request->client_type_id;
