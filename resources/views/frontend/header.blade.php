@@ -27,7 +27,7 @@
         <div class="row">
             <nav class="navbar navbar-expand-lg py-0 px-3 ">
                 <a class="navbar-brand" href="/">
-                    <img src="./images/logo.svg" width="200px">
+                    <img src="{{ isset($company->company_logo) ? asset('images/company/'.$company->company_logo) : '' }}" width="200px"> 
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
@@ -36,33 +36,25 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
                     <ul class="navbar-nav ms-auto navCustom">
-                        <!-- "me-auto" for left align | "ms-auto" for right align | "mx-auto" for center align--->
-
-                        <!-- <li class="nav-item dropdown">
-
-                        <a class="nav-link dropdown-toggle" href="#" id="dropdownItem" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            About
-                        </a>
-                        <ul class="dropdown-menu border-0 shadow-lg" aria-labelledby="dropdownItem">
-                            <li><a class="dropdown-item" href="#">Introduction</a></li> 
-                        </ul>
-                    </li> -->
-
                         <li class="nav-item">
-                            <a class="nav-link active" href="">Home</a>
+                            <a class="nav-link {{ request()->routeIs('homepage') ? 'active' : '' }}" href="/">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="">Services</a>
+                            <a class="nav-link" href="{{ route('homepage') }}#services">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="">about</a>
+                            <a class="nav-link" href="{{ route('homepage') }}#about">about</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="portfolio.html">portfolio</a>
+                            <a class="nav-link {{ request()->routeIs('portfolio') || request()->routeIs('portfolioDetails') ? 'active' : '' }}" href="{{ route('portfolio') }}">
+                                portfolio
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="">Contact</a>
+                            <a class="nav-link" href="{{ route('homepage') }}#contact">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('quotation') ? 'active' : '' }}" href="{{ route('quotation') }}">Get Quotation</a>
                         </li>
                     </ul>
                 </div>

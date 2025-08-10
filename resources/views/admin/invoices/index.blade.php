@@ -646,6 +646,7 @@
         });
 
         function populateForm(data){
+            pageTop();
             $("#codeid").val(data.id);
             $("#invoice_number").val(data.invoice_number);
             $("#invoice_date").val(data.invoice_date);

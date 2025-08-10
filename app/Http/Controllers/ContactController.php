@@ -12,7 +12,7 @@ class ContactController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Contact::latest();
+            $data = Contact::orderBy('status', 'asc')->orderBy('id', 'desc');
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('full_name', function($row) {

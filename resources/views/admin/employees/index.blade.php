@@ -58,7 +58,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>User Type <span class="text-danger">*</span></label>
+                                        <label>Employee Type <span class="text-danger">*</span></label>
                                         <select class="form-control" id="is_type" name="is_type" required>
                                             <option value="1">Admin</option>
                                             <option value="2">Manager</option>
@@ -95,7 +95,7 @@
                                     <th>Date</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>User Type</th>
+                                    <th>Employee Type</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -207,6 +207,7 @@
         });
 
         function populateForm(data){
+            pageTop();
             $("#name").val(data.name);
             $("#email").val(data.email);
             $("#is_type").val(data.is_type);

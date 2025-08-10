@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use Yajra\DataTables\Facades\DataTables;
 use Validator;
+use App\Models\ProjectSlider;
+use App\Models\ProjectType;
 
 class ProjectController extends Controller
 {
@@ -26,9 +28,9 @@ class ProjectController extends Controller
                     }
                     return '';
                 })
-                ->addColumn('service', function($row) {
-                    return $row->service->title ?? 'N/A';
-                })
+                // ->addColumn('service', function($row) {
+                //     return $row->service->title ?? 'N/A';
+                // })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">
@@ -54,13 +56,15 @@ class ProjectController extends Controller
         }
 
         $services = Service::where('status', 1)->get();
-        return view('admin.projects.index', compact('services'));
+        $projectTypes = ProjectType::where('status', 1)->get();
+        return view('admin.projects.index', compact('services', 'projectTypes'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'service_id' => 'required|exists:services,id',
+            'service_id' => 'nullable|exists:services,id',
+            'project_type_id' => 'required|exists:project_types,id',
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'demo_video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200', // 50MB
@@ -76,13 +80,15 @@ class ProjectController extends Controller
 
         $data = new Project;
         $data->service_id = $request->service_id;
+        $data->project_type_id = $request->project_type_id;
         $data->title = $request->title;
-        $data->slug = Str::slug($request->title);
+        $data->slug = Str::slug($request->title) . '-' . Str::random(6);
         $data->sub_title = $request->sub_title;
         $data->project_url = $request->project_url;
         $data->short_desc = $request->short_desc;
         $data->long_desc = $request->long_desc;
         $data->technologies_used = $request->technologies_used;
+        $data->functional_features = $request->functional_features;
         $data->sl = $request->sl ?? 0;
         $data->meta_title = $request->meta_title;
         $data->meta_description = $request->meta_description;
@@ -133,7 +139,7 @@ class ProjectController extends Controller
             $video = $request->file('demo_video');
             $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
             $path = public_path('images/projects/videos/');
-            
+
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
@@ -147,7 +153,7 @@ class ProjectController extends Controller
             $metaImage = $request->file('meta_image');
             $metaImageName = 'meta_' . time() . '.webp';
             $path = public_path('images/projects/meta/');
-            
+
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
@@ -161,6 +167,30 @@ class ProjectController extends Controller
                 ->save($path . $metaImageName);
 
             $data->meta_image = $metaImageName;
+        }
+
+        $data->save();
+
+        if ($request->hasFile('slider_images')) {
+            $path = public_path('images/projects/sliders/');
+
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            foreach ($request->file('slider_images') as $image) {
+                $imageName = time() . '_' . uniqid() . '.webp';
+
+                Image::make($image)
+                    ->fit(1200, 600)
+                    ->encode('webp', 85)
+                    ->save($path . $imageName);
+
+                $data->projectSliders()->create([
+                    'image' => $imageName,
+                    'created_by' => auth()->id()
+                ]);
+            }
         }
 
         if ($data->save()) {
@@ -178,7 +208,7 @@ class ProjectController extends Controller
 
     public function edit($id)
     {
-        $project = Project::find($id);
+        $project = Project::with('projectSliders')->find($id);
         if (!$project) {
             return response()->json([
                 'status' => 404,
@@ -191,7 +221,8 @@ class ProjectController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'service_id' => 'required|exists:services,id',
+            'service_id' => 'nullable|exists:services,id',
+            'project_type_id' => 'required|exists:project_types,id',
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'demo_video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200', // 50MB
@@ -214,15 +245,15 @@ class ProjectController extends Controller
         }
 
         $project->service_id = $request->service_id;
+        $project->project_type_id = $request->project_type_id;
         $project->title = $request->title;
-        $slug = Str::slug($request->title);
-        $project->slug = Project::where('slug', $slug)->where('id', '!=', $request->codeid)->exists() ? $slug . '-' . uniqid() : $slug;
         $project->title = $request->title;
         $project->sub_title = $request->sub_title;
         $project->project_url = $request->project_url;
         $project->short_desc = $request->short_desc;
         $project->long_desc = $request->long_desc;
         $project->technologies_used = $request->technologies_used;
+        $project->functional_features = $request->functional_features;
         $project->sl = $request->sl ?? 0;
         $project->meta_title = $request->meta_title;
         $project->meta_description = $request->meta_description;
@@ -304,6 +335,30 @@ class ProjectController extends Controller
             $project->meta_image = $metaImageName;
         }
 
+        $project->save();
+
+        if ($request->hasFile('slider_images')) {
+            $path = public_path('images/projects/sliders/');
+            
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            foreach ($request->file('slider_images') as $image) {
+                $imageName = time() . '_' . uniqid() . '.webp';
+                
+                Image::make($image)
+                    ->fit(1200, 600)
+                    ->encode('webp', 85)
+                    ->save($path . $imageName);
+
+                $project->projectSliders()->create([
+                    'image' => $imageName,
+                    'created_by' => auth()->id()
+                ]);
+            }
+        }
+
         if ($project->save()) {
             return response()->json([
                 'status' => 200,
@@ -373,5 +428,21 @@ class ProjectController extends Controller
         $project->save();
 
         return response()->json(['status' => 200, 'message' => 'Featured status updated successfully']);
+    }
+
+    public function destroySlider($id)
+    {
+        $slider = ProjectSlider::find($id);
+        
+        if (!$slider) {
+            return response()->json(['success' => false, 'message' => 'Slider not found'], 404);
+        }
+
+        if ($slider->image && file_exists(public_path('images/projects/sliders/' . $slider->image))) {
+            unlink(public_path('images/projects/sliders/' . $slider->image));
+        }
+
+        $slider->delete();
+        return response()->json(['success' => true, 'message' => 'Slider deleted successfully']);
     }
 }

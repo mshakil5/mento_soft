@@ -42,7 +42,7 @@
                             
                             <div class="form-group">
                                 <label>Review</label>
-                                <textarea class="form-control summernote" id="review" name="review" rows="5" placeholder="Enter client review"></textarea>
+                                <textarea class="form-control" id="review" name="review" rows="5" placeholder="Enter client review"></textarea>
                             </div>
                             
                             <div class="row">
@@ -198,7 +198,7 @@
 
         function populateForm(data){
             $("#name").val(data.name);
-            $("#review").summernote('code', data.review);
+            $("#review").val(data.review);
             $("#video_link").val(data.video_link);
             $("#sl").val(data.sl);
             $("#codeid").val(data.id);
@@ -220,7 +220,6 @@
             $("#addBtn").html('Create');
             $("#addThisFormContainer").slideUp(200);
             $("#newBtn").slideDown(200);
-            $('.summernote').summernote('reset');
             $('#preview-image').attr('src', '#');
             $("#cardTitle").text('Add new client review');
         }
@@ -287,7 +286,7 @@
                 }
             },
             columns: [
-                {data: 'sl', name: 'sl'},
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 {data: 'image', name: 'image', orderable: false, searchable: false},
                 {data: 'name', name: 'name'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},

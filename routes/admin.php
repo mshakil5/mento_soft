@@ -18,12 +18,28 @@ use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ChartOfAccountController;
+use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\LiabilityController;
+use App\Http\Controllers\EquityController;
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\EquityHolderController;
+use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\ProjectTypeController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductFeatureController;
+use App\Http\Controllers\ProductClientController;
+use App\Http\Controllers\ProductFaqController;
+use App\Http\Controllers\ProductClientVideoController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
     Route::get('/toggle-sidebar', [HomeController::class, 'toggleSidebar'])->name('toggle.sidebar');
 
     Route::get('/dashboard', [HomeController::class, 'adminHome'])->name('admin.dashboard');
+
+    //Frontend Part
 
     Route::get('/company-details', [CompanyDetailsController::class, 'index'])->name('admin.companyDetails');
     Route::post('/company-details', [CompanyDetailsController::class, 'update'])->name('admin.companyDetails');
@@ -36,6 +52,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('/terms-and-conditions', [CompanyDetailsController::class, 'termsAndConditions'])->name('admin.terms-and-conditions');
     Route::post('/terms-and-conditions', [CompanyDetailsController::class, 'termsAndConditionsUpdate'])->name('admin.terms-and-conditions');
+
+    Route::get('/company/seo-meta', [CompanyDetailsController::class, 'seoMeta'])->name('admin.company.seo-meta');
+    Route::post('/company/seo-meta/update', [CompanyDetailsController::class, 'seoMetaUpdate'])->name('admin.company.seo-meta.update');
 
     Route::get('/faq-questions', [FAQController::class, 'index'])->name('allFaq');    
     Route::post('/faq-questions', [FAQController::class, 'store']);
@@ -75,6 +94,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/service/{id}', [ServiceController::class, 'serviceDelete']);
     Route::post('/service-status', [ServiceController::class, 'toggleStatus']);
 
+    // Project Types
+    Route::get('/project-types', [ProjectTypeController::class, 'index'])->name('project-types.index');
+    Route::post('/project-types', [ProjectTypeController::class, 'store']);
+    Route::get('/project-types/{id}/edit', [ProjectTypeController::class, 'edit']);
+    Route::post('/project-types/update', [ProjectTypeController::class, 'update']);
+    Route::get('/project-types/{id}', [ProjectTypeController::class, 'destroy']);
+    Route::post('/project-types/status', [ProjectTypeController::class, 'toggleStatus'])->name('project-types.status');
+
     // Projects Routes
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('/projects', [ProjectController::class, 'store']);
@@ -83,6 +110,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::post('/projects/status', [ProjectController::class, 'toggleStatus'])->name('projects.status');
     Route::post('/projects/featured', [ProjectController::class, 'toggleFeatured'])->name('projects.featured');
+    Route::delete('/projects/sliders/{id}', [ProjectController::class, 'destroySlider'])->name('projects.sliders.destroy');
 
     // Client Reviews Routes
     Route::get('/client-reviews', [ClientReviewController::class, 'index'])->name('client-reviews.index');
@@ -92,17 +120,66 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/client-reviews/{id}', [ClientReviewController::class, 'destroy']);
     Route::post('/client-reviews/status', [ClientReviewController::class, 'toggleStatus'])->name('client-reviews.status');
 
+    // Contacts
     Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::get('/contacts/{id}', [ContactController::class, 'show']);
     Route::get('/contacts/{id}/delete', [ContactController::class, 'destroy']);
     Route::post('/contacts/status', [ContactController::class, 'toggleStatus'])->name('contacts.status');
 
+    //Quotation
+    Route::get('/quotations', [QuotationController::class, 'index'])->name('quotations.index');
+    Route::get('/quotations/{id}', [QuotationController::class, 'show'])->name('quotations.show');
+    Route::delete('/quotations/{id}', [QuotationController::class, 'destroy'])->name('quotations.destroy');
+    Route::post('/quotations/status', [QuotationController::class, 'toggleStatus'])->name('quotations.status');
+
+    // Product 
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit']);
+    Route::post('/products/update', [ProductController::class, 'update']);
+    Route::get('/products/{id}', [ProductController::class, 'destroy']);
+    Route::post('/products/status', [ProductController::class, 'toggleStatus'])->name('products.status');
+
+    // Product Features
+    Route::get('/products/{product}/features', [ProductFeatureController::class, 'index'])->name('products.features.index');
+    Route::post('/products/features', [ProductFeatureController::class, 'store']);
+    Route::get('/products/features/{id}/edit', [ProductFeatureController::class, 'edit']);
+    Route::post('/products/features/update', [ProductFeatureController::class, 'update']);
+    Route::get('/products/features/{id}', [ProductFeatureController::class, 'destroy']);
+    Route::post('/products/features/status', [ProductFeatureController::class, 'toggleStatus'])->name('products.features.status');
+
+    // Product Clients Routes
+    Route::get('/products/{product}/clients', [ProductClientController::class, 'index'])->name('products.clients.index');
+    Route::post('/products/clients', [ProductClientController::class, 'store']);
+    Route::get('/products/clients/{id}', [ProductClientController::class, 'destroy']);
+    Route::post('/products/clients/status', [ProductClientController::class, 'toggleStatus'])->name('products.clients.status');
+
+    // Product FAQs
+    Route::get('/products/{product}/faqs', [ProductFaqController::class, 'index'])->name('products.faqs.index');
+    Route::post('/products/faqs', [ProductFaqController::class, 'store']);
+    Route::get('/products/faqs/{id}/edit', [ProductFaqController::class, 'edit']);
+    Route::post('/products/faqs/update', [ProductFaqController::class, 'update']);
+    Route::get('/products/faqs/{id}', [ProductFaqController::class, 'destroy']);
+    Route::post('/products/faqs/status', [ProductFaqController::class, 'toggleStatus'])->name('products.faqs.status');
+
+    // Product client video
+    Route::get('/products/{product}/client-videos', [ProductClientVideoController::class, 'index'])->name('products.clients.video');
+    Route::post('/products/client-videos', [ProductClientVideoController::class, 'store']);
+    Route::get('/products/client-videos/{id}/edit', [ProductClientVideoController::class, 'edit']);
+    Route::post('/products/client-videos/update', [ProductClientVideoController::class, 'update']);
+    Route::get('/products/client-videos/{id}', [ProductClientVideoController::class, 'destroy']);
+    Route::post('/products/client-videos/status', [ProductClientVideoController::class, 'toggleStatus'])->name('products.client-videos.status');
+
+    //Software Part
+
+    // Client Types
     Route::get('/client-types', [ClientTypeController::class, 'index'])->name('client-types.index');
     Route::post('/client-types', [ClientTypeController::class, 'store']);
     Route::get('/client-types/{id}/edit', [ClientTypeController::class, 'edit']);
     Route::post('/client-types/update', [ClientTypeController::class, 'update']);
     Route::get('/client-types/{id}', [ClientTypeController::class, 'destroy']);
 
+    // Clients
     Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
     Route::post('/clients', [ClientController::class, 'store']);
     Route::get('/clients/{id}/edit', [ClientController::class, 'edit']);
@@ -110,6 +187,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/clients/{id}', [ClientController::class, 'destroy']);
     Route::post('/clients/status', [ClientController::class, 'toggleStatus'])->name('clients.status');
 
+    // Client Projects
     Route::get('/client-projects', [ClientProjectController::class, 'index'])->name('client-projects.index');
     Route::post('/client-projects', [ClientProjectController::class, 'store']);
     Route::get('/client-projects/{id}/edit', [ClientProjectController::class, 'edit']);
@@ -117,6 +195,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/client-projects/{id}', [ClientProjectController::class, 'destroy']);
     Route::post('/client-projects/status', [ClientProjectController::class, 'toggleStatus'])->name('client-projects.status');
 
+    // Employees
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
     Route::post('/employees', [EmployeeController::class, 'store']);
     Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit']);
@@ -124,12 +203,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/employees/{id}', [EmployeeController::class, 'destroy']);
     Route::post('/employees/status', [EmployeeController::class, 'toggleStatus']);
 
+    // Project Tasks
     Route::get('/project-tasks/{project_id}', [ProjectTaskController::class, 'getByProject'])->name('project-tasks.by-project');
     Route::post('/project-tasks/store', [ProjectTaskController::class, 'storeTask'])->name('project-tasks.store');
     Route::post('/project-tasks/update', [ProjectTaskController::class, 'updateTask'])->name('project-tasks.update');
     Route::delete('/project-tasks/{task}', [ProjectTaskController::class, 'deleteTask'])->name('project-tasks.destroy');
     Route::post('/project-tasks/toggle-status', [ProjectTaskController::class, 'toggleStatus'])->name('project-tasks.toggle-status');
 
+    // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::post('/invoices', [InvoiceController::class, 'store']);
     Route::get('/invoices/create', [InvoiceController::class, 'create']);
@@ -141,5 +222,55 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/invoices/client-projects/{id}', [InvoiceController::class, 'getClientProjects']);
     Route::get('/invoices/project-info/{id}', [InvoiceController::class, 'getProjectInfo']);
     Route::post('/invoices/send-email/{id}', [InvoiceController::class, 'sendEmail'])->name('invoices.send.email');
+
+    //Chart of account
+    Route::get('chart-of-account', [ChartOfAccountController::class, 'index'])->name('admin.addchartofaccount');
+    Route::post('chart-of-accounts', [ChartOfAccountController::class, 'index'])->name('admin.addchartofaccount.filter');
+    Route::post('chart-of-account', [ChartOfAccountController::class, 'store']);
+    Route::get('chart-of-account/{id}', [ChartOfAccountController::class, 'edit']);
+    Route::put('chart-of-account/{id}', [ChartOfAccountController::class, 'update']);
+    Route::get('chart-of-account/{id}/change-status', [ChartOfAccountController::class, 'changeStatus']);
+
+    //Income
+    Route::get('income', [IncomeController::class, 'index'])->name('admin.income');
+    Route::post('incomes', [IncomeController::class, 'index'])->name('admin.income.filter');
+    Route::post('income', [IncomeController::class, 'store']);
+    Route::get('income/{id}', [IncomeController::class, 'edit']);
+    Route::put('income/{id}', [IncomeController::class, 'update']); 
+
+    //Expense
+    Route::get('expense', [ExpenseController::class, 'index'])->name('admin.expense');
+    Route::post('expenses', [ExpenseController::class, 'index'])->name('admin.expense.filter');
+    Route::post('expense', [ExpenseController::class, 'store']);
+    Route::get('expense/{id}', [ExpenseController::class, 'edit']);
+    Route::put('expense/{id}', [ExpenseController::class, 'update']); 
+
+    //Asset
+    Route::get('asset', [AssetController::class, 'index'])->name('admin.asset');
+    Route::post('assets', [AssetController::class, 'index'])->name('admin.asset.filter');
+    Route::post('asset', [AssetController::class, 'store']);
+    Route::get('asset/{id}', [AssetController::class, 'edit']);
+    Route::put('asset/{id}', [AssetController::class, 'update']); 
+
+    //Liability
+    Route::get('liabilities', [LiabilityController::class, 'index'])->name('admin.liabilities');
+    Route::post('liability', [LiabilityController::class, 'index'])->name('admin.liability.filter');
+    Route::post('liabilities', [LiabilityController::class, 'store']);
+    Route::get('liabilities/{id}', [LiabilityController::class, 'edit']);
+    Route::put('liabilities/{id}', [LiabilityController::class, 'update']);
+
+    //Equity
+    Route::get('equity', [EquityController::class, 'index'])->name('admin.equity');
+    Route::post('equities', [EquityController::class, 'index'])->name('admin.equity.filter');
+    Route::post('equity', [EquityController::class, 'store']);
+    Route::get('equity/{id}', [EquityController::class, 'edit']);
+    Route::put('equity/{id}', [EquityController::class, 'update']);
+
+    //Equity holders
+    Route::get('equity-holders', [EquityHolderController::class, 'index'])->name('admin.equityholders');
+    Route::post('equity-holders', [EquityHolderController::class, 'store']);
+    Route::get('equity-holders/{id}', [EquityHolderController::class, 'edit']);
+    Route::put('equity-holders/{id}', [EquityHolderController::class, 'update']);
+    Route::get('equity-holders/{id}/change-status', [EquityHolderController::class, 'changeStatus']);
 
 });

@@ -66,6 +66,55 @@
         </ul>
     </li>
 
+    <li class="nav-item">
+        <a href="{{ route('admin.addchartofaccount') }}" class="nav-link {{ Route::is('admin.addchartofaccount') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Chart Of Accounts</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('admin.income') }}" class="nav-link {{ Route::is('admin.income') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Income</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('admin.expense') }}" class="nav-link {{ Route::is('admin.expense') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Expense</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('admin.asset') }}" class="nav-link {{ Route::is('admin.asset') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Assets</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('admin.liabilities') }}" class="nav-link {{ Route::is('admin.liabilities') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Liabilities</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('admin.equity') }}" class="nav-link {{ Route::is('admin.equity') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Equity</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('admin.equityholders') }}" class="nav-link {{ Route::is('admin.equityholders') ? 'active' : '' }}">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Equity Holders</p>
+        </a>
+    </li>
+
     <li class="nav-item" style="margin-top: 200px">
     </li>
 

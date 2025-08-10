@@ -2,22 +2,26 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale())}}">
 
 @php
-    $company = \App\Models\CompanyDetails::select('fav_icon', 'company_name', 'footer_content', 'address1', 'email1', 'phone1', 'company_logo', 'facebook', 'twitter', 'instagram', 'youtube', 'currency','google_map', 'copyright', 'whatsapp')->first();
+    $company = \App\Models\CompanyDetails::first();
+    $services = \App\Models\Service::where('status', 1)->latest()->limit(6)->pluck('title');
 @endphp 
 
 <head>
     <meta charset="utf-8">
-    <title>@yield('title', $company->company_name)</title>
+    {{-- <title>@yield('title', $company->company_name)</title> --}}
+    {{-- <title>{!! SEO::getTitle() ?? $company->company_name !!}</title> --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    
-    <meta name="title" content="@yield('meta_title', '')">
 
-    <meta name="description" content="@yield('meta_description', '')">
+    {!! SEOMeta::generate() !!}
+    {!! OpenGraph::generate() !!}
+    {!! Twitter::generate() !!}
 
-    <meta name="keywords" content="@yield('meta_keywords', '')">
+    {{-- <meta name="google-site-verification" content="{{ $company->google_site_verification ?? '' }}" />
 
-    <meta name="google-site-verification" content="EAiBnUW1XISlAkvcite__kJvue-vwZ2-lVUIfv1HaK4" />
+    <meta name="title" content="@yield('meta_title', $company->meta_title ?? $company->company_name ?? '')">
+    <meta name="description" content="@yield('meta_description', $company->meta_description ?? '')">
+    <meta property="og:image" content="@yield('meta_image', $company->meta_image ? asset('images/company/meta/' . $company->meta_image) : '')"> --}}
 
     <link rel="icon" href="{{ asset('images/company/' . $company->fav_icon) }}">
 
@@ -27,9 +31,26 @@
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/slick.css') }}">
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/slick-theme.css') }}">
 
+    <script src="{{ asset('resources/frontend/js/wow.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/animate.min.css') }}">
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/magnific-popup.css') }}">
 </head>
+
+<script>
+  function scroller() {
+
+    let p = window.pageYOffset;
+
+    if (p > 200) {
+      let k = document.getElementById('header');
+      k.classList.add('active')
+    } else {
+      let k = document.getElementById('header');
+      k.classList.remove('active')
+    }
+
+  }
+</script>
 
 <body onscroll="scroller()">
     <!-- Header Start -->
@@ -44,6 +65,10 @@
     @include('frontend.footer')
     <!-- Footer End -->
 
+    <script>
+        window.services = {!! json_encode($services) !!};
+    </script>
+
     <script src="{{ asset('resources/frontend/js/bootstrap-5.bundle.min.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/iconify.min.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/jquery-3.0.min.js') }}"></script>
@@ -52,7 +77,6 @@
     <script src="{{ asset('resources/frontend/js/slick.min.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/counter.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/app.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/wow.min.js') }}"></script>
 
     @yield('script')
     

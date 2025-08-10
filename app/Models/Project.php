@@ -10,6 +10,8 @@ class Project extends Model
 
     use SoftDeletes;
 
+    protected $guarded = [];
+
     protected static function boot()
     {
       parent::boot();
@@ -25,5 +27,15 @@ class Project extends Model
     public function service ()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function projectType ()
+    {
+        return $this->belongsTo(ProjectType::class);
+    }
+
+    public function projectSliders ()
+    {
+        return $this->hasMany(ProjectSlider::class);
     }
 }

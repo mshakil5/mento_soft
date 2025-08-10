@@ -26,13 +26,24 @@
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
                             
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <div class="form-group">
                                         <label>Service <span class="text-danger">*</span></label>
                                         <select class="form-control" id="service_id" name="service_id" required>
                                             <option value="">Select Service</option>
                                             @foreach($services as $service)
                                             <option value="{{ $service->id }}">{{ $service->title }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Project Type <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="project_type_id" name="project_type_id" required>
+                                            <option value="">Select Project Type</option>
+                                            @foreach($projectTypes as $projectType)
+                                            <option value="{{ $projectType->id }}">{{ $projectType->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -75,6 +86,11 @@
                                 <textarea class="form-control" id="technologies_used" name="technologies_used" rows="2" placeholder="Enter technologies used"></textarea>
                             </div>
                             
+                            <div class="form-group">
+                                <label>Functional Features (comma separated)</label>
+                                <textarea class="form-control" id="functional_features" name="functional_features" rows="2" placeholder="Enter functional features"></textarea>
+                            </div>
+                            
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -90,6 +106,12 @@
                                         <div id="video-preview" class="mt-2"></div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Project Sliders</label>
+                                <input type="file" class="filepond-multiple" name="slider_images[]" multiple>
+                                <div id="slider-preview" class="row mt-3"></div>
                             </div>
                             
                             <div class="form-group">
@@ -156,9 +178,9 @@
                                     <th>Sl</th>
                                     <th>Thumbnail</th>
                                     <th>Title</th>
-                                    <th>Service</th>
+                                    {{-- <th>Service</th> --}}
                                     <th>Status</th>
-                                    <th>Featured</th>
+                                    {{-- <th>Featured</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -179,12 +201,16 @@
 <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
 <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
 
 <script>
     // Initialize FilePond for preview only
     FilePond.registerPlugin(
         FilePondPluginImagePreview,
-        FilePondPluginFileValidateType
+        FilePondPluginFileValidateType,
+        FilePondPluginImageResize,
+        FilePondPluginFileEncode
     );
 
     const pond = FilePond.create(document.querySelector('.filepond'), {
@@ -200,6 +226,15 @@
         allowRemove: true,
         allowRevert: false
     });
+
+    const sliderPond = FilePond.create(document.querySelector('.filepond-multiple'), {
+        acceptedFileTypes: ['image/*'],
+        allowMultiple: true,
+        maxFiles: 10,
+        storeAsFile: true,
+        labelIdle: 'Drag & Drop slider images or <span class="filepond--label-action">Browse</span>'
+    });
+
 </script>
 
 <script>
@@ -225,12 +260,14 @@
       $("#addBtn").click(function(){
           var form_data = new FormData();
           form_data.append("service_id", $("#service_id").val());
+          form_data.append("project_type_id", $("#project_type_id").val());
           form_data.append("title", $("#title").val());
           form_data.append("sub_title", $("#sub_title").val());
           form_data.append("project_url", $("#project_url").val());
           form_data.append("short_desc", $("#short_desc").val());
           form_data.append("long_desc", $("#long_desc").val());
           form_data.append("technologies_used", $("#technologies_used").val());
+          form_data.append("functional_features", $("#functional_features").val());
           form_data.append("sl", $("#sl").val());
           form_data.append("meta_title", $("#meta_title").val());
           form_data.append("meta_description", $("#meta_description").val());
@@ -251,6 +288,12 @@
           var metaImageInput = document.getElementById('meta_image');
           if(metaImageInput.files && metaImageInput.files[0]) {
               form_data.append("meta_image", metaImageInput.files[0]);
+          }
+
+          if (sliderPond.getFiles().length > 0) {
+              sliderPond.getFiles().forEach((file, index) => {
+                  form_data.append(`slider_images[${index}]`, file.file);
+              });
           }
 
           if($(this).val() == 'Create') {
@@ -305,6 +348,29 @@
           }
       });
 
+      $(document).on('click', '.delete-slider', function() {
+          if (!confirm('Are you sure you want to delete this slider image?')) return;
+          
+          var sliderId = $(this).data('id');
+          $.ajax({
+              url: '/admin/projects/sliders/' + sliderId,
+              method: 'DELETE',
+              data: {
+                  _token: "{{ csrf_token() }}"
+              },
+              success: function(res) {
+                  if (res.success) {
+                      $('.slider-preview-item[data-id="' + sliderId + '"]').parent().remove();
+                      success(res.message);
+                  }
+              },
+              error: function(xhr) {
+                  console.error(xhr.responseText);
+                  error('Failed to delete slider');
+              }
+          });
+      });
+
       //Edit
       $("#contentContainer").on('click','.edit', function(){
           $("#cardTitle").text('Update this project');
@@ -317,12 +383,14 @@
 
       function populateForm(data){
           $("#service_id").val(data.service_id);
+          $("#project_type_id").val(data.project_type_id);
           $("#title").val(data.title);
           $("#sub_title").val(data.sub_title);
           $("#project_url").val(data.project_url);
           $("#short_desc").val(data.short_desc);
           $("#long_desc").summernote('code', data.long_desc);
           $("#technologies_used").val(data.technologies_used);
+          $("#functional_features").val(data.functional_features);
           $("#sl").val(data.sl);
           $("#meta_title").val(data.meta_title);
           $("#meta_description").val(data.meta_description);
@@ -352,6 +420,20 @@
               `);
           }
 
+          $('#slider-preview').empty();
+          if (data.project_sliders && data.project_sliders.length > 0) {
+              data.project_sliders.forEach(function(slider) {
+                  $('#slider-preview').append(`
+                      <div class="col-md-3 mb-3">
+                          <div class="slider-preview-item" data-id="${slider.id}">
+                              <img src="/images/projects/sliders/${slider.image}" class="img-fluid">
+                              <button class="btn btn-sm btn-danger btn-block mt-1 delete-slider" data-id="${slider.id}">Delete</button>
+                          </div>
+                      </div>
+                  `);
+              });
+          }
+
           $("#addBtn").val('Update');
           $("#addBtn").html('Update');
           $("#addThisFormContainer").show(300);
@@ -367,6 +449,8 @@
           $('#video-preview').html('');
           $('.summernote').summernote('reset');
           pond.removeFiles();
+          sliderPond.removeFiles();
+          $('#slider-preview').empty();
           $('#preview-image').attr('src', '#');
           $('#preview-meta-image').attr('src', '#');
           $("#cardTitle").text('Add new project');
@@ -462,9 +546,9 @@
               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
               {data: 'thumbnail', name: 'thumbnail', orderable: false, searchable: false},
               {data: 'title', name: 'title'},
-              {data: 'service', name: 'service'},
+              // {data: 'service', name: 'service'},
               {data: 'status', name: 'status', orderable: false, searchable: false},
-              {data: 'featured', name: 'featured', orderable: false, searchable: false},
+              // {data: 'featured', name: 'featured', orderable: false, searchable: false},
               {data: 'action', name: 'action', orderable: false, searchable: false},
           ],
           responsive: true,

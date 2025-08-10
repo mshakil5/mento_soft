@@ -15,7 +15,7 @@ return new class extends Migration
             $table->renameColumn('name', 'first_name');
             $table->string('last_name')->after('first_name')->nullable();
             $table->string('phone')->after('email')->nullable();
-            $table->tinyInteger('status')->default(1)->after('message');
+            $table->tinyInteger('status')->default(0)->after('message');
         });
     }
 

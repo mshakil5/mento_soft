@@ -119,6 +119,7 @@
 <script src="{{ asset('resources/admin/codemirror/mode/htmlmixed/htmlmixed.js')}}"></script>
 <script src="{{ asset('resources/admin/codemirror/mode/php/php.js')}}"></script>
 <script src="{{ asset('resources/admin/toastr/toastr.min.js')}}"></script>
+<script src="{{ asset('resources/frontend/js/iconify.min.js') }}"></script>
 
 <script src="{{ asset('resources/admin/js/app.js')}}"></script>
 

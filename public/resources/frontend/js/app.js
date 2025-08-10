@@ -1,89 +1,167 @@
-// Bootstrap tooltip
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl);
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+$(".testimonial-section").ripples({
+    resolution: 256,
+    perturbance: 0.01,
 });
 
-// WOW animation
+$(function () {
+  $(".typed").typed({
+    strings: services,
+    stringsElement: null,
+    // typing speed
+    typeSpeed: 30,
+    // time before typing starts
+    startDelay: 500,
+    // backspacing speed
+    backSpeed: 40,
+    // time before backspacing
+    backDelay: 500,
+    // loop
+    loop: true,
+    // false = infinite
+    loopCount: 5,
+    // show cursor
+    showCursor: false,
+    // character for cursor
+    cursorChar: "|",
+    // attribute to type (null == text)
+    attr: null,
+    // either html or text
+    contentType: 'html',
+    // call when done callback function
+    callback: function () { },
+    // starting callback function before each string
+    preStringTyped: function () { },
+    //callback for every typed string
+    onStringTyped: function () { },
+    // callback for reset
+    resetCallback: function () { }
+  });
+});
+
+$(document).ready(function () {
+
+  $('.testimonial').slick({
+    autoplay: true,
+    autoplaySpeed: 3000,
+    centerMode: true,
+    centerPadding: '0px',
+    slidesToShow: 2,
+    slidesToScroll: 1,
+    draggable: true,
+    swipeToSlide: true,
+    arrows: false,
+    dots: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          arrows: true,
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+          dots: true,
+          centerMode: true,
+          centerPadding: '0px',
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          arrows: false,
+          dots: true,
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          arrows: false,
+          dots: true,
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      },
+    ]
+  });
+
+});
+
 new WOW().init();
 
-// Header scroll fixed
-window.addEventListener('scroll', function () {
-  let header = document.getElementById('header');
-  if (window.pageYOffset > 200) {
-    header.classList.add('active');
-  } else {
-    header.classList.remove('active');
-  }
-});
+var linkbtn = document.getElementsByClassName('link-btn');
 
-// Header menu link button active state
-document.addEventListener("DOMContentLoaded", function () {
-  let linkbtn = document.getElementsByClassName('link-btn');
-  for (let i = 0; i < linkbtn.length; i++) {
-    linkbtn[i].addEventListener("click", function () {
-      for (let j = 0; j < linkbtn.length; j++) {
-        linkbtn[j].classList.remove('active');
-      }
-      this.classList.add('active');
-    });
-  }
+for (let i = 0; i <= linkbtn.length; i++) {
+  linkbtn[i].addEventListener("click", function () {
+    for (var j = 0; j < linkbtn.length; j++) {
+      linkbtn[j].classList.remove('active');
+    }
+    this.classList.add('active');
+  });
 
-  // Ripples effect
-  if ($('.testimonial-section').length) {
-    $('.testimonial-section').ripples({
-      resolution: 256,
-      perturbance: 0.01,
-    });
-  }
+}
 
-  // Typed animation
-  if ($(".typed").length) {
-    $(".typed").typed({
-      strings: ["Website Development", "Custom Software Development", "Mobile App Development", "SEO", "Graphics Design Supports"],
-      typeSpeed: 30,
-      startDelay: 500,
-      backSpeed: 40,
-      backDelay: 500,
-      loop: true,
-      loopCount: 5,
-      showCursor: false,
-      cursorChar: "|",
-      contentType: 'html'
-    });
-  }
+function openBox(idToShow) {
+    const allBoxes = document.querySelectorAll('.visualBox');
 
-  // Slick carousel for testimonials
-  if ($('.testimonial').length) {
-    $('.testimonial').slick({
-      autoplay: true,
-      autoplaySpeed: 3000,
-      centerMode: true,
-      centerPadding: '0px',
-      slidesToShow: 2,
-      slidesToScroll: 1,
-      draggable: true,
-      swipeToSlide: true,
-      arrows: false,
-      dots: true,
-      responsive: [
-        {
-          breakpoint: 1024,
-          settings: { slidesToShow: 2, slidesToScroll: 1, arrows: true }
-        },
-        {
-          breakpoint: 768,
-          settings: { slidesToShow: 1, arrows: false, dots: true }
-        },
-        {
-          breakpoint: 600,
-          settings: { slidesToShow: 1, arrows: false, dots: true }
-        },
-        {
-          breakpoint: 480,
-          settings: { slidesToShow: 1, arrows: false, dots: true }
+    allBoxes.forEach(box => {
+        const iframe = box.querySelector('iframe');
+        const video = box.querySelector('video');
+
+        // Reset previous videos
+        if (iframe) iframe.src = '';
+        if (video) {
+            video.pause();
+            video.innerHTML = '';
         }
-      ]
+
+        // Activate selected box
+        if (box.id === idToShow + '-box') {
+            box.classList.add('active');
+
+            // Load iframe src
+            if (iframe && !iframe.src) {
+                iframe.src = iframe.dataset.src;
+            }
+
+            // Load video src
+            if (video && !video.src) {
+                const source = document.createElement('source');
+                source.src = video.dataset.src;
+                source.type = 'video/mp4';
+                video.appendChild(source);
+                video.load();
+            }
+        } else {
+            box.classList.remove('active');
+        }
     });
-  }
-});
+}
+
+function closeModule() {
+    const allBoxes = document.querySelectorAll('.visualBox');
+    allBoxes.forEach(box => {
+        box.classList.remove('active');
+
+        const iframe = box.querySelector('iframe');
+        const video = box.querySelector('video');
+
+        if (iframe) iframe.src = '';
+        if (video) {
+            video.pause();
+            video.innerHTML = '';
+        }
+    });
+}

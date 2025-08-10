@@ -314,6 +314,7 @@
         });
 
         function populateForm(data){
+            pageTop();
             $("#client_id").val(data.client_id).trigger('change');
             $("#title").val(data.title);
             $("#domain").val(data.domain);

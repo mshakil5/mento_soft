@@ -33,6 +33,15 @@ class ServiceController extends Controller
                 }
                 return '';
             })
+            // ->addColumn('video', function($row) {
+            //     if ($row->video) {
+            //         return '<video width="160" controls>
+            //                     <source src="'.asset("images/service/videos/".$row->video).'" type="video/mp4">
+            //                     Your browser does not support the video tag.
+            //                 </video>';
+            //     }
+            //     return '';
+            // })
             ->addColumn('status', function($row) {
                 $checked = $row->status == 1 ? 'checked' : '';
                 return '<div class="custom-control custom-switch">
@@ -49,7 +58,7 @@ class ServiceController extends Controller
                   <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
                 ';
             })
-            ->rawColumns(['icon', 'image', 'status', 'action'])
+            ->rawColumns(['icon', 'image', 'video', 'status', 'action'])
             ->make(true);
 
         }
@@ -61,6 +70,7 @@ class ServiceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
+            'video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200',
         ]);
 
         if ($validator->fails()) {
@@ -72,9 +82,10 @@ class ServiceController extends Controller
         
         $data = new Service;
         $data->title = $request->title;
-        $data->slug = Str::slug($request->title);
+        $slug = Str::slug($request->title) . '-' . Str::random(6);
         $data->short_desc = $request->short_desc;
         $data->long_desc = $request->long_desc;
+        $data->youtube_link = $request->youtube_link;
         $data->meta_title = $request->meta_title;
         $data->meta_description = $request->meta_description;
         $data->meta_keywords = $request->meta_keywords;
@@ -122,6 +133,20 @@ class ServiceController extends Controller
             $data->image = $imageName;
         }
 
+        // Video upload
+        if ($request->hasFile('video')) {
+            $uploadedFile = $request->file('video');
+            $videoName = 'video_' . mt_rand(10000000, 99999999) . '.' . $uploadedFile->getClientOriginalExtension();
+            $destinationPath = public_path('images/service/videos/');
+
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $uploadedFile->move($destinationPath, $videoName);
+            $data->video = $videoName;
+        }
+
         // Meta image upload
         if ($request->hasFile('meta_image')) {
             $uploadedFile = $request->file('meta_image');
@@ -165,6 +190,7 @@ class ServiceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
+            'video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200',
         ]);
 
         if ($validator->fails()) {
@@ -176,10 +202,9 @@ class ServiceController extends Controller
 
         $service = Service::find($request->codeid);
         $service->title = $request->title;
-        $slug = Str::slug($request->title);
-        $service->slug = Service::where('slug', $slug)->where('id', '!=', $request->codeid)->exists() ? $slug . '-' . uniqid() : $slug;
         $service->short_desc = $request->short_desc;
         $service->long_desc = $request->long_desc;
+        $service->youtube_link = $request->youtube_link;
         $service->meta_title = $request->meta_title;
         $service->meta_description = $request->meta_description;
         $service->meta_keywords = $request->meta_keywords;
@@ -227,6 +252,21 @@ class ServiceController extends Controller
                 ->save($destinationPath . $imageName);
 
             $service->image = $imageName;
+        }
+
+        // Video update
+        if ($request->hasFile('video')) {
+            // Delete old video if exists
+            if ($service->video && file_exists(public_path('images/service/videos/' . $service->video))) {
+                unlink(public_path('images/service/videos/' . $service->video));
+            }
+
+            $uploadedFile = $request->file('video');
+            $videoName = 'video_' . mt_rand(10000000, 99999999) . '.' . $uploadedFile->getClientOriginalExtension();
+            $destinationPath = public_path('images/service/videos/');
+
+            $uploadedFile->move($destinationPath, $videoName);
+            $service->video = $videoName;
         }
 
         // Meta image update
@@ -280,6 +320,10 @@ class ServiceController extends Controller
         // Delete image file if exists
         if ($service->image && file_exists(public_path('images/service/' . $service->image))) {
             unlink(public_path('images/service/' . $service->image));
+        }
+
+        if ($service->video && file_exists(public_path('images/service/videos/' . $service->video))) {
+            unlink(public_path('images/service/videos/' . $service->video));
         }
 
         // Delete meta image file if exists

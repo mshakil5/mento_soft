@@ -55,6 +55,11 @@ return new class extends Migration
             $table->string('bank')->nullable();
             $table->string('vat_number')->nullable();
             $table->string('opening_time')->nullable();
+            $table->string('google_site_verification')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->longText('meta_description')->nullable();
+            $table->longText('meta_keywords')->nullable(); // comma-separated
+            $table->string('meta_image')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->timestamps();

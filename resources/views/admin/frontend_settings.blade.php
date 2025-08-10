@@ -20,21 +20,60 @@
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('projects.index') }}" class="nav-link {{ Route::is('projects.index') ? 'active' : '' }}">
+        <a href="{{ route('products.index') }}" class="nav-link {{ Route::is('products.*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-project-diagram"></i>
-            <p>Projects</p>
+            <p>Products</p>
         </a>
     </li>
 
-    <li class="nav-item">
-        <a href="{{ route('contacts.index') }}" class="nav-link {{ Route::is('contacts.index') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-address-book"></i>
-            <p>Contact Messages</p>
+    <li class="nav-item dropdown {{ Route::is('project-types.index') || Route::is('projects.index') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('project-types.index') || Route::is('projects.index') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-briefcase"></i>
+            <p>
+                Portfolio <i class="fas fa-angle-left right"></i>
+            </p>
         </a>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="{{ route('projects.index') }}" class="nav-link {{ Route::is('projects.index') ? 'active' : '' }}">
+                    <i class="fas fa-tasks nav-icon"></i>
+                    <p>Projects</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('project-types.index') }}" class="nav-link {{ Route::is('project-types.index') ? 'active' : '' }}">
+                    <i class="fas fa-layer-group nav-icon"></i>
+                    <p>Project Types</p>
+                </a>
+            </li>
+        </ul>
     </li>
 
-    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ Route::is('contacts.index') || Route::is('quotations.index') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('contacts.index') || Route::is('quotations.index') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-envelope"></i>
+            <p>
+                Messages <i class="fas fa-angle-left right"></i>
+            </p>
+        </a>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="{{ route('contacts.index') }}" class="nav-link {{ Route::is('contacts.index') ? 'active' : '' }}">
+                    <i class="fas fa-envelope-open-text nav-icon"></i>
+                    <p>Contact Messages</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('quotations.index') }}" class="nav-link {{ Route::is('quotations.index') ? 'active' : '' }}">
+                    <i class="fas fa-file-signature nav-icon"></i>
+                    <p>Quotations</p>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
             <p>
                 Settings <i class="fas fa-angle-left right"></i>
@@ -69,6 +108,12 @@
                 <a href="{{ route('allFaq') }}" class="nav-link {{ Route::is('allFaq') ? 'active' : '' }}">
                     <i class="fas fa-building nav-icon"></i>
                     <p>FAQ</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.company.seo-meta') }}" class="nav-link {{ Route::is('admin.company.seo-meta') ? 'active' : '' }}">
+                    <i class="fas fa-building nav-icon"></i>
+                    <p>SEO</p>
                 </a>
             </li>
             <li class="nav-item">

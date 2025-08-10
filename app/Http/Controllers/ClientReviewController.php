@@ -80,7 +80,7 @@ class ClientReviewController extends Controller
 
             // Save image
             Image::make($image)
-                ->resize(400, 400, function ($constraint) {
+                ->resize(200, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 })
@@ -158,7 +158,7 @@ class ClientReviewController extends Controller
 
             // Save image
             Image::make($image)
-                ->resize(400, 400, function ($constraint) {
+                ->resize(200, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 })

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CompanyDetails;
+use Intervention\Image\Facades\Image;
 
 class CompanyDetailsController extends Controller
 {
@@ -168,5 +169,64 @@ class CompanyDetailsController extends Controller
         $companyDetails->save();
 
         return redirect()->back()->with('success', 'Terms and conditions updated successfully.');
+    }
+
+    public function seoMeta()
+    {
+        $companyDetails = CompanyDetails::first();
+        return view('admin.company.seo-meta', compact('companyDetails'));
+    }
+
+    public function seoMetaUpdate(Request $request)
+    {
+        $request->validate([
+            'google_site_verification' => 'nullable|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords' => 'nullable|string',
+            'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $companyDetails = CompanyDetails::first();
+        if (!$companyDetails) {
+            $companyDetails = new CompanyDetails();
+        }
+
+        $companyDetails->google_site_verification = $request->google_site_verification;
+        $companyDetails->meta_title = $request->meta_title;
+        $companyDetails->meta_description = $request->meta_description;
+        $companyDetails->meta_keywords = $request->meta_keywords;
+
+        // Handle meta image upload
+        if ($request->hasFile('meta_image')) {
+            $metaImage = $request->file('meta_image');
+            $metaImageName = 'meta_' . time() . '.webp';
+            $path = public_path('images/company/meta/');
+
+            // Ensure directory exists
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            // Delete old image if exists
+            if ($companyDetails->meta_image && file_exists($path . $companyDetails->meta_image)) {
+                unlink($path . $companyDetails->meta_image);
+            }
+
+            // Process and save new image
+            Image::make($metaImage)
+                ->resize(1200, 630, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->encode('webp', 80)
+                ->save($path . $metaImageName);
+
+            $companyDetails->meta_image = $metaImageName;
+        }
+
+        $companyDetails->save();
+
+        return redirect()->back()->with('success', 'SEO Meta fields updated successfully.');
     }
 }

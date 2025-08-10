@@ -63,6 +63,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>YouTube Link</label>
+                                        <input type="url" class="form-control" id="youtube_link" name="youtube_link" placeholder="Enter YouTube link">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Video Upload</label>
+                                        <input type="file" class="filepond" id="video" name="video" accept="video/mp4,video/webm">
+                                        <div id="video-preview" class="mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <!-- Meta Fields Section -->
                             <div class="row mt-4">
@@ -122,9 +137,10 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Icon</th>
-                                    <th>Image</th>
                                     <th>Title</th>
+                                    {{-- <th>Video</th> --}}
+                                    {{-- <th>Icon</th>
+                                    <th>Image</th> --}}
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -139,6 +155,32 @@
 @endsection
 
 @section('script')
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+
+<script>
+  FilePond.registerPlugin(
+      FilePondPluginImagePreview,
+      FilePondPluginFileValidateType
+  );
+
+  const pond = FilePond.create(document.querySelector('.filepond'), {
+      acceptedFileTypes: ['video/mp4', 'video/webm'],
+      fileValidateTypeDetectType: (source, type) => new Promise((resolve, reject) => {
+          resolve(type);
+      }),
+      maxFileSize: '50MB',
+      labelIdle: 'Drag & Drop your video or <span class="filepond--label-action">Browse</span>',
+      labelFileTypeNotAllowed: 'File of invalid type',
+      fileValidateTypeLabelExpectedTypes: 'Expects MP4 or WebM',
+      allowProcess: false,
+      allowRemove: true,
+      allowRevert: false
+  });
+</script>
 
 <script>
   $(document).ready(function () {
@@ -165,6 +207,7 @@
           form_data.append("title", $("#title").val());
           form_data.append("short_desc", $("#short_desc").val());
           form_data.append("long_desc", $("#long_desc").val());
+          form_data.append("youtube_link", $("#youtube_link").val());
           form_data.append("meta_title", $("#meta_title").val());
           form_data.append("meta_description", $("#meta_description").val());
           form_data.append("meta_keywords", $("#meta_keywords").val());
@@ -179,6 +222,10 @@
           var imageInput = document.getElementById('image');
           if(imageInput.files && imageInput.files[0]) {
               form_data.append("image", imageInput.files[0]);
+          }
+
+          if (pond.getFiles().length > 0) {
+              form_data.append("video", pond.getFiles()[0].file);
           }
 
           // Meta image upload
@@ -284,6 +331,7 @@
           $("#title").val(data.title);
           $("#short_desc").val(data.short_desc); 
           $("#long_desc").summernote('code', data.long_desc);
+          $("#youtube_link").val(data.youtube_link);
           $("#meta_title").val(data.meta_title);
           $("#meta_description").val(data.meta_description);
           $("#meta_keywords").val(data.meta_keywords);
@@ -304,6 +352,17 @@
               imagePreview.src = "#";
           }
 
+          if (data.video) {
+              $("#video-preview").html(`
+                  <div class="alert alert-info">
+                      Current video: ${data.video}
+                      <button type="button" class="close" id="remove-video" data-id="${data.id}">
+                          <span>&times;</span>
+                      </button>
+                  </div>
+              `);
+          }
+
           var metaImagePreview = document.getElementById('preview-meta-image');
           if (data.meta_image) { 
               metaImagePreview.src = '/images/service/meta/' + data.meta_image;
@@ -320,6 +379,7 @@
       function clearform(){
           $('#createThisForm')[0].reset();
           $('.summernote').summernote('reset');
+          pond.removeFiles();
           $("#addBtn").val('Create');
           $("#addBtn").html('Create');
           $("#addThisFormContainer").slideUp(200);
@@ -368,9 +428,10 @@
         },
         columns: [
           { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-          { data: 'icon', name: 'icon', orderable: false, searchable: false },
-          { data: 'image', name: 'image', orderable: false, searchable: false },
+          // { data: 'icon', name: 'icon', orderable: false, searchable: false },
+          // { data: 'image', name: 'image', orderable: false, searchable: false },
           { data: 'title', name: 'title' },
+          // { data: 'video', name: 'video', orderable: false, searchable: false },
           { data: 'status', name: 'status', orderable: false, searchable: false },
           { data: 'action', name: 'action', orderable: false, searchable: false },
         ],
