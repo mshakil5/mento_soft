@@ -97,6 +97,21 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Domain Expiry Date</label>
+                                        <input type="date" class="form-control" id="domain_expiry_date" name="domain_expiry_date" value="">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Hosting Expiry Date</label>
+                                        <input type="date" class="form-control" id="hosting_expiry_date" name="hosting_expiry_date">
+                                    </div>
+                                </div>
+                            </div>
                             
                             <div class="form-group">
                                 <label>Description</label>
@@ -192,6 +207,8 @@
             form_data.append("additional_info", $("#additional_info").val());
             form_data.append("start_date", $("#start_date").val());
             form_data.append("end_date", $("#end_date").val());
+            form_data.append("domain_expiry_date", $("#domain_expiry_date").val());
+            form_data.append("hosting_expiry_date", $("#hosting_expiry_date").val());
             form_data.append("status", $("#status").val());
 
             // Handle image upload
@@ -273,6 +290,8 @@
             $("#additional_info").summernote('code', data.additional_info);
             $("#start_date").val(data.start_date);
             $("#end_date").val(data.end_date);
+            $("#domain_expiry_date").val(data.domain_expiry_date);
+            $("#hosting_expiry_date").val(data.hosting_expiry_date);
             $("#status").val(data.status);
             $("#codeid").val(data.id);
             

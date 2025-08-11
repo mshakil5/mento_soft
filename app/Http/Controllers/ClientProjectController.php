@@ -62,15 +62,72 @@ class ClientProjectController extends Controller
                     </div>
                     ';
                 })
-                ->addColumn('action', function($row) {
-                    $percent = $row->completed_percentage;
+                ->setRowClass(function($row) {
+                    $today = \Carbon\Carbon::today();
 
+                    $domainExpiry = $row->domain_expiry_date ? \Carbon\Carbon::parse($row->domain_expiry_date) : null;
+                    $hostingExpiry = $row->hosting_expiry_date ? \Carbon\Carbon::parse($row->hosting_expiry_date) : null;
+
+                    $warning = false;
+                    $danger = false;
+
+                    if ($domainExpiry) {
+                        $daysDomain = $today->diffInDays($domainExpiry, false); // false = allow negative
+                        if ($daysDomain < 0) {
+                            $danger = true; // expired
+                        } elseif ($daysDomain <= 7) {
+                            $warning = true; // expiring this week
+                        }
+                    }
+
+                    if ($hostingExpiry) {
+                        $daysHosting = $today->diffInDays($hostingExpiry, false);
+                        if ($daysHosting < 0) {
+                            $danger = true;
+                        } elseif ($daysHosting <= 7) {
+                            $warning = true;
+                        }
+                    }
+
+                    if ($danger) {
+                        return 'table-danger'; // Bootstrap red bg
+                    } elseif ($warning) {
+                        return 'table-warning'; // Bootstrap yellow bg
+                    }
+
+                    return '';
+                })
+                ->addColumn('action', function($row) {
+                    $indicators = [];
+                    $today = \Carbon\Carbon::today();
+
+                    if ($row->domain_expiry_date) {
+                        $days = $today->diffInDays($row->domain_expiry_date, false);
+                        if ($days < 0) {
+                            $indicators[] = 'Domain expired';
+                        } elseif ($days <= 7) {
+                            $indicators[] = 'Domain expiring soon';
+                        }
+                    }
+
+                    if ($row->hosting_expiry_date) {
+                        $days = $today->diffInDays($row->hosting_expiry_date, false);
+                        if ($days < 0) {
+                            $indicators[] = 'Hosting expired';
+                        } elseif ($days <= 7) {
+                            $indicators[] = 'Hosting expiring soon';
+                        }
+                    }
+
+                    $percent = $row->completed_percentage;
                     $badgeClass = 'bg-warning';
                     if ($percent >= 100) {
                         $badgeClass = 'bg-success';
                     } elseif ($percent < 20) {
                         $badgeClass = 'bg-danger';
                     }
+
+                    $indicatorsHtml = count($indicators) ? '<div style="font-size: 0.8rem;">' . implode('<br>', $indicators) . '</div>' : '';
 
                     return '
                       <a href="'.route('client-projects.tasks', $row->id).'" class="btn btn-sm '.$badgeClass.'">
@@ -82,7 +139,7 @@ class ClientProjectController extends Controller
                       </a>
                       <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
                       <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
-                    ';
+                      '.$indicatorsHtml;
                 })
 
                 ->rawColumns(['image', 'status', 'action'])
@@ -105,6 +162,8 @@ class ClientProjectController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'domain_expiry_date' => 'nullable|date|after_or_equal:start_date',
+            'hosting_expiry_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|in:1,2,3,4',
         ]);
 
@@ -125,6 +184,8 @@ class ClientProjectController extends Controller
         $data->additional_info = $request->additional_info;
         $data->start_date = $request->start_date;
         $data->end_date = $request->end_date;
+        $data->domain_expiry_date = $request->domain_expiry_date;
+        $data->hosting_expiry_date = $request->hosting_expiry_date;
         $data->status = $request->status;
         $data->created_by = auth()->id();
 
@@ -185,6 +246,8 @@ class ClientProjectController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'domain_expiry_date' => 'nullable|date|after_or_equal:start_date',
+            'hosting_expiry_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|in:1,2,3,4',
         ]);
 
@@ -212,6 +275,8 @@ class ClientProjectController extends Controller
         $project->additional_info = $request->additional_info;
         $project->start_date = $request->start_date;
         $project->end_date = $request->end_date;
+        $project->domain_expiry_date = $request->domain_expiry_date;
+        $project->hosting_expiry_date = $request->hosting_expiry_date;
         $project->status = $request->status;
         $project->updated_by = auth()->id();
 
