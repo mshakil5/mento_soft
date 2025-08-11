@@ -13,7 +13,7 @@
     </a>
 
     <li class="nav-item">
-        <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') ? 'active' : '' }}">
+        <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') || Route::is('client-projects.updates') ? 'active' : '' }}">
             <i class="fas fa-project-diagram nav-icon"></i>
             <p>Client Projects</p>
         </a>

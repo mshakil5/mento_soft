@@ -16,7 +16,7 @@ class ClientProjectController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = ClientProject::with('client')->latest();
+            $data = ClientProject::with('client')->withCount('recentUpdates')->latest();
 
             if ($request->client_id) {
                 $data->where('client_id', $request->client_id);
@@ -76,6 +76,9 @@ class ClientProjectController extends Controller
                       <a href="'.route('client-projects.tasks', $row->id).'" class="btn btn-sm '.$badgeClass.'">
                         Tasks
                         <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
+                      </a>
+                      <a href="'.route('client-projects.updates', $row->id).'" class="btn btn-sm btn-primary">
+                        Updates'.($row->recent_updates_count > 0 ? ' <span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '').'
                       </a>
                       <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
                       <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>

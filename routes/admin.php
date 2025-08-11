@@ -32,6 +32,7 @@ use App\Http\Controllers\ProductFeatureController;
 use App\Http\Controllers\ProductClientController;
 use App\Http\Controllers\ProductFaqController;
 use App\Http\Controllers\ProductClientVideoController;
+use App\Http\Controllers\ProjectRecentUpdateController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -202,6 +203,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/client-projects-task/{task}', [ProjectTaskController::class, 'update']);
     Route::delete('/client-projects-task/{task}', [ProjectTaskController::class, 'destroy']);
     Route::post('/client-projects-task/{task}/toggle-status', [ProjectTaskController::class, 'toggleStatus']);
+
+    // Project Updates
+    Route::get('/client-projects/{project}/updates', [ProjectRecentUpdateController::class, 'index'])->name('client-projects.updates');
+    Route::post('/client-projects/{project}/updates', [ProjectRecentUpdateController::class, 'store']);
+    Route::get('/client-projects-update/{update}/edit', [ProjectRecentUpdateController::class, 'edit']);
+    Route::post('/client-projects-update/{update}', [ProjectRecentUpdateController::class, 'update']);
+    Route::delete('/client-projects-update/{update}', [ProjectRecentUpdateController::class, 'destroy']);
 
     // Employees
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');

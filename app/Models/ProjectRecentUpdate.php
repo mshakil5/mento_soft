@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class ClientProject extends Model
+class ProjectRecentUpdate extends Model
 {
-
     use SoftDeletes, LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
@@ -20,7 +19,9 @@ class ClientProject extends Model
             ->dontSubmitEmptyLogs()
             ->logExcept(['updated_at']);
     }
-    
+
+    protected $guarded = [];
+
     protected static function boot()
     {
       parent::boot();
@@ -32,33 +33,14 @@ class ClientProject extends Model
         }
       });
     }
-    
-    public function client()
+
+    public function project()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(ClientProject::class, 'client_project_id');
     }
 
-    public function tasks()
+    public function user()
     {
-        return $this->hasMany(ProjectTask::class);
+        return $this->belongsTo(User::class);
     }
-
-    public function recentUpdates()
-    {
-        return $this->hasMany(ProjectRecentUpdate::class, 'client_project_id');
-    }
-
-    public function getCompletedPercentageAttribute()
-    {
-        $total = $this->tasks()->count();
-        $completed = $this->tasks()->where('status', 1)->count();
-
-        return $total > 0 ? round(($completed / $total) * 100) : 0;
-    }
-
-    public function invoiceDetails()
-    {
-        return $this->hasMany(InvoiceDetail::class);
-    }
-    
 }
