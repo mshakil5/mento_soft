@@ -9,7 +9,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Transaction extends Model
 {
-      use LogsActivity, SoftDeletes;
+    use LogsActivity, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -40,5 +40,10 @@ class Transaction extends Model
     public function equityHolder()
     {
         return $this->belongsTo(EquityHolder::class, 'share_holder_id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 }

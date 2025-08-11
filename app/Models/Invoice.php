@@ -4,10 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Invoice extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['updated_at']);
+    }
     
     protected static function boot()
     {
@@ -29,6 +40,24 @@ class Invoice extends Model
     public function details()
     {
         return $this->hasMany(InvoiceDetail::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function isPending()
+    {
+        $due = $this->transactions()
+            ->where('transaction_type', 'Due')
+            ->sum('amount');
+
+        $received = $this->transactions()
+            ->where('transaction_type', 'Received')
+            ->sum('amount');
+
+        return ($due - $received) > 0;
     }
 
 }

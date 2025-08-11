@@ -33,8 +33,8 @@
         </a>
     </li>
 
-    <li class="nav-item dropdown {{ Route::is('invoices.index') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('invoices.index') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ request()->routeIs('invoices.*') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-file-alt"></i>
             <p>
                 Invoice <i class="fas fa-angle-left right"></i>
@@ -42,9 +42,21 @@
         </a>
         <ul class="nav nav-treeview">
             <li class="nav-item">
-                <a href="{{ route('invoices.index') }}" class="nav-link {{ Route::is('invoices.index') ? 'active' : '' }}">
-                    <i class="fas fa-file-invoice nav-icon"></i>
-                    <p>Invoices</p>
+                <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
+                    <i class="fas fa-list nav-icon"></i>
+                    <p>All Invoices</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('invoices.due') }}" class="nav-link {{ request()->routeIs('invoices.due') ? 'active' : '' }}">
+                    <i class="fas fa-hourglass-half nav-icon"></i>
+                    <p>Due Invoices</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('invoices.received') }}" class="nav-link {{ request()->routeIs('invoices.received') ? 'active' : '' }}">
+                    <i class="fas fa-check-circle nav-icon"></i>
+                    <p>Received Invoices</p>
                 </a>
             </li>
         </ul>

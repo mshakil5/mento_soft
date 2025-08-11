@@ -228,6 +228,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/due', [InvoiceController::class, 'due'])->name('invoices.due');
+    Route::get('/invoices/received', [InvoiceController::class, 'received'])->name('invoices.received');
     Route::post('/invoices', [InvoiceController::class, 'store']);
     Route::get('/invoices/create', [InvoiceController::class, 'create']);
     Route::get('/invoices/{id}/edit', [InvoiceController::class, 'edit']);
@@ -238,6 +240,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/invoices/client-projects/{id}', [InvoiceController::class, 'getClientProjects']);
     Route::get('/invoices/project-info/{id}', [InvoiceController::class, 'getProjectInfo']);
     Route::post('/invoices/send-email/{id}', [InvoiceController::class, 'sendEmail'])->name('invoices.send.email');
+    Route::post('/invoices/{invoice}/receive', [InvoiceController::class, 'receive'])->name('invoices.receive');
 
     //Chart of account
     Route::get('chart-of-account', [ChartOfAccountController::class, 'index'])->name('admin.addchartofaccount');

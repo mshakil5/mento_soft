@@ -244,7 +244,7 @@
                 success: function(res) {
                     $('#client_id').empty().append('<option value="">Select Client</option>');
                     $.each(res.clients, function(key, value) {
-                        $('#client_id').append('<option value="'+value.id+'">'+value.name+'</option>');
+                        $('#client_id').append('<option value="'+value.id+'">'+value.business_name+'</option>');
                     });
 
                     // Set actual invoice number
@@ -331,18 +331,18 @@
             }
             
             // Check if project already exists in table
-            var exists = false;
-            $('#invoiceItemsTable tbody tr').each(function() {
-                if ($(this).data('project-id') == projectId) {
-                    exists = true;
-                    return false;
-                }
-            });
+            // var exists = false;
+            // $('#invoiceItemsTable tbody tr').each(function() {
+            //     if ($(this).data('project-id') == projectId) {
+            //         exists = true;
+            //         return false;
+            //     }
+            // });
             
-            if (exists) {
-                alert('This project is already added to the invoice');
-                return;
-            }
+            // if (exists) {
+            //     alert('This project is already added to the invoice');
+            //     return;
+            // }
             
             // Get project info (description from project if available)
             var description = '';
@@ -710,11 +710,19 @@
             });
         });
 
+        let ajaxUrl = "{{ route('invoices.index') }}";
+
+        if (window.location.pathname.includes('/invoices/due')) {
+            ajaxUrl = "{{ route('invoices.due') }}";
+        } else if (window.location.pathname.includes('/invoices/received')) {
+            ajaxUrl = "{{ route('invoices.received') }}";
+        }
+
         var table = $('#example1').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('invoices.index') }}" + window.location.search,
+                url: ajaxUrl + window.location.search,
                 type: "GET",
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -755,6 +763,7 @@
                 },
                 success: function (res) {
                     success(res.message ?? 'Email sent successfully!');
+                    reloadTable();
                 },
                 error: function (xhr) {
                     const msg = xhr.responseJSON?.message ?? 'Email sending failed.';
@@ -763,6 +772,25 @@
                 complete: function () {
                     spinner.addClass('d-none');
                     $btn.prop('disabled', false);
+                }
+            });
+        });
+
+        $(document).on('submit', '.receive-form', function(e) {
+            e.preventDefault();
+            if (!confirm('Mark as received?')) return;
+
+            let form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                success(res) {
+                    success(res.message ?? 'Email sent successfully!');
+                    reloadTable();
+                },
+                error() {
+                    error('Something went wrong.');
                 }
             });
         });

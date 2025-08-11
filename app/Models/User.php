@@ -39,4 +39,17 @@ class User extends Authenticatable
             get: fn ($value) =>  ["1", "2", "3"][$value],
         );
     }
+
+    protected static function boot()
+    {
+      parent::boot();
+
+      static::deleting(function ($model) {
+        if (auth()->check()) {
+          $model->deleted_by = auth()->id();
+          $model->save();
+        }
+      });
+    }
+    
 }
