@@ -154,9 +154,6 @@ class ProjectTaskController extends Controller
             return response()->json(['success' => false, 'message' => 'Task not found.'], 404);
         }
 
-        $task->deleted_by = auth()->id();
-        $task->save();
-
         if ($task->delete()) {
             return response()->json(['success' => true, 'message' => 'Task deleted successfully.']);
         }

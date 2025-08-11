@@ -235,9 +235,6 @@ class ClientController extends Controller
             unlink(public_path('images/clients/' . $client->image));
         }
 
-        $client->deleted_by = auth()->id();
-        $client->save();
-
         if ($client->delete()) {
             return response()->json(['success' => true, 'message' => 'Client deleted successfully.']);
         }

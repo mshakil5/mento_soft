@@ -156,9 +156,6 @@ class ProjectRecentUpdateController extends Controller
             unlink(public_path('images/recent-updates/'.$update->attachment));
         }
 
-        $update->deleted_by = auth()->id();
-        $update->save();
-
         if ($update->delete()) {
             return response()->json(['success' => true, 'message' => 'Update deleted successfully.']);
         }

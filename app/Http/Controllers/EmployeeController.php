@@ -151,9 +151,6 @@ class EmployeeController extends Controller
             return response()->json(['success' => false, 'message' => 'Employee not found.'], 404);
         }
 
-        $employee->deleted_by = auth()->id();
-        $employee->save();
-
         if ($employee->delete()) {
             return response()->json(['success' => true, 'message' => 'Employee deleted successfully.']);
         }

@@ -194,9 +194,6 @@ class ClientReviewController extends Controller
             unlink(public_path('images/client-reviews/' . $review->image));
         }
 
-        $review->deleted_by = auth()->id();
-        $review->save();
-
         if ($review->delete()) {
             return response()->json(['success' => true, 'message' => 'Client review deleted successfully.']);
         }

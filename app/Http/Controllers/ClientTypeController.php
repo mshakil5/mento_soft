@@ -127,9 +127,6 @@ class ClientTypeController extends Controller
             return response()->json(['success' => false, 'message' => 'Client Type not found.'], 404);
         }
 
-        $clientType->deleted_by = auth()->id();
-        $clientType->save();
-
         if ($clientType->delete()) {
             return response()->json(['success' => true, 'message' => 'Client Type deleted successfully.']);
         }

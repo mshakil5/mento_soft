@@ -129,9 +129,6 @@ class ProjectTypeController extends Controller
             return response()->json(['success' => false, 'message' => 'Project Type not found.'], 404);
         }
 
-        $projectType->deleted_by = auth()->id();
-        $projectType->save();
-
         if ($projectType->delete()) {
             return response()->json(['success' => true, 'message' => 'Project Type deleted successfully.']);
         }

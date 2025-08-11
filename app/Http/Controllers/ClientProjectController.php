@@ -328,9 +328,6 @@ class ClientProjectController extends Controller
             unlink(public_path('images/client-projects/' . $project->image));
         }
 
-        $project->deleted_by = auth()->id();
-        $project->save();
-
         if ($project->delete()) {
             return response()->json(['success' => true, 'message' => 'Client Project deleted successfully.']);
         }
