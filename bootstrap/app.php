@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_manager' => App\Http\Middleware\IsManager::class,
             'is_user' => App\Http\Middleware\IsUser::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('project-service:auto-create')->everyFiveMinutes();
+        //php artisan schedule:work
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
