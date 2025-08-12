@@ -32,6 +32,15 @@ class ProjectRecentUpdate extends Model
           $model->save();
         }
       });
+
+      static::deleting(function ($model) {
+          if ($model->attachment) {
+              $path = public_path('images/recent-updates/' . $model->attachment);
+              if (file_exists($path)) {
+                  unlink($path);
+              }
+          }
+      });
     }
 
     public function project()

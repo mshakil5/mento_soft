@@ -19,7 +19,9 @@ class ProjectServiceController extends Controller
               $data = ProjectService::with('details')
                   ->withCount('details')
                   ->with(['details' => function($q) {
-                      $q->orderByDesc('end_date')->limit(1);
+                      $q->where('status', 1)
+                        ->orderByDesc('end_date')
+                        ->limit(1);
                   }])
                   ->where('client_project_id', $project->id)
                   ->latest();

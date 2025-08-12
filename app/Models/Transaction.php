@@ -46,4 +46,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
+
+    public function projectServiceDetail()
+    {
+        return $this->belongsTo(ProjectServiceDetail::class);
+    }
 }
