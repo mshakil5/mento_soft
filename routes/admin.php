@@ -33,6 +33,8 @@ use App\Http\Controllers\ProductClientController;
 use App\Http\Controllers\ProductFaqController;
 use App\Http\Controllers\ProductClientVideoController;
 use App\Http\Controllers\ProjectRecentUpdateController;
+use App\Http\Controllers\ProjectServiceController;
+use App\Http\Controllers\ProjectServiceDetailController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -219,12 +221,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/employees/{id}', [EmployeeController::class, 'destroy']);
     Route::post('/employees/status', [EmployeeController::class, 'toggleStatus']);
 
-    // Project Tasks
-    Route::get('/project-tasks/{project_id}', [ProjectTaskController::class, 'getByProject'])->name('project-tasks.by-project');
-    Route::post('/project-tasks/store', [ProjectTaskController::class, 'storeTask'])->name('project-tasks.store');
-    Route::post('/project-tasks/update', [ProjectTaskController::class, 'updateTask'])->name('project-tasks.update');
-    Route::delete('/project-tasks/{task}', [ProjectTaskController::class, 'deleteTask'])->name('project-tasks.destroy');
-    Route::post('/project-tasks/toggle-status', [ProjectTaskController::class, 'toggleStatus'])->name('project-tasks.toggle-status');
+    // Project Services
+    Route::get('/client-projects/{project}/services', [ProjectServiceController::class, 'index'])->name('client-projects.services');
+    Route::post('/client-projects/{project}/services', [ProjectServiceController::class, 'store']);
+    Route::get('/client-projects-service/{service}/edit', [ProjectServiceController::class, 'edit']);
+    Route::post('/client-projects-service/{service}', [ProjectServiceController::class, 'update']);
+    Route::delete('/client-projects-service/{service}', [ProjectServiceController::class, 'destroy']);
+    Route::post('/client-projects-service/{service}/toggle-status', [ProjectServiceController::class, 'toggleStatus']);
+
+    // Project Service Details
+    Route::get('/client-project-services/{service}/details', [ProjectServiceDetailController::class, 'index'])->name('client-project-services.details');
+    Route::post('/client-project-services/{service}/details', [ProjectServiceDetailController::class, 'store']);
+    Route::get('/client-project-service-detail/{detail}/edit', [ProjectServiceDetailController::class, 'edit']);
+    Route::post('/client-project-service-detail/{detail}', [ProjectServiceDetailController::class, 'update']);
+    Route::delete('/client-project-service-detail/{detail}', [ProjectServiceDetailController::class, 'destroy']);
+    Route::post('/client-project-service-detail/{detail}/toggle-status', [ProjectServiceDetailController::class, 'toggleStatus']);
 
     // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
