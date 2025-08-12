@@ -141,7 +141,9 @@ $(document).ready(function () {
         form_data.append("amount", $("#amount").val());
         form_data.append("note", $("#note").val());
         form_data.append("is_auto", $("#is_auto").is(":checked") ? 1 : null);
-        form_data.append("cycle_type", $("#is_auto").is(":checked") ? $("#cycle_type").val() : null);
+        if ($("#is_auto").is(":checked")) {
+            form_data.append("is_auto", 1);
+        }
 
         if($(this).val() == 'Create') {
             // Create
@@ -169,6 +171,13 @@ $(document).ready(function () {
         } else {
             // Update
             form_data.append("codeid", $("#codeid").val());
+            if ($("#is_auto").is(":checked")) {
+                form_data.append("is_auto", 1);
+                form_data.append("cycle_type", $("#cycle_type").val());
+            } else {
+                form_data.append("is_auto", 0);
+                form_data.append("cycle_type", "");
+            }
             var updateUrl = upurl.replace(':id', $("#codeid").val());
 
             $.ajax({

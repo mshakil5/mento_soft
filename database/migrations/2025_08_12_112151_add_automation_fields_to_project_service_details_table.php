@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('project_service_details', function (Blueprint $table) {
             $table->boolean('is_auto')->default(false)->after('note');
-            $table->unsignedTinyInteger('cycle_type')->default(2)->comment('1 = Monthly, 2 = Yearly')->after('is_auto');
+            $table->unsignedTinyInteger('cycle_type')->nullable()->comment('1 = Monthly, 2 = Yearly')->after('is_auto');
             $table->string('next_start_date')->nullable()->after('cycle_type');
             $table->string('next_end_date')->nullable()->after('next_start_date');
             $table->boolean('next_created')->default(false)->after('next_end_date');
