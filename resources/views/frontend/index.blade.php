@@ -187,7 +187,7 @@
         </div>
     </section>
 
-    <section class="our-products" style="background-image: url(../images/pattern-1.svg), linear-gradient(16deg, rgb(4, 11, 22), rgb(10, 45, 102)); background-size: 100% 100%; background-position: 100% 100%;">
+    <section class="our-products" style="background-image: url(../images/pattern-1.svg), linear-gradient(16deg, rgb(4, 11, 22), rgb(10, 45, 102)); background-size: 100% 100%; background-position: 100% 100%;" id="products">
         <div class="row px-2 text-center py-5">
             <h2 class="secTtile text-light text-uppercase fw-bold title-font wow bounce mb-0">our products</h2>
         </div>

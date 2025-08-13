@@ -43,11 +43,16 @@
                             <a class="nav-link" href="{{ route('homepage') }}#services">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('homepage') }}#about">about</a>
+                            <a class="nav-link" href="{{ route('homepage') }}#about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('homepage') }}#products">
+                                Products
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('portfolio') || request()->routeIs('portfolioDetails') ? 'active' : '' }}" href="{{ route('portfolio') }}">
-                                portfolio
+                                Portfolio
                             </a>
                         </li>
                         <li class="nav-item">

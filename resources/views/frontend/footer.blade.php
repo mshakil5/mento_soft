@@ -13,8 +13,9 @@
                 <span class="title">Company</span> <br>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="{{ route('homepage') }}#services">service</a></li>
+                    <li><a href="{{ route('homepage') }}#services">Services</a></li>
                     <li><a href="{{ route('homepage') }}#about">About</a></li>
+                    <li><a href="{{ route('homepage') }}#products">Products</a></li>
                     <li><a href="{{ route('portfolio') }}">Portfolio</a></li>
                     <li><a href="{{ route('homepage') }}#contact">Contact</a></li>
                     <li><a href="{{ route('quotation') }}">Get Quotation</a></li>
