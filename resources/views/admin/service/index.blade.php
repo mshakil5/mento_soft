@@ -78,6 +78,11 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                <label>Sort Order</label>
+                                <input type="number" class="form-control" id="sl" name="sl" value="0">
+                            </div>
                             
                             <!-- Meta Fields Section -->
                             <div class="row mt-4">
@@ -138,6 +143,7 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Title</th>
+                                    <th>Sort No.</th>
                                     {{-- <th>Video</th> --}}
                                     {{-- <th>Icon</th>
                                     <th>Image</th> --}}
@@ -205,6 +211,7 @@
           // Create or Update
           var form_data = new FormData();
           form_data.append("title", $("#title").val());
+          form_data.append("sl", $("#sl").val());
           form_data.append("short_desc", $("#short_desc").val());
           form_data.append("long_desc", $("#long_desc").val());
           form_data.append("youtube_link", $("#youtube_link").val());
@@ -329,6 +336,7 @@
       
       function populateForm(data){
           $("#title").val(data.title);
+          $("#sl").val(data.sl);
           $("#short_desc").val(data.short_desc); 
           $("#long_desc").summernote('code', data.long_desc);
           $("#youtube_link").val(data.youtube_link);
@@ -431,6 +439,7 @@
           // { data: 'icon', name: 'icon', orderable: false, searchable: false },
           // { data: 'image', name: 'image', orderable: false, searchable: false },
           { data: 'title', name: 'title' },
+          { data: 'sl', name: 'sl' },
           // { data: 'video', name: 'video', orderable: false, searchable: false },
           { data: 'status', name: 'status', orderable: false, searchable: false },
           { data: 'action', name: 'action', orderable: false, searchable: false },

@@ -24,6 +24,9 @@ class ClientReviewController extends Controller
                     }
                     return '';
                 })
+                ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">

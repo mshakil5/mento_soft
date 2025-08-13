@@ -146,6 +146,7 @@
                                     <th>Sl</th>
                                     <th>Thumbnail</th>
                                     <th>Title</th>
+                                    <th>Sort No.</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -422,6 +423,7 @@
               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
               {data: 'thumbnail', name: 'thumbnail', orderable: false, searchable: false},
               {data: 'title', name: 'title'},
+              { data: 'sl', name: 'sl' },
               {data: 'status', name: 'status', orderable: false, searchable: false},
               {data: 'action', name: 'action', orderable: false, searchable: false},
           ],

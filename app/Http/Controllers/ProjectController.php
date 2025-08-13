@@ -28,6 +28,9 @@ class ProjectController extends Controller
                     }
                     return '';
                 })
+                ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 // ->addColumn('service', function($row) {
                 //     return $row->service->title ?? 'N/A';
                 // })

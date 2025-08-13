@@ -178,6 +178,7 @@
                                     <th>Sl</th>
                                     <th>Thumbnail</th>
                                     <th>Title</th>
+                                    <th>Sort No.</th>
                                     {{-- <th>Service</th> --}}
                                     <th>Status</th>
                                     {{-- <th>Featured</th> --}}
@@ -546,6 +547,7 @@
               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
               {data: 'thumbnail', name: 'thumbnail', orderable: false, searchable: false},
               {data: 'title', name: 'title'},
+              {data: 'sl', name: 'sl'},
               // {data: 'service', name: 'service'},
               {data: 'status', name: 'status', orderable: false, searchable: false},
               // {data: 'featured', name: 'featured', orderable: false, searchable: false},

@@ -17,6 +17,9 @@ class ProductFeatureController extends Controller
             $data = $product->features()->latest();
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 ->addColumn('image', function($row) {
                     if ($row->image) {
                         return '<a href="'.asset("images/product-features/".$row->image).'" target="_blank">

@@ -23,6 +23,9 @@ class ProductFaqController extends Controller
                                 <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
                             </div>';
                 })
+                ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 ->addColumn('action', function($row) {
                     return '
                       <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>

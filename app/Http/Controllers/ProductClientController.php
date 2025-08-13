@@ -22,6 +22,9 @@ class ProductClientController extends Controller
                                 <img src="'.asset("images/product-clients/".$row->image).'" style="max-width:80px; height:auto;">
                             </a>';
                 })
+                ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">

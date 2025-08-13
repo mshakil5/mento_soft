@@ -25,6 +25,9 @@ class ProductController extends Controller
                     }
                     return '';
                 })
+                ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">
@@ -193,6 +196,7 @@ class ProductController extends Controller
         }
 
         $product->title = $request->title;
+        $product->slug = Str::slug($request->title) . '-' . Str::random(6);
         $product->sub_title = $request->sub_title;
         $product->url = $request->url;
         $product->short_description = $request->short_description;

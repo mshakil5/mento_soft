@@ -52,6 +52,9 @@ class ServiceController extends Controller
             ->addColumn('title', function($row) {
                 return $row->title;
             })
+            ->addColumn('sl', function ($row) {
+                return $row->sl ?? '';
+            })
             ->addColumn('action', function($row) {
                 return '
                   <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
@@ -81,6 +84,7 @@ class ServiceController extends Controller
         }
         
         $data = new Service;
+        $data->sl = $request->sl;
         $data->title = $request->title;
         $slug = Str::slug($request->title) . '-' . Str::random(6);
         $data->short_desc = $request->short_desc;
@@ -201,6 +205,7 @@ class ServiceController extends Controller
         }
 
         $service = Service::find($request->codeid);
+        $service->sl = $request->sl;
         $service->title = $request->title;
         $service->short_desc = $request->short_desc;
         $service->long_desc = $request->long_desc;

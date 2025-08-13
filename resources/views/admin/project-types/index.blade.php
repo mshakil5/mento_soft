@@ -34,6 +34,10 @@
                                 <label>Description</label>
                                 <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description"></textarea>
                             </div>
+                            <div class="form-group">
+                                <label>Sort Order</label>
+                                <input type="number" class="form-control" id="sl" name="sl" value="0">
+                            </div>
                         </form>
                     </div>
                     <div class="card-footer">
@@ -61,6 +65,7 @@
                                     <th>Sl</th>
                                     <th>Name</th>
                                     {{-- <th>Slug</th> --}}
+                                    <th>Sort No.</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -102,7 +107,8 @@
                     method: "POST",
                     data: {
                         name: $("#name").val(),
-                        description: $("#description").val()
+                        description: $("#description").val(),
+                        sl: $("#sl").val()
                     },
                     success: function(res) {
                         clearform();
@@ -126,7 +132,8 @@
                     data: {
                         codeid: $("#codeid").val(),
                         name: $("#name").val(),
-                        description: $("#description").val()
+                        description: $("#description").val(),
+                        sl: $("#sl").val()
                     },
                     success: function(res) {
                         clearform();
@@ -158,6 +165,7 @@
 
         function populateForm(data){
             $("#name").val(data.name);
+            $("#sl").val(data.sl);
             $("#description").val(data.description);
             $("#codeid").val(data.id);
             $("#addBtn").val('Update');
@@ -237,6 +245,7 @@
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'name', name: 'name'},
+                {data: 'sl', name: 'sl'},
                 // {data: 'slug', name: 'slug'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},

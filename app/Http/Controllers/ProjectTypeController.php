@@ -23,6 +23,9 @@ class ProjectTypeController extends Controller
                                 <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
                             </div>';
                 })
+               ->addColumn('sl', function ($row) {
+                    return $row->sl ?? '';
+                })
                 ->addColumn('action', function($row) {
                     return '
                       <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
@@ -52,6 +55,7 @@ class ProjectTypeController extends Controller
 
         $data = new ProjectType;
         $data->name = $request->name;
+        $data->sl = $request->sl;
         $data->slug = Str::slug($request->name);
         $data->description = $request->description;
         $data->created_by = auth()->id();
@@ -105,6 +109,7 @@ class ProjectTypeController extends Controller
 
         $projectType->name = $request->name;
         $projectType->slug = Str::slug($request->name);
+        $projectType->sl = $request->sl;
         $projectType->description = $request->description;
         $projectType->updated_by = auth()->id();
 
