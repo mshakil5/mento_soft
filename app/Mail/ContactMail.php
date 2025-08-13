@@ -25,10 +25,13 @@ class ContactMail extends Mailable
                     ->with([
                         'first_name' => $this->contact->first_name,
                         'last_name'  => $this->contact->last_name,
-                        'email' => $this->contact->email,
+                        'email'      => $this->contact->email,
                         'phone'      => $this->contact->phone,
-                        'subject' => $this->contact->subject ?? 'No Subject',
-                        'message' => $this->contact->message,
+                        'subject'    => $this->contact->subject ?? 'No Subject',
+                        'message'    => $this->contact->message,
+                        'product'    => $this->contact->product_id 
+                                      ? \App\Models\Product::find($this->contact->product_id) 
+                                      : null,
                     ]);
     }
 }

@@ -8,7 +8,7 @@
     </div>
 </section>
 
-@include('frontend.contact')
+@include('frontend.contact', ['product' => $product])
 
 @endsection
 

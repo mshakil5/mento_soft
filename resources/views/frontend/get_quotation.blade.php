@@ -22,7 +22,7 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-6 form-group">
-                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name') }}" required>
+                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name', auth()->check() ? auth()->user()->name : '') }}" required>
                             @error('first_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
@@ -30,11 +30,11 @@
                             @error('last_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="email" name="email" class="form-control" placeholder="Email Address *" value="{{ old('email') }}" required>
+                            <input type="email" name="email" class="form-control" placeholder="Email Address *" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required>
                             @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="text" name="phone" class="form-control" placeholder="Phone Number *" value="{{ old('phone') }}" required>
+                            <input type="text" name="phone" class="form-control" placeholder="Phone Number *" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required>
                             @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">

@@ -6,6 +6,10 @@
 **Phone:** {{ $phone }}  
 **Subject:** {{ $subject }}  
 
+@if($product)
+**Product Requested:** {{ $product->title }}
+@endif
+
 **Message:**  
 {{ $message }}
 

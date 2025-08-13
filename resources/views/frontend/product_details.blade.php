@@ -52,7 +52,7 @@
 </section>
 
 <div id="demoRequest" class="wow fadeInRight infinite" data-wow-delay="1s" data-wow-iteration="1">
-    <a href="{{ route('quotation') }}">Request a Demo</a>
+    <a href="{{ route('contact') }}?product_id={{ $product->id }}">Request a Demo</a>
 </div>
 
 @if ($product->features->count() > 0)
@@ -219,6 +219,6 @@
 
 @include('frontend.reviews')
 
-@include('frontend.contact')
+@include('frontend.contact', ['product' => null])
 
 @endsection

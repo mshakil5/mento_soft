@@ -40,10 +40,18 @@
                 <form action="{{ route('contact.store') }}" method="POST" class="form-style fadeInUp">
                     @csrf
                     <div class="row">
-                        <h3 class="text-white">Speak to an expert</h3>
+                      @php
+                          $product = $product ?? null;
+                      @endphp
 
+                        <h3 class="text-white">Speak to an expert 
+                            @if(isset($product))
+                                about <b><a href="{{ route('productDetails', $product->slug) }}" class="text-light text-decoration-underline">{{ $product->title }}</a></b>
+                            @endif
+                        </h3>
+                        <input type="hidden" name="product_id" value="{{ $product->id ?? '' }}">
                         <div class="col-md-6 form-group">
-                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name') }}" required>
+                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name', auth()->check() ? auth()->user()->name : '') }}" required>
                             @error('first_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
@@ -53,17 +61,17 @@
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <input type="email" name="email" class="form-control" placeholder="E-mail *" value="{{ old('email') }}" required>
+                            <input type="email" name="email" class="form-control" placeholder="E-mail *" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required>
                             @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <input type="number" name="phone" class="form-control" placeholder="Phone *" value="{{ old('phone') }}" required>
+                            <input type="number" name="phone" class="form-control" placeholder="Phone *" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required>
                             @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-12 form-group">
-                            <textarea name="message" class="textarea form-control" rows="3" placeholder="Message *" required>{{ old('message') }}</textarea>
+                            <textarea name="message" class="textarea form-control" rows="3" placeholder="Message *" required>{{ old('message') }} @if(isset($product)) I want to see a demo of {{ $product->title ?? '' }}@endif</textarea>
                             @error('message') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 

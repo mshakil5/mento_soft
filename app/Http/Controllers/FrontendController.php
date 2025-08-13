@@ -22,11 +22,16 @@ use App\Models\CompanyDetails;
 class FrontendController extends Controller
 {
 
-    public function contact()
+    public function contact(Request $request)
     {
         $this->setDefaultSEO();
+
+        $product = null;
+        if ($request->product_id) {
+            $product = Product::find($request->product_id);
+        }
         
-        return view('frontend.contact_us');
+        return view('frontend.contact_us', compact('product'));
     }
 
     public function getQuotation()
@@ -42,25 +47,27 @@ class FrontendController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'phone'      => 'required',
+            'phone' => 'required',
             'subject' => 'nullable|string|max:255',
             'message' => 'required|string',
+            'product_id' => 'nullable|exists:products,id',
         ]);
 
         $contact = new Contact();
-        $contact->first_name  = $request->input('first_name');
+        $contact->first_name = $request->input('first_name');
         $contact->last_name  = $request->input('last_name');
-        $contact->email = $request->input('email');
-        $contact->phone = $request->input('phone');
-        $contact->subject = $request->input('subject');
-        $contact->message = $request->input('message');
+        $contact->email      = $request->input('email');
+        $contact->phone      = $request->input('phone');
+        $contact->subject    = $request->input('subject');
+        $contact->message    = $request->input('message');
+        $contact->product_id = $request->input('product_id');
         $contact->save();
 
         $contactEmails = ContactEmail::where('status', 1)->pluck('email');
 
         foreach ($contactEmails as $contactEmail) {
-          Mail::to($contactEmail)->send(new ContactMail($contact));
-      }
+            Mail::to($contactEmail)->send(new ContactMail($contact));
+        }
 
         return back()->with('success', 'Your message has been sent successfully!');
     }

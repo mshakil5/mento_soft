@@ -41,6 +41,6 @@
 
 @include('frontend.reviews')
 
-@include('frontend.contact')
+@include('frontend.contact', ['product' => null])
 
 @endsection

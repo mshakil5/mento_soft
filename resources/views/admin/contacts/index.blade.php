@@ -19,6 +19,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Subject</th>
+                                    <th>Product</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -53,6 +54,7 @@
                         <p><strong>Subject:</strong> <span id="view-subject"></span></p>
                         <p><strong>Date:</strong> <span id="view-date"></span></p>
                         <p><strong>Status:</strong> <span id="view-status" class="badge badge-success"></span></p>
+                        <p><strong>Product:</strong> <span id="product"></span></p>
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -91,6 +93,7 @@
                 $('#view-subject').text(data.subject);
                 $('#view-message').text(data.message);
                 $('#view-date').text(data.formatted_created_at);
+                $('#product').text(data.product_title);
                 
                 // Set status badge
                 var statusBadge = $('#view-status');
@@ -165,6 +168,7 @@
                 {data: 'full_name', name: 'full_name'},
                 {data: 'email', name: 'email'},
                 {data: 'subject', name: 'subject'},
+                {data: 'product', name: 'product'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],

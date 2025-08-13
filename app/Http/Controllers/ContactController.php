@@ -12,11 +12,14 @@ class ContactController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Contact::orderBy('status', 'asc')->orderBy('id', 'desc');
+            $data = Contact::with('product')->orderBy('status', 'asc')->orderBy('id', 'desc');
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('full_name', function($row) {
                     return $row->first_name . ' ' . $row->last_name;
+                })
+                ->addColumn('product', function($row) {
+                    return $row->product ? $row->product->title : '';
                 })
                 ->addColumn('date', function($row) {
                     return Carbon::parse($row->created_at)->format('d-m-Y');
@@ -43,7 +46,7 @@ class ContactController extends Controller
 
     public function show($id)
     {
-        $contact = Contact::find($id);
+        $contact = Contact::with('product')->find($id);
         if (!$contact) {
             return response()->json([
                 'status' => 404,
@@ -51,6 +54,7 @@ class ContactController extends Controller
             ], 404);
         }
         $contact->formatted_created_at = $contact->created_at->format('d-m-Y | H:i:s');
+        $contact->product_title = $contact->product ? $contact->product->title : '';
         return response()->json($contact);
     }
 
