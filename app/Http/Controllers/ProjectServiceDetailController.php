@@ -23,9 +23,11 @@ class ProjectServiceDetailController extends Controller
                 ->addColumn('end_date', fn($row) => $row->end_date ? Carbon::parse($row->end_date)->format('d-m-Y') : 'N/A')
                 ->addColumn('next_renewal', function($row) {
                     if ($row->is_auto == 1 && $row->next_start_date && $row->next_end_date) {
+                        $cycle = $row->cycle_type == 1 ? 'Monthly' : ($row->cycle_type == 2 ? 'Yearly' : '');
                         return Carbon::parse($row->next_start_date)->format('d-m-Y') 
                             . ' - ' 
-                            . Carbon::parse($row->next_end_date)->format('d-m-Y');
+                            . Carbon::parse($row->next_end_date)->format('d-m-Y')
+                            . ($cycle ? " ({$cycle})" : '');
                     }
                     return '';
                 })
