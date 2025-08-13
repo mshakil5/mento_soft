@@ -1781,3 +1781,87 @@ section.default.contact-section .secTtile {
 :target {
   padding-top: 90px !important;
 }/*# sourceMappingURL=app.css.map */
+
+/* Cookie Policy */
+.cookie-consent-banner {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.15);
+    z-index: 999999;
+    transition: bottom 0.5s ease-in-out;
+}
+
+.cookie-consent-banner.active {
+    bottom: 0;
+}
+
+.cookie-content {
+    max-width: 1170px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.cookie-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cookie-header iconify-icon {
+    color: #FF6D33;
+}
+
+.cookie-header h4 {
+    margin: 0;
+    color: #222539;
+    font-family: "titilliumweb";
+    font-weight: bold;
+}
+
+.cookie-content p {
+    margin: 0;
+    color: #545454;
+    line-height: 1.5;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-cookie-accept {
+    background: #FF6D33;
+    color: #ffffff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 100px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-cookie-accept:hover {
+    background: #222539;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .cookie-consent-banner {
+        padding: 15px;
+    }
+    
+    .cookie-buttons {
+        flex-direction: column;
+    }
+    
+    .cookie-buttons button {
+        width: 100%;
+    }
+}

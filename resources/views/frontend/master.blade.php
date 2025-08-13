@@ -61,6 +61,10 @@
     @yield('content')
     <!-- Main Content End -->
 
+    {{-- Cookie Consent Start --}}
+    @include('frontend.cookie_consent')
+    {{-- Cookie Consent End --}}
+
     <!-- Footer Start -->
     @include('frontend.footer')
     <!-- Footer End -->
