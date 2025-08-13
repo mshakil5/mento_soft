@@ -812,7 +812,8 @@ section.default.contact-section .secTtile {
   text-decoration: none;
   animation: letterSpacing 8s linear infinite;
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
+  font-weight: 100;
   line-height: 1;
   border-radius: 90px;
 }
@@ -820,7 +821,7 @@ section.default.contact-section .secTtile {
   background: #FF6D33;
 }
 .our-products .innerbox div {
-  width: 115px;
+  width: 170px;
   height: 54px;
   border-radius: 31px !important;
   display: flex;

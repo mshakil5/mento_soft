@@ -3,7 +3,7 @@
 
 @php
     $company = \App\Models\CompanyDetails::first();
-    $services = \App\Models\Service::where('status', 1)->latest()->limit(6)->pluck('title');
+    $services = \App\Models\Service::where('status', 1)->orderByRaw('sl = 0, sl ASC')->orderBy('id', 'desc')->limit(6)->pluck('title');
 @endphp 
 
 <head>

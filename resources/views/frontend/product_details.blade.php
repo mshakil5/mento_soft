@@ -28,28 +28,25 @@
 <section class="product-details">
     <div class="container py-5">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="{{ $product->video ? 'col-lg-6' : 'col-12' }}">
                 <div class="block-area bg-white p-4 h-100">
                     <h2 class="secTtile fw-bold wow bounce">{{ $product->short_description }}</h2>
-                    @if($product->short_description)
+                    @if($product->long_description)
                         <p class="mb-3 text-muted small">
                             {!! $product->long_description !!}
                         </p>
                     @endif
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
-                @if($product->video)
+
+            @if($product->video)
+                <div class="col-lg-6 text-center">
                     <video width="100%" height="auto" controls>
                         <source src="{{ asset('images/products/videos/'.$product->video) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                @else
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 100%; min-height: 300px;">
-                        <p class="text-muted">No video available</p>
-                    </div>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -83,7 +80,7 @@
                         <iconify-icon class="text-ternary" icon="emojione-monotone:ledger" width="50" height="50"></iconify-icon>
                     @endif
 
-                    <h5>{{ $feature->title }}</h5>
+                    <h4>{{ $feature->title }}</h4>
                     <p class="small text-muted">{!! Str::limit($feature->description ?? '', 100) !!}</p>
                 </div>
             </div>
@@ -181,5 +178,47 @@
     </div>
 </section>
 @endif
+
+<section class="our-products" style="background-image: url(../images/pattern-1.svg), linear-gradient(16deg, rgb(4, 11, 22), rgb(10, 45, 102)); background-size: 100% 100%; background-position: 100% 100%;" id="products">
+    <div class="row px-2 text-center py-5">
+        <h2 class="secTtile text-light text-uppercase fw-bold title-font wow bounce mb-0">Other Products</h2>
+    </div>
+    <div class="row g-0">
+        @foreach($otherProducts as $product)
+            <div class="col-lg-6">
+                <div class="innerbox {{ $loop->odd ? 'accounting' : 'ai' }}">
+                    <a href="{{ route('productDetails', $product->slug) }}" class="productitle">
+                        {{ $product->title }}
+                    </a>
+                    
+                    @php
+                        $allClasses = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+                        $bgClasses = ['bg-dark text-light', ''];
+                        
+                        shuffle($allClasses);
+                        
+                        $features = $product->features->take(8);
+                    @endphp
+                    
+                    @foreach($features as $index => $feature)
+                        @php
+                            $bgClass = $bgClasses[$index % count($bgClasses)];
+                            $positionClass = $allClasses[$index % count($allClasses)];
+                            $animationClass = $index === 0 ? 'fadeInUp wow' : '';
+                        @endphp
+                        
+                        <div class="{{ $positionClass }} {{ $bgClass }} {{ $animationClass }}">
+                            {{ $feature->title }}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
+
+@include('frontend.reviews')
+
+@include('frontend.contact')
 
 @endsection

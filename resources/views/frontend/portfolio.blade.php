@@ -39,4 +39,8 @@
 </section>
 @endforeach
 
+@include('frontend.reviews')
+
+@include('frontend.contact')
+
 @endsection

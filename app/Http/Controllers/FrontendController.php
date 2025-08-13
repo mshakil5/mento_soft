@@ -9,7 +9,6 @@ use App\Mail\ContactMail;
 use App\Models\Contact;
 use App\Models\Master;
 use App\Models\Service;
-use App\Models\ClientReview;
 use App\Models\Quotation;
 use App\Models\ProjectType;
 use App\Models\Project;
@@ -98,15 +97,29 @@ class FrontendController extends Controller
         $landingPage = Master::where('name', 'landing page')->first();
         $whyChooseUs = Master::where('name', 'Why Choose Us')->first();
         $ourFlexible = Master::where('name', 'our flexible')->first();
-        $services = Service::where('status', 1)->latest()->limit(6)->get();
-        $testimonials = ClientReview::where('status', 1)->latest()->get();
+        $services = Service::where('status', 1)
+          ->orderByRaw('sl = 0, sl ASC')
+          ->orderBy('id', 'desc')->limit(6)
+          ->get();
         $products = Product::with(['features' => function($q){
-            $q->where('status', 1)->latest();
-        }])->where('status', 1)->latest()->limit(8)->get();
+            $q->where('status', 1)
+              ->orderByRaw('sl = 0, sl ASC')
+              ->orderBy('id', 'desc');
+        }])
+          ->where('status', 1)
+          ->orderByRaw('sl = 0, sl ASC')
+          ->orderBy('id', 'desc')
+          ->limit(8)
+          ->get();
+
+        $count = $products->count();
+        if ($count % 2 != 0 && $count > 1) {
+            $products = $products->slice(0, $count - 1);
+        }
 
         $this->setDefaultSEO();
 
-        return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'testimonials', 'products'));
+        return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'products'));
     }
 
     public function portfolio()
@@ -116,8 +129,12 @@ class FrontendController extends Controller
                 $query->where('status', 1);
             })
             ->with(['projects' => function ($query) {
-                $query->where('status', 1);
+                $query->where('status', 1)
+                      ->orderByRaw('sl = 0, sl ASC')
+                      ->orderBy('id', 'desc');
             }])
+            ->orderByRaw('sl = 0, sl ASC')
+            ->orderBy('id', 'desc')
             ->get();
 
         $this->setDefaultSEO();
@@ -153,13 +170,19 @@ class FrontendController extends Controller
     {
         $product = Product::with([
             'features' => function ($q) {
-                $q->where('status', 1)->latest();
+                $q->where('status', 1)
+                  ->orderByRaw('sl = 0, sl ASC')
+                  ->orderBy('id', 'desc');
             },
             'clients' => function ($q) {
-                $q->where('status', 1)->latest();
+                $q->where('status', 1)
+                  ->orderByRaw('sl = 0, sl ASC')
+                  ->orderBy('id', 'desc');
             },
             'faqs' => function ($q) {
-                $q->where('status', 1)->latest();
+                $q->where('status', 1)
+                  ->orderByRaw('sl = 0, sl ASC')
+                  ->orderBy('id', 'desc');
             },
             'videos' => function ($q) {
                 $q->where('status', 1)->latest();
@@ -169,13 +192,29 @@ class FrontendController extends Controller
         ->where('status', 1)
         ->firstOrFail();
 
+        $otherProducts = Product::with(['features' => function($q) {
+            $q->where('status', 1)
+              ->orderByRaw('sl = 0, sl ASC')
+              ->orderBy('id', 'desc');
+        }])
+          ->where('status', 1)
+          ->where('id', '!=', $product->id)
+          ->orderByRaw('sl = 0, sl ASC')
+          ->orderBy('id', 'desc')
+          ->limit(8)
+          ->get();
+
+        if ($otherProducts->count() % 2 != 0) {
+            $otherProducts = $otherProducts->slice(0, $otherProducts->count() - 1);
+        }
+
         $this->setDefaultSEO(
             $product->meta_title,
             $product->meta_description,
             $product->meta_keywords,
             $product->meta_image ? 'images/products/meta/' . $product->meta_image : null
         );
-        return view('frontend.product_details', compact('product'));
+        return view('frontend.product_details', compact('product', 'otherProducts'));
     }
 
     private function setDefaultSEO($title = null, $description = null, $keywords = null, $image = null)

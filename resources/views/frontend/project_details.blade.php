@@ -60,20 +60,21 @@
 
             <div class="col-lg-4 px-0">
                 <div class="p-4">
-                    @if(count($technologies) > 1)
-                        <h5 class="fst-italic text-center bg-light text-dark px-3 py-2 rounded-3 shadow-sm">Technology - Features</h5>
+
+                    @if(count($functionalFeatures) > 1)
+                        <h5 class="fst-italic text-center bg-light text-dark px-3 py-2 rounded-3 shadow-sm mt-1">Functional - Features</h5>
                         <ul class="list-group mt-3 small fst-italic shadow-sm">
-                            @foreach($technologies as $tech)
-                                <li class="list-group-item text-muted bg-transparent">{{ $tech }}</li>
+                            @foreach($functionalFeatures as $feature)
+                                <li class="list-group-item text-muted bg-transparent">{{ $feature }}</li>
                             @endforeach
                         </ul>
                     @endif
 
-                    @if(count($functionalFeatures) > 1)
-                        <h5 class="fst-italic text-center bg-light text-dark px-3 py-2 rounded-3 mt-3 shadow-sm">Functional - Features</h5>
+                    @if(count($technologies) > 1)
+                        <h5 class="fst-italic text-center bg-light text-dark px-3 py-2 rounded-3 shadow-sm mt-3">Technology - Features</h5>
                         <ul class="list-group mt-3 small fst-italic shadow-sm">
-                            @foreach($functionalFeatures as $feature)
-                                <li class="list-group-item text-muted bg-transparent">{{ $feature }}</li>
+                            @foreach($technologies as $tech)
+                                <li class="list-group-item text-muted bg-transparent">{{ $tech }}</li>
                             @endforeach
                         </ul>
                     @endif
@@ -90,4 +91,9 @@
         </div>
     </div>
 </section>
+
+@include('frontend.reviews')
+
+@include('frontend.contact')
+
 @endsection
