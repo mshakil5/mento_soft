@@ -128,7 +128,7 @@
             </li>
             <li class="nav-item">
                 <a href="{{ route('bankbook') }}" class="nav-link {{ request()->routeIs('bankbook') ? 'active' : '' }}">
-                    <i class="fas fa-plus nav-icon"></i>
+                    <i class="fas fa-list nav-icon"></i>
                     <p>Bank Book</p>
                 </a>
             </li>

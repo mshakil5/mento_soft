@@ -19,12 +19,12 @@
                                     
                                     <div class="form-group mx-md-3">
                                         <label class="sr-only">Start Date</label>
-                                        <input type="date" class="form-control" name="start_date" value="{{ request()->input('start_date', date('Y-m-d')) }}">
+                                        <input type="date" class="form-control" name="start_date" value="{{ request()->input('start_date') }}">
                                     </div>
                                     
                                     <div class="form-group mx-md-3">
                                         <label class="sr-only">End Date</label>
-                                        <input type="date" class="form-control" name="end_date" value="{{ request()->input('end_date', date('Y-m-d')) }}">
+                                        <input type="date" class="form-control" name="end_date" value="{{ request()->input('end_date') }}">
                                     </div>
 
                                     <button type="submit" class="btn btn-secondary">Search</button>

@@ -176,7 +176,7 @@ class InvoiceController extends Controller
             $transaction->date = $invoice->invoice_date;
             $transaction->invoice_id = $invoice->id;
             $transaction->client_id = $invoice->client_id;
-            $transaction->table_type = 'Assets';
+            $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Due';
             $transaction->payment_type = 'Bank';
             $transaction->description = $invoice->description;
@@ -430,7 +430,7 @@ class InvoiceController extends Controller
         $transaction->date = date('Y-m-d');
         $transaction->invoice_id = $invoice->id;
         $transaction->client_id = $invoice->client_id;
-        $transaction->table_type = 'Assets';
+        $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
         $transaction->payment_type = 'Bank';
         $transaction->description = 'Due Received';

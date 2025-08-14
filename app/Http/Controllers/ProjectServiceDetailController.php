@@ -115,7 +115,7 @@ class ProjectServiceDetailController extends Controller
         $transaction->project_service_detail_id = $detail->id;
         $clientId = $detail->projectService?->clientProject?->client_id;
         $transaction->client_id = $clientId;
-        $transaction->table_type = 'Assets';
+        $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Due';
         $transaction->payment_type = 'Bank';
         $transaction->description = $detail->note;
@@ -233,7 +233,7 @@ class ProjectServiceDetailController extends Controller
         $transaction->date = date('Y-m-d');
         $transaction->project_service_detail_id = $id;
         $transaction->client_id = $previousTransaction->client_id;
-        $transaction->table_type = 'Assets';
+        $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
         $transaction->payment_type = 'Bank';
         $transaction->description = 'Due Received';
