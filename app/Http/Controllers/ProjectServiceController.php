@@ -32,6 +32,13 @@ class ProjectServiceController extends Controller
 
               return DataTables::of($data)
                   ->addIndexColumn()
+                  ->addColumn('status', function($row) {
+                      $checked = $row->status ? 'checked' : '';
+                      return '<div class="custom-control custom-switch">
+                                  <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
+                                  <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
+                              </div>';
+                  })
                   ->addColumn('action', function($row) use ($today, $warningDate) {
                       $detailsUrl = route('client-project-services.details', $row->id);
 
