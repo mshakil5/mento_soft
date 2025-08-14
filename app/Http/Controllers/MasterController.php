@@ -11,8 +11,7 @@ class MasterController extends Controller
     public function index()
     {
         $data = Master::orderBy('id', 'DESC')->get();
-        $softCodes = Softcode::orderBy('id', 'DESC')->get();
-        return view('admin.master.index', compact('data', 'softCodes'));
+        return view('admin.master.index', compact('data'));
     }
 
     public function store(Request $request)
@@ -22,26 +21,16 @@ class MasterController extends Controller
             return response()->json(['status'=> 303,'message'=>$message]);
             exit();
         }
-        if(empty($request->softcode_id)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \" Soft Code \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
-        if(empty($request->short_title)){
-            $message ="<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \" Short Title \" field..!</b></div>";
-            return response()->json(['status'=> 303,'message'=>$message]);
-            exit();
-        }
         
         $data = new Master;
         $data->name = $request->name;
-        $data->softcode_id = $request->softcode_id;
         $data->short_title = $request->short_title;
         $data->long_title = $request->long_title;
         $data->short_description = $request->short_description;
         $data->long_description = $request->long_description;
         $data->meta_title = $request->meta_title;
         $data->meta_description = $request->meta_description;
+        $data->meta_keywords = $request->meta_keywords;
         $data->created_by =  auth()->id();
 
         if ($request->hasFile('meta_image')) {
@@ -78,10 +67,6 @@ class MasterController extends Controller
             return response()->json(['status'=> 303,'message'=>$message]);
             exit();
         }
-        if (empty($request->short_title)) {
-            $message = "<div class='alert alert-warning'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><b>Please fill \"Short Title\" field..!</b></div>";
-            return response()->json(['status' => 303, 'message' => $message]);
-        }
 
         if ($request->hasFile('meta_image')) {
             if ($data->meta_image) {
@@ -104,6 +89,7 @@ class MasterController extends Controller
         $data->long_description = $request->long_description;
         $data->meta_title = $request->meta_title;
         $data->meta_description = $request->meta_description;
+        $data->meta_keywords = $request->meta_keywords;
         $data->updated_by = auth()->id();
 
         if ($data->save()) {

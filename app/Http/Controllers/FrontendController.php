@@ -24,11 +24,22 @@ class FrontendController extends Controller
 
     public function contact(Request $request)
     {
-        $this->setDefaultSEO();
+        $this->seo();
 
         $product = null;
         if ($request->product_id) {
             $product = Product::find($request->product_id);
+        }
+
+        $contact = Master::where('name', 'contact')->first();
+
+        if($contact){
+            $this->seo(
+                $contact->meta_title,
+                $contact->meta_description,
+                $contact->meta_keywords,
+                $contact->meta_image ? asset('images/meta_image/' . $contact->meta_image) : null
+            );
         }
         
         return view('frontend.contact_us', compact('product'));
@@ -36,7 +47,16 @@ class FrontendController extends Controller
 
     public function getQuotation()
     {
-        $this->setDefaultSEO();
+        $quotation = Master::where('name', 'quotation')->first();
+
+        if($quotation){
+            $this->seo(
+                $quotation->meta_title,
+                $quotation->meta_description,
+                $quotation->meta_keywords,
+                $quotation->meta_image ? asset('images/meta_image/' . $quotation->meta_image) : null
+            );
+        }
 
         return view('frontend.get_quotation');
     }
@@ -124,7 +144,14 @@ class FrontendController extends Controller
             $products = $products->slice(0, $count - 1);
         }
 
-        $this->setDefaultSEO();
+        $company = CompanyDetails::first();
+
+        $this->seo(
+            $company->meta_title,
+            $company->meta_description,
+            $company->meta_keywords,
+            $company->meta_image ? asset('images/company/meta/' . $company->meta_image) : null
+        );
 
         return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'products'));
     }
@@ -144,7 +171,15 @@ class FrontendController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        $this->setDefaultSEO();
+        $portfolio = Master::where('name', 'portfolio')->first();
+        if($portfolio){
+            $this->seo(
+                $portfolio->meta_title,
+                $portfolio->meta_description,
+                $portfolio->meta_keywords,
+                $portfolio->meta_image ? asset('images/meta_image/' . $portfolio->meta_image) : null
+            );
+        }
 
         return view('frontend.portfolio', compact('projectTypes'));
     }
@@ -163,11 +198,11 @@ class FrontendController extends Controller
 
         $company = CompanyDetails::first();
 
-        $this->setDefaultSEO(
+        $this->seo(
             $project->meta_title,
             $project->meta_description,
             $project->meta_keywords,
-            $project->meta_image ? 'images/projects/meta/' . $project->meta_image : null
+            $project->meta_image ? asset('images/projects/meta/' . $project->meta_image) : null
         );
 
         return view('frontend.project_details', compact('project', 'technologies', 'functionalFeatures'));
@@ -215,27 +250,33 @@ class FrontendController extends Controller
             $otherProducts = $otherProducts->slice(0, $otherProducts->count() - 1);
         }
 
-        $this->setDefaultSEO(
+        $this->seo(
             $product->meta_title,
             $product->meta_description,
             $product->meta_keywords,
-            $product->meta_image ? 'images/products/meta/' . $product->meta_image : null
+            $product->meta_image ? asset('images/products/meta/' . $product->meta_image) : null
         );
         return view('frontend.product_details', compact('product', 'otherProducts'));
     }
 
-    private function setDefaultSEO($title = null, $description = null, $keywords = null, $image = null)
+    private function seo($title = null, $description = null, $keywords = null, $image = null)
     {
-        $company = CompanyDetails::first();
+        if ($title) {
+            SEOMeta::setTitle($title);
+            OpenGraph::setTitle($title);
+        }
 
-        SEOMeta::setTitle($title ?? $company->meta_title ?? $company->company_name);
-        SEOMeta::setDescription($description ?? $company->meta_description);
-        SEOMeta::setKeywords($keywords ?? $company->meta_keywords);
+        if ($description) {
+            SEOMeta::setDescription($description);
+            OpenGraph::setDescription($description);
+        }
 
-        OpenGraph::setTitle($title ?? $company->company_name);
-        OpenGraph::setDescription($description ?? $company->meta_description);
-        if ($image ?? $company->meta_image) {
-            OpenGraph::addImage(asset('images/company/meta/' . ($image ?? $company->meta_image)));
+        if ($keywords) {
+            SEOMeta::setKeywords($keywords);
+        }
+
+        if ($image) {
+            OpenGraph::addImage($image);
         }
     }
 

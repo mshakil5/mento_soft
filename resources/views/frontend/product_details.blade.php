@@ -68,7 +68,8 @@
             
             @foreach($product->features as $feature)
             <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
-                <div class="p-3 p-2 rounded-3 shadow-sm module-box fadeInUp wow"
+                <div class="p-3 rounded-3 shadow-sm module-box fadeInUp wow"
+                    style="cursor: pointer; height: 300px;"
                     type="button"
                     data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasFeature{{ $feature->id }}"
