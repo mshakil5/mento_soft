@@ -27,36 +27,36 @@
                             <input type="hidden" name="project_service_id" value="{{ $service->id }}">
 
                             <div class="row">
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                      <label>Start Date <span class="text-danger">*</span></label>
-                                      <input type="date" class="form-control" id="start_date" name="start_date" required>
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                      <label>End Date <span class="text-danger">*</span></label>
-                                      <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                  </div>
-                              </div>                
-                            </div>
-
-                            <div class="row">
-                              <div class="col-md-6">
-                                  <div class="form-control">
-                                      <input type="checkbox" class="form-control-input" id="is_auto" name="is_auto" value="1">
-                                      <label>Auto Renewal</label>
-                                  </div>
-                              </div>
-
-                              <div class="col-md-6" id="cycle_type_container" style="display:none;">
-                                  <div class="form-group">
-                                        <select class="form-control" name="cycle_type" id="cycle_type">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Start Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Cycle Type <span class="text-danger">*</span></label>
+                                        <select class="form-control" name="cycle_type" id="cycle_type" required>
                                             <option value="1">Monthly</option>
                                             <option value="2">Yearly</option>
                                         </select>
-                                  </div>
-                              </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>End Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="end_date" name="end_date" readonly required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-top: 35px;">
+                                        <input type="checkbox" class="form-control-input" id="is_auto" name="is_auto" value="1">
+                                        <label>Auto Renewal</label>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group mt-3">
@@ -133,6 +133,39 @@ $(document).ready(function () {
     var url = "/admin/client-project-services/{{ $service->id }}/details";
     var upurl = "/admin/client-project-service-detail/:id";
 
+    function calculateEndDate() {
+        var start = $("#start_date").val();
+        var cycleType = $("#cycle_type").val();
+        if (!start || !cycleType) return;
+
+        var startDate = new Date(start);
+        var endDate = new Date(startDate);
+
+        if (cycleType == "1") {
+            endDate.setMonth(endDate.getMonth() + 1);
+
+            if (endDate.getDate() !== startDate.getDate()) {
+                endDate.setDate(0);
+            }
+
+        } else if (cycleType == "2") {
+            endDate.setFullYear(endDate.getFullYear() + 1);
+
+            if (endDate.getMonth() !== startDate.getMonth()) {
+                endDate.setDate(0);
+            }
+        }
+
+        endDate.setDate(endDate.getDate() - 1);
+
+        var formattedDate = endDate.toISOString().split('T')[0];
+        $("#end_date").val(formattedDate);
+    }
+
+    $("#start_date, #cycle_type").change(function() {
+        calculateEndDate();
+    });
+
     $("#addBtn").click(function(){
         var form_data = new FormData();
         form_data.append("project_service_id", "{{ $service->id }}");
@@ -140,10 +173,8 @@ $(document).ready(function () {
         form_data.append("end_date", $("#end_date").val());
         form_data.append("amount", $("#amount").val());
         form_data.append("note", $("#note").val());
-        form_data.append("is_auto", $("#is_auto").is(":checked") ? 1 : null);
-        if ($("#is_auto").is(":checked")) {
-            form_data.append("is_auto", 1);
-        }
+        form_data.append("cycle_type", $("#cycle_type").val());
+        form_data.append("is_auto", $("#is_auto").is(":checked") ? 1 : 0);
 
         if($(this).val() == 'Create') {
             // Create
@@ -171,13 +202,6 @@ $(document).ready(function () {
         } else {
             // Update
             form_data.append("codeid", $("#codeid").val());
-            if ($("#is_auto").is(":checked")) {
-                form_data.append("is_auto", 1);
-                form_data.append("cycle_type", $("#cycle_type").val());
-            } else {
-                form_data.append("is_auto", 0);
-                form_data.append("cycle_type", "");
-            }
             var updateUrl = upurl.replace(':id', $("#codeid").val());
 
             $.ajax({
@@ -216,19 +240,12 @@ $(document).ready(function () {
 
     function populateForm(data){
         $("#start_date").val(data.start_date);
+        $("#cycle_type").val(data.cycle_type);
         $("#end_date").val(data.end_date);
         $("#amount").val(data.amount);
         $("#note").val(data.note);
         $("#codeid").val(data.id);
-        if(data.is_auto == 1){
-            $("#is_auto").prop('checked', true);
-            $("#cycle_type_container").show();
-            $("#cycle_type").val(data.cycle_type); // Set selected option
-        } else {
-            $("#is_auto").prop('checked', false);
-            $("#cycle_type_container").hide();
-            $("#cycle_type").val(''); // Clear selection
-        }
+        $("#is_auto").prop('checked', data.is_auto == 1);
 
         $("#addBtn").val('Update');
         $("#addBtn").html('Update');
@@ -239,8 +256,6 @@ $(document).ready(function () {
     function clearform(){
         $('#createThisForm')[0].reset();
         $("#is_auto").prop('checked', false);
-        $("#cycle_type_container").hide();
-        $("#cycle_type").val('');
         $("#addBtn").val('Create');
         $("#addBtn").html('Create');
         $("#addThisFormContainer").slideUp(200);
@@ -328,14 +343,6 @@ $(document).ready(function () {
     function reloadTable() {
       table.ajax.reload(null, false);
     }
-
-    $('#is_auto').change(function() {
-        if ($(this).is(':checked')) {
-            $('#cycle_type_container').show();
-        } else {
-            $('#cycle_type_container').hide();
-        }
-    });
 
     $(document).on('submit', '.receive-form', function(e) {
         e.preventDefault();

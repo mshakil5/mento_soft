@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\ChartOfAccount;
 use Carbon\Carbon;
+use App\Models\User;
 
 class ExpenseController extends Controller
 {
@@ -47,8 +48,10 @@ class ExpenseController extends Controller
                 })
                 ->make(true);
         }
+
+        $employees = User::where('status', 1)->get();
         $accounts = ChartOfAccount::where('account_head', 'Expenses')->get();
-        return view('admin.transactions.expense', compact('accounts'));
+        return view('admin.transactions.expense', compact('accounts', 'employees'));
     }
 
     public function store(Request $request)

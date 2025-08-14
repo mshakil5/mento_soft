@@ -97,10 +97,12 @@ class ProjectServiceDetailController extends Controller
     public function store(ProjectService $service, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'start_date' => 'required',
+            'start_date' => 'required|date',
             'end_date' => 'required|after_or_equal:start_date',
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
+            'cycle_type' => 'nullable|in:1,2',
+            'is_auto' => 'nullable|boolean'
         ]);
 
         if ($validator->fails()) {
@@ -108,29 +110,28 @@ class ProjectServiceDetailController extends Controller
         }
 
         $isAuto = $request->input('is_auto') == 1 ? 1 : 0;
+        $cycleType = $request->input('cycle_type');
 
-        $cycleType = null;
+        $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+        $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+
         $nextStartDate = null;
         $nextEndDate = null;
 
         if ($isAuto) {
-            $cycleType = (int) $request->input('cycle_type', 2);
-            $endDate = Carbon::parse($request->end_date);
-            if ($cycleType === 1) {
-                $nextStartDate = $endDate->copy()->addDay();
-                $nextEndDate = $nextStartDate->copy()->endOfMonth();
-            } else {
-                $nextStartDate = $endDate->copy()->addDay()->startOfYear();
-                $nextEndDate = $nextStartDate->copy()->endOfYear();
+            $nextStartDate = Carbon::parse($endDate)->addDay()->format('Y-m-d');
+
+            if ($cycleType == 1) {
+                $nextEndDate = Carbon::parse($nextStartDate)->addMonthNoOverflow()->subDay()->format('Y-m-d');
+            } elseif ($cycleType == 2) {
+                $nextEndDate = Carbon::parse($nextStartDate)->addYear()->subDay()->format('Y-m-d');
             }
-            $nextStartDate = $nextStartDate->format('Y-m-d');
-            $nextEndDate = $nextEndDate->format('Y-m-d');
         }
 
         $detail = ProjectServiceDetail::create([
             'project_service_id' => $service->id,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'amount' => $request->amount,
             'note' => $request->note,
             'status' => true,
@@ -142,23 +143,26 @@ class ProjectServiceDetailController extends Controller
         ]);
 
         $transaction = new Transaction();
-        $transaction->date = $request->start_date;
+        $transaction->date = $startDate;
         $transaction->project_service_detail_id = $detail->id;
-        $clientId = $detail->projectService?->clientProject?->client_id;
-        $transaction->client_id = $clientId;
+        $transaction->client_id = $detail->projectService?->clientProject?->client_id;
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Due';
         $transaction->payment_type = 'Bank';
-        $transaction->description = $detail->note ?? "Due for {$service->name} for service period ".\Carbon\Carbon::parse($detail->start_date)->format('d-m-Y')." to ".\Carbon\Carbon::parse($detail->end_date)->format('d-m-Y');
+        $transaction->description = $detail->note ?? "Due for {$service->name} for service period ".$startDate." to ".$endDate;
         $transaction->amount = $detail->amount;
         $transaction->at_amount = $detail->amount;
         $transaction->created_by = auth()->id();
-        $transaction->created_ip = request()->ip();
+        $transaction->created_ip = $request->ip();
         $transaction->save();
         $transaction->tran_id = 'AT' . date('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT);
         $transaction->save();
 
-        return response()->json(['status' => 200, 'message' => 'Service detail created successfully.', 'data' => $detail], 201);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Service detail created successfully.',
+            'data' => $detail
+        ], 201);
     }
 
     public function edit(ProjectServiceDetail $detail)
@@ -172,10 +176,12 @@ class ProjectServiceDetailController extends Controller
     public function update(Request $request, ProjectServiceDetail $detail)
     {
         $validator = Validator::make($request->all(), [
-            'start_date' => 'required',
-            'end_date' => 'required|after_or_equal:start_date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
+            'cycle_type' => 'nullable|in:1,2',
+            'is_auto' => 'nullable|boolean'
         ]);
 
         if ($validator->fails()) {
@@ -185,28 +191,31 @@ class ProjectServiceDetailController extends Controller
         $isAuto = $request->input('is_auto') == 1 ? 1 : 0;
         $cycleType = $isAuto ? (int) $request->input('cycle_type', 2) : null;
 
+        $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+        $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+
+        $nextStartDate = null;
+        $nextEndDate = null;
+
         if ($isAuto) {
-            $endDate = Carbon::parse($request->end_date);
+            $nextStartDate = Carbon::parse($endDate)->addDay();
+
             if ($cycleType === 1) {
-                $nextStartDate = $endDate->copy()->addDay();
-                $nextEndDate = $nextStartDate->copy()->endOfMonth();
-            } else {
-                $nextStartDate = $endDate->copy()->addDay()->startOfYear();
-                $nextEndDate = $nextStartDate->copy()->endOfYear();
+                $nextEndDate = $nextStartDate->copy()->addMonthNoOverflow()->subDay();
+            } elseif ($cycleType === 2) {
+                $nextEndDate = $nextStartDate->copy()->addYear()->subDay();
             }
+
             $nextStartDate = $nextStartDate->format('Y-m-d');
             $nextEndDate = $nextEndDate->format('Y-m-d');
-        } else {
-            $nextStartDate = null;
-            $nextEndDate = null;
         }
 
-        $detail->start_date = $request->start_date;
-        $detail->end_date = $request->end_date;
+        $detail->start_date = $startDate;
+        $detail->end_date = $endDate;
         $detail->amount = $request->amount;
         $detail->note = $request->note;
         $detail->is_auto = $isAuto;
-        $detail->cycle_type = $cycleType;
+        $detail->cycle_type = $request->cycle_type;
         $detail->next_start_date = $nextStartDate;
         $detail->next_end_date = $nextEndDate;
         $detail->updated_by = auth()->id();
@@ -214,13 +223,13 @@ class ProjectServiceDetailController extends Controller
         if ($detail->save()) {
             $transaction = Transaction::where('project_service_detail_id', $detail->id)->first();
             if ($transaction) {
-                $transaction->date = $request->start_date;
+                $transaction->date = $startDate;
                 $transaction->client_id = $detail->projectService?->clientProject?->client_id;
                 $transaction->description = $detail->note;
                 $transaction->amount = $detail->amount;
                 $transaction->at_amount = $detail->amount;
                 $transaction->updated_by = auth()->id();
-                $transaction->updated_ip = request()->ip();
+                $transaction->updated_ip = $request->ip();
                 $transaction->save();
             }
 

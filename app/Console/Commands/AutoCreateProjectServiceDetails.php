@@ -25,26 +25,27 @@ class AutoCreateProjectServiceDetails extends Command
 
         foreach ($details as $detail) {
             $newDetail = $detail->replicate();
-            $newDetail->start_date = $detail->next_start_date;
-            $newDetail->end_date = $detail->next_end_date;
+
+            $startDate = Carbon::parse($detail->next_start_date)->format('Y-m-d');
+            $endDate = Carbon::parse($detail->next_end_date)->format('Y-m-d');
+
+            $newDetail->start_date = $startDate;
+            $newDetail->end_date = $endDate;
             $newDetail->next_created = 0;
             $newDetail->bill_paid = 0;
-            $newDetail->last_auto_run = Carbon::now();
+            $newDetail->last_auto_run = now();
             $newDetail->created_at = now();
             $newDetail->updated_at = now();
 
-            $endDate = Carbon::parse($newDetail->end_date);
-
-            if ($detail->cycle_type === 1) { // Monthly
-                $newDetail->next_start_date = $endDate->copy()->addDay();
-                $newDetail->next_end_date = $newDetail->next_start_date->copy()->endOfMonth();
-            } else { // Yearly
-                $newDetail->next_start_date = $endDate->copy()->addDay()->startOfYear();
-                $newDetail->next_end_date = $newDetail->next_start_date->copy()->endOfYear();
+            $nextStart = Carbon::parse($endDate)->addDay();
+            if ($detail->cycle_type === 1) {
+                $nextEnd = $nextStart->copy()->addMonthNoOverflow()->subDay();
+            } else {
+                $nextEnd = $nextStart->copy()->addYear()->subDay();
             }
 
-            $newDetail->next_start_date = $newDetail->next_start_date->format('Y-m-d');
-            $newDetail->next_end_date = $newDetail->next_end_date->format('Y-m-d');
+            $newDetail->next_start_date = $nextStart->format('Y-m-d');
+            $newDetail->next_end_date = $nextEnd->format('Y-m-d');
 
             $newDetail->save();
 
@@ -52,13 +53,13 @@ class AutoCreateProjectServiceDetails extends Command
             $detail->save();
 
             $transaction = new Transaction();
-            $transaction->date = $newDetail->start_date;
+            $transaction->date = $startDate;
             $transaction->project_service_detail_id = $newDetail->id;
             $transaction->client_id = $newDetail->projectService?->clientProject?->client_id;
-            $transaction->table_type = 'Assets';
+            $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Due';
             $transaction->payment_type = 'Bank';
-            $transaction->description = $newDetail->note;
+            $transaction->description = $newDetail->note ?? "Due for {$newDetail->projectService->name} for service period {$startDate} to {$endDate}";
             $transaction->amount = $newDetail->amount;
             $transaction->at_amount = $newDetail->amount;
             $transaction->created_by = $newDetail->created_by;
@@ -70,5 +71,4 @@ class AutoCreateProjectServiceDetails extends Command
 
         $this->info('Auto-create process completed.');
     }
-
 }
