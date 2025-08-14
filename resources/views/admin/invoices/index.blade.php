@@ -786,7 +786,8 @@
                 method: 'POST',
                 data: form.serialize(),
                 success(res) {
-                    success(res.message ?? 'Email sent successfully!');
+                    success(res.message ?? 'Received successfully!');
+                    form.closest('.modal').modal('hide');
                     reloadTable();
                 },
                 error() {

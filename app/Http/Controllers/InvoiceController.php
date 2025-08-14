@@ -62,10 +62,44 @@ class InvoiceController extends Controller
 
                     $btn = '';
                     if ($row->isPending()) {
-                        $btn .= '<form method="POST" action="'.route('invoices.receive', $row->id).'" style="display:inline;" class="receive-form">
-                                    '.csrf_field().'
-                                    <button type="submit" class="btn btn-sm btn-success receive-btn">Receive</button>
-                                </form> ';
+
+                        $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
+                        $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+
+                        $btn .= '
+                        <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <form method="POST" action="'.route('invoices.receive', $row->id).'" class="receive-form">
+                              '.csrf_field().'
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Mark This Invoice as Received</h5>
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                    <label>Payment Type <span class="text-danger"> *</span></label>
+                                    <select name="payment_type" class="form-control" required>
+                                      <option value="Cash">Cash</option>
+                                      <option value="Bank">Bank</option>
+                                    </select>
+                                  </div>
+                                  <div class="mb-3">
+                                    <label>Note</label>
+                                    <textarea name="note" class="form-control"></textarea>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-success">Submit</button>
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        ';
+                    } else {
+                        $btn .= '<button class="btn btn-sm btn-success" disabled>Receive</button> ';
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
                     }
                     $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button> ';
@@ -164,6 +198,7 @@ class InvoiceController extends Controller
             }
 
             $discountAmount = $subtotal * ($invoice->discount_percent / 100);
+            $netWithoutVat = $subtotal - $discountAmount;
             $netAmount = ($subtotal + $totalVat) - $discountAmount;
 
             $invoice->subtotal = $subtotal;
@@ -180,8 +215,10 @@ class InvoiceController extends Controller
             $transaction->transaction_type = 'Due';
             $transaction->payment_type = 'Bank';
             $transaction->description = $invoice->description;
-            $transaction->amount = $invoice->net_amount;
+            $transaction->amount = $netWithoutVat;
             $transaction->at_amount = $invoice->net_amount;
+            $transaction->vat_amount = $invoice->vat_amount;
+            $transaction->discount = $invoice->discount_amount;
             $transaction->created_by = auth()->id();
             $transaction->created_ip = request()->ip();
             $transaction->save();
@@ -322,6 +359,7 @@ class InvoiceController extends Controller
             }
 
             $discountAmount = $subtotal * ($invoice->discount_percent / 100);
+            $netWithoutVat = $subtotal - $discountAmount;
             $netAmount = ($subtotal + $totalVat) - $discountAmount;
 
             $invoice->subtotal = $subtotal;
@@ -335,8 +373,10 @@ class InvoiceController extends Controller
                 $transaction->date = $invoice->invoice_date;
                 $transaction->client_id = $invoice->client_id;
                 $transaction->description = $invoice->description;
-                $transaction->amount = $invoice->net_amount;
+                $transaction->amount = $netWithoutVat;
                 $transaction->at_amount = $invoice->net_amount;
+                $transaction->vat_amount = $invoice->vat_amount;
+                $transaction->discount = $invoice->discount_amount;
                 $transaction->updated_by = auth()->id();
                 $transaction->updated_ip = request()->ip();
                 $transaction->save();
@@ -423,19 +463,21 @@ class InvoiceController extends Controller
         return response()->json(['message' => 'Invoice email sent successfully.']);
     }
 
-    public function receive(Invoice $invoice)
+    public function receive(Request $request, Invoice $invoice)
     {
-        $due_amount = Transaction::where('invoice_id', $invoice->id)->where('transaction_type', 'Due')->first()->amount;
+        $prevTransaction = Transaction::where('invoice_id', $invoice->id)->where('transaction_type', 'Due')->first();
         $transaction = new Transaction();
         $transaction->date = date('Y-m-d');
         $transaction->invoice_id = $invoice->id;
         $transaction->client_id = $invoice->client_id;
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
-        $transaction->payment_type = 'Bank';
-        $transaction->description = 'Due Received';
-        $transaction->amount = $due_amount;
-        $transaction->at_amount = $due_amount;
+        $transaction->payment_type = $request->payment_type;
+        $transaction->description = $request->note ?? 'Due Received for Invoice: ' . $invoice->invoice_number;
+        $transaction->amount = $invoice->subtotal;
+        $transaction->at_amount = $invoice->net_amount;
+        $transaction->vat_amount = $invoice->vat_amount;
+        $transaction->discount = $invoice->discount_amount;
         $transaction->created_by = auth()->id();
         $transaction->created_ip = request()->ip();
         $transaction->save();

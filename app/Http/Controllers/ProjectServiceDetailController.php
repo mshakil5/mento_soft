@@ -43,14 +43,45 @@ class ProjectServiceDetailController extends Controller
                 ->addColumn('action', function($row) {
                     $btn = '';
                     if ($row->isPending()) {
-                        $btn .= '<form method="POST" action="'.route('project-service-details.receive', $row->id).'" style="display:inline;" class="receive-form">'
-                              . csrf_field()
-                              . '<button type="submit" class="btn btn-sm btn-success receive-btn">Receive</button>'
-                              . '</form> ';
+
+                        $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+
+                        $btn .= '
+                        <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <form method="POST" action="'.route('project-service-details.receive', $row->id).'" class="receive-form">
+                              '.csrf_field().'
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Receive this payment</h5>
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                    <label>Payment Type <span class="text-danger"> *</span></label>
+                                    <select name="payment_type" class="form-control" required>
+                                      <option value="Cash">Cash</option>
+                                      <option value="Bank">Bank</option>
+                                    </select>
+                                  </div>
+                                  <div class="mb-3">
+                                    <label>Note</label>
+                                    <textarea name="note" class="form-control"></textarea>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-success">Submit</button>
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        ';
                     } else {
-                        $btn .= '<button type="submit" class="btn btn-sm btn-success receive-btn disabled">Received</button>'
-                              . '</form> ';
+                        $btn .= '<button class="btn btn-sm btn-success" disabled>Receive</button> ';
+                        $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
                     }
 
                     $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>';
@@ -118,7 +149,7 @@ class ProjectServiceDetailController extends Controller
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Due';
         $transaction->payment_type = 'Bank';
-        $transaction->description = $detail->note;
+        $transaction->description = $detail->note ?? "Due for {$service->name} for service period ".\Carbon\Carbon::parse($detail->start_date)->format('d-m-Y')." to ".\Carbon\Carbon::parse($detail->end_date)->format('d-m-Y');
         $transaction->amount = $detail->amount;
         $transaction->at_amount = $detail->amount;
         $transaction->created_by = auth()->id();
@@ -226,8 +257,9 @@ class ProjectServiceDetailController extends Controller
         return response()->json(['status'=>200, 'message'=>'Status updated successfully']);
     }
 
-    public function receive($id)
+    public function receive(Request $request, $id)
     {
+        $serviceDetail = ProjectServiceDetail::with('projectService')->find($id);
         $previousTransaction = Transaction::where('project_service_detail_id', $id)->where('transaction_type', 'Due')->first();
         $transaction = new Transaction();
         $transaction->date = date('Y-m-d');
@@ -235,8 +267,8 @@ class ProjectServiceDetailController extends Controller
         $transaction->client_id = $previousTransaction->client_id;
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
-        $transaction->payment_type = 'Bank';
-        $transaction->description = 'Due Received';
+        $transaction->payment_type = $request->payment_type;
+        $transaction->description = $request->note ?? "Due received for {$serviceDetail->projectService->name} for service period ".\Carbon\Carbon::parse($serviceDetail->start_date)->format('d-m-Y')." to ".\Carbon\Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
         $transaction->amount = $previousTransaction->amount;
         $transaction->at_amount = $previousTransaction->amount;
         $transaction->created_by = auth()->id();
