@@ -57,7 +57,6 @@
                                 <th>Account Name</th>
                                 <th>Account Head</th>
                                 <th>Sub Account Head</th>
-                                <th>Serial</th>
                                 <th>Description</th>
                                 <th>Status</th>
                                 <th><i class=""></i> Action</th>
@@ -177,7 +176,6 @@
             {data: 'account_name', name: 'account_name'},
             {data: 'account_head', name: 'account_head'},
             {data: 'sub_account_head', name: 'sub_account_head'},
-            { data: 'serial', name: 'serial' },
             {data: 'description', name: 'description'},
             {
                 data: 'status', name: 'status', render: function (data, type, row, meta) {

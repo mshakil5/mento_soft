@@ -35,6 +35,7 @@ use App\Http\Controllers\ProductClientVideoController;
 use App\Http\Controllers\ProjectRecentUpdateController;
 use App\Http\Controllers\ProjectServiceController;
 use App\Http\Controllers\ProjectServiceDetailController;
+use App\Http\Controllers\DaybookController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -304,4 +305,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::put('equity-holders/{id}', [EquityHolderController::class, 'update']);
     Route::get('equity-holders/{id}/change-status', [EquityHolderController::class, 'changeStatus']);
 
+    Route::match(['get', 'post'], 'cash-book', [DaybookController::class, 'cashbook'])->name('cashbook');
+    Route::match(['get', 'post'], 'bank-book', [DaybookController::class, 'bankbook'])->name('bankbook');
 });

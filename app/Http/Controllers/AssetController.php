@@ -38,7 +38,7 @@ class AssetController extends Controller
 
             return DataTables::of($transactions)
                 ->addColumn('chart_of_account', function ($transaction) {
-                    return $transaction->chartOfAccount->account_name;
+                    return $transaction->chartOfAccount->account_name ?? 'NA';
                 })
                 ->editColumn('date', function ($transaction) {
                     return Carbon::parse($transaction->date)->format('d-m-Y');
