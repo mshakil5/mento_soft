@@ -59,8 +59,8 @@
                         <th>Transaction Type</th>
                         <th>Payment Type</th>
                         <th>Gross Amount</th>
-                        <th>Tax Rate</th>
-                        <th>Tax Amount</th>
+                        {{-- <th>Vat Rate</th> --}}
+                        <th>Vat Amount</th>
                         <th>Net Amount</th>
                         <th><i class=""></i> Action</th>
                         @endslot
@@ -111,6 +111,20 @@
                     </div>
 
                     <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group d-none" id="showEmployee">
+                                <label for="employee_id" class="control-label">Employee</label>
+                                <select class="form-control" id="employee_id" name="employee_id">
+                                    <option value="">Select employee</option>
+                                    @foreach($employees as $employee)
+                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="ref" class="control-label">Reference</label>
@@ -146,15 +160,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="tax_rate" class="control-label">Tax %</label>
-                                    <input type="text" name="tax_rate" class="form-control" id="tax_rate">
+                                    <label for="vat_rate" class="control-label">Vat %</label>
+                                    <input type="number" name="vat_rate" class="form-control" id="vat_rate">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="tax_amount" class="control-label">Tax Amount</label>
-                                    <input type="text" name="tax_amount" class="form-control" id="tax_amount">
+                                    <label for="vat_amount" class="control-label">Vat Amount</label>
+                                    <input type="text" name="vat_amount" class="form-control" id="vat_amount">
                                 </div>
                             </div>
                         </div>
@@ -263,6 +277,16 @@
             });
         }).change();
 
+        $("#chart_of_account_id").change(function() {
+            var selectedAccount = $(this).find("option:selected").text();
+            if (selectedAccount == "Wage") {
+                $("#showEmployee").removeClass('d-none').addClass('d-block');
+            } else {
+                $("#showEmployee").removeClass('d-block').addClass('d-none');
+                $("#employee_id").val('');
+            }
+        });
+
         function clearPayableHolder() {
             $("#payable_holder_id").val('');
         }
@@ -273,17 +297,17 @@
 <script>
     function calculateTotal() {
         var amount = parseFloat(document.getElementById('amount').value) || 0;
-        var taxRate = parseFloat(document.getElementById('tax_rate').value) || 0;
+        var taxRate = parseFloat(document.getElementById('vat_rate').value) || 0;
 
         var taxAmount = amount * (taxRate / 100);
-        document.getElementById('tax_amount').value = taxAmount.toFixed(2);
+        document.getElementById('vat_amount').value = taxAmount.toFixed(2);
 
         var totalAmount = amount + taxAmount;
         document.getElementById('at_amount').value = totalAmount.toFixed(2);
     }
 
     document.getElementById('amount').addEventListener('input', calculateTotal);
-    document.getElementById('tax_rate').addEventListener('input', calculateTotal);
+    document.getElementById('vat_rate').addEventListener('input', calculateTotal);
 
     calculateTotal();
 </script>
@@ -296,6 +320,7 @@
 
     var charturl = "{{URL::to('/admin/expense')}}";
     var customerTBL = $('#expenseTBL').DataTable({
+        order: [],
         processing: true,
         serverSide: true,
         ajax: {
@@ -343,13 +368,13 @@
                 data: 'amount',
                 name: 'amount'
             },
+            // {
+            //     data: 'vat_rate',
+            //     name: 'vat_rate'
+            // },
             {
-                data: 'tax_rate',
-                name: 'tax_rate'
-            },
-            {
-                data: 'tax_amount',
-                name: 'tax_amount'
+                data: 'vat_amount',
+                name: 'vat_amount'
             },
             {
                 data: 'at_amount',
@@ -397,10 +422,16 @@
                     } else {
                         $("#pre_adjust").show();
                     }
+                    if (response.chartOfAccount && response.chartOfAccount.account_name == "Wage") {
+                        $("#showEmployee").removeClass('d-none').addClass('d-block');
+                        $('#employee_id').val(response.employee_id);
+                    } else {
+                        $("#showEmployee").removeClass('d-block').addClass('d-none');
+                    }
                     $('#transaction_type').val(response.transaction_type);
                     $('#amount').val(response.amount);
-                    $('#tax_rate').val(response.tax_rate);
-                    $('#tax_amount').val(response.tax_amount);
+                    $('#vat_rate').val(response.vat_rate);
+                    $('#vat_amount').val(response.vat_amount);
                     $('#at_amount').val(response.at_amount);
                     $('#payment_type').val(response.payment_type);
                     $('#description').val(response.description);
@@ -519,6 +550,8 @@
         $('#payment_type').html("<option value=''>Please Select</option>" + "<option value='Cash'>Cash</option>" + "<option value='Bank'>Bank</option>");
         $('#showpayable').hide();
         $('#payable_holder_id').val('');
+        $('#employee_id').val('');
+        $("#showEmployee").removeClass('d-block').addClass('d-none');
     });
 </script>
 
