@@ -111,9 +111,8 @@
         </a>
     </li>
 
-    <li class="nav-item dropdown {{ request()->is('admin/cash-book') || request()->is('admin/bank-book')  ? 'menu-open' : '' }}">
-
-        <a href="#" class="nav-link dropdown-toggle {{ request()->is('admin/cash-book') || request()->is('admin/bank-book') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ request()->routeIs('cashbook') || request()->routeIs('bankbook') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link {{ request()->routeIs('cashbook') || request()->routeIs('bankbook') ? 'active' : '' }}">
             <i class="nav-icon fas fa-warehouse"></i>
             <p>
                 Day Book <i class="fas fa-angle-left right"></i>
@@ -130,6 +129,29 @@
                 <a href="{{ route('bankbook') }}" class="nav-link {{ request()->routeIs('bankbook') ? 'active' : '' }}">
                     <i class="fas fa-list nav-icon"></i>
                     <p>Bank Book</p>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    <li class="nav-item dropdown {{ request()->routeIs('income-statement') || request()->routeIs('balance-sheet') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link {{ request()->routeIs('income-statement') || request()->routeIs('balance-sheet') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-chart-line"></i>
+            <p>
+                Financial Statement <i class="fas fa-angle-left right"></i>
+            </p>
+        </a>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="{{ route('income-statement') }}" class="nav-link {{ request()->routeIs('income-statement') ? 'active' : '' }}">
+                    <i class="fas fa-file-invoice nav-icon"></i>
+                    <p>Income Statement</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('balance-sheet') }}" class="nav-link {{ request()->routeIs('balance-sheet') ? 'active' : '' }}">
+                    <i class="fas fa-file-alt nav-icon"></i>
+                    <p>Balance Sheet</p>
                 </a>
             </li>
         </ul>

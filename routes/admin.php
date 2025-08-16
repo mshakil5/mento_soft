@@ -36,6 +36,7 @@ use App\Http\Controllers\ProjectRecentUpdateController;
 use App\Http\Controllers\ProjectServiceController;
 use App\Http\Controllers\ProjectServiceDetailController;
 use App\Http\Controllers\DaybookController;
+use App\Http\Controllers\FinancialStatementController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -307,4 +308,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::match(['get', 'post'], 'cash-book', [DaybookController::class, 'cashbook'])->name('cashbook');
     Route::match(['get', 'post'], 'bank-book', [DaybookController::class, 'bankbook'])->name('bankbook');
+
+    Route::get('income-statement', [FinancialStatementController::class, 'incomeStatement'])->name('income-statement');
+    Route::post('income-statement', [FinancialStatementController::class, 'incomeStatementReport'])->name('income-statement.report');
+
+    Route::get('balance-sheet', [FinancialStatementController::class, 'balanceSheet'])->name('balance-sheet');
+    Route::post('balance-sheet', [FinancialStatementController::class, 'balanceSheetReport'])->name('balance-sheet.report');
 });

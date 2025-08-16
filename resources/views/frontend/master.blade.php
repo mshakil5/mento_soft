@@ -8,20 +8,12 @@
 
 <head>
     <meta charset="utf-8">
-    {{-- <title>@yield('title', $company->company_name)</title> --}}
-    {{-- <title>{!! SEO::getTitle() ?? $company->company_name !!}</title> --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     {!! SEOMeta::generate() !!}
     {!! OpenGraph::generate() !!}
     {!! Twitter::generate() !!}
-
-    {{-- <meta name="google-site-verification" content="{{ $company->google_site_verification ?? '' }}" />
-
-    <meta name="title" content="@yield('meta_title', $company->meta_title ?? $company->company_name ?? '')">
-    <meta name="description" content="@yield('meta_description', $company->meta_description ?? '')">
-    <meta property="og:image" content="@yield('meta_image', $company->meta_image ? asset('images/company/meta/' . $company->meta_image) : '')"> --}}
 
     <link rel="icon" href="{{ asset('images/company/' . $company->fav_icon) }}">
 
