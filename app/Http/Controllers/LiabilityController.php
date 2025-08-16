@@ -18,7 +18,7 @@ class LiabilityController extends Controller
     {
         if($request->ajax()){
             $transactions = Transaction::with('chartOfAccount')
-                ->where('table_type', 'Liabilities');
+                ->where('table_type', 'Liabilities')->latest()->where('status', 0);
 
             if ($request->filled('start_date')) {
                 $endDate = $request->filled('end_date') ? $request->input('end_date') : now()->endOfDay();
@@ -79,8 +79,8 @@ class LiabilityController extends Controller
         $transaction->ref = $request->input('ref');
         $transaction->description = $request->input('description');
         $transaction->amount = $request->input('amount');
-        $transaction->tax_rate = $request->input('tax_rate');
-        $transaction->tax_amount = $request->input('tax_amount');
+        $transaction->vat_rate = $request->input('vat_rate');
+        $transaction->vat_amount = $request->input('vat_amount');
         $transaction->vat_rate = $request->input('vat_rate');
         $transaction->vat_amount = $request->input('vat_amount');
         $transaction->at_amount = $request->input('at_amount');
@@ -108,8 +108,8 @@ class LiabilityController extends Controller
             'ref' => $transaction->ref,
             'transaction_type' => $transaction->transaction_type,
             'amount' => $transaction->amount,
-            'tax_rate' => $transaction->tax_rate,
-            'tax_amount' => $transaction->tax_amount,
+            'vat_rate' => $transaction->vat_rate,
+            'vat_amount' => $transaction->vat_amount,
             'at_amount' => $transaction->at_amount,
             'payment_type' => $transaction->payment_type,
             'description' => $transaction->description,
@@ -147,8 +147,8 @@ class LiabilityController extends Controller
         $transaction->ref = $request->input('ref');
         $transaction->description = $request->input('description');
         $transaction->amount = $request->input('amount');
-        $transaction->tax_rate = $request->input('tax_rate');
-        $transaction->tax_amount = $request->input('tax_amount');
+        $transaction->vat_rate = $request->input('vat_rate');
+        $transaction->vat_amount = $request->input('vat_amount');
         $transaction->vat_rate = $request->input('vat_rate');
         $transaction->vat_amount = $request->input('vat_amount');
         $transaction->at_amount = $request->input('at_amount');

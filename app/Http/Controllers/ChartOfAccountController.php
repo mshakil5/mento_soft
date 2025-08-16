@@ -15,7 +15,7 @@ class ChartOfAccountController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = ChartOfAccount::query();
+            $query = ChartOfAccount::latest();
 
             if ($accountHead = $request->input('account_head')) {
                 $query->where('account_head', $accountHead);

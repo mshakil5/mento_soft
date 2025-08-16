@@ -120,6 +120,7 @@
 
 
     var customerTBL = $('#chartTBL').DataTable({
+        order: [],
         processing: true,
         serverSide: true,
         ajax: {

@@ -200,6 +200,7 @@
 
     var charturl = "{{URL::to('/admin/equity')}}";
     var customerTBL = $('#expenseTBL').DataTable({
+        order: [],
         processing: true,
         serverSide: true,
         ajax: {

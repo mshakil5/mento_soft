@@ -19,7 +19,7 @@ class EquityController extends Controller
     {
         if($request->ajax()){
             $transactions = Transaction::with('chartOfAccount', 'equityHolder')
-                ->where('table_type', 'Equity');
+                ->where('table_type', 'Equity')->latest();
 
             if ($request->filled('start_date')) {
                 $endDate = $request->filled('end_date') ? $request->input('end_date') : now()->endOfDay();

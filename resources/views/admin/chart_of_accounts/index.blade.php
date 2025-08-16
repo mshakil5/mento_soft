@@ -160,6 +160,7 @@
     
     var charturl = "{{URL::to('/admin/chart-of-account')}}";
     var customerTBL = $('#chartTBL').DataTable({
+        order: [],
         processing: true,
         serverSide: true,
         width: '100%',
