@@ -75,7 +75,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>Description</label>
+                                <label>Description <small>(Use Titillium Web Font)</small></label>
                                 <textarea class="form-control summernote" id="description" name="description" rows="5" placeholder="Enter description"></textarea>
                             </div>
                         </form>

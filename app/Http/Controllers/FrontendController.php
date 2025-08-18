@@ -236,9 +236,6 @@ class FrontendController extends Controller
 
         $otherProducts = Product::with(['features' => function($q) {
             $q->where('status', 1)
-              // ->orderByRaw('sl = 0, sl ASC')
-              // ->orderBy('id', 'desc')
-              // ->take(6);
               ->inRandomOrder()
               ->take(6);
         }])

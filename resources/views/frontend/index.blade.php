@@ -225,7 +225,7 @@
                       @endforeach
                   </div>
               </div>
-              @if($loop->iteration % 2 == 0)
+              @if($loop->iteration % 2 == 0 && !$loop->last)
                 <div class="w-100 my-3">
                     <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
                 </div>

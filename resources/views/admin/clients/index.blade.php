@@ -58,7 +58,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row d-none">
                                 <div class="col-md-6">
                                     <div class="form-control">
                                         <input type="checkbox" class="form-control-input" id="on_going" name="on_going" value="1">
