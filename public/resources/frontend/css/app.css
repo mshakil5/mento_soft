@@ -812,6 +812,7 @@ section.default.contact-section .secTtile {
   text-decoration: none;
   animation: letterSpacing 8s linear infinite;
   text-align: center;
+  font-family: "titilliumweb";
   font-size: 1.5rem;
   font-weight: 100;
   line-height: 1;
@@ -820,23 +821,29 @@ section.default.contact-section .secTtile {
 .our-products .innerbox .productitle:hover {
   background: #FF6D33;
 }
+
+@media (max-width: 768px) {
+  .our-products .innerbox .productitle {
+    background: #FF6D33 !important;
+  }
+}
 .our-products .innerbox div {
-  width: 150px;
-  height: 50px;
+  width: 130px;
+  height: 45px;
   border-radius: 30px !important;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: #fff;
-  padding: 10px 12px !important;
-  font-size: 21px !important;
+  padding: 8px 10px !important;
+  /* font-size: 21px !important; */
   line-height: 1;
 }
 .our-products .innerbox .one {
   position: absolute;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 17px;
   box-shadow: -4px 8px 20px rgba(0, 0, 0, 0.1607843137);
   padding: 4px 8px;
   background: transparent;
@@ -850,7 +857,7 @@ section.default.contact-section .secTtile {
 .our-products .innerbox .two {
   position: absolute;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 17px;
   box-shadow: -4px 8px 20px rgba(0, 0, 0, 0.1607843137);
   padding: 4px 8px;
   background: transparent;
@@ -864,7 +871,7 @@ section.default.contact-section .secTtile {
 .our-products .innerbox .three {
   position: absolute;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 17px;
   box-shadow: -4px 8px 20px rgba(0, 0, 0, 0.1607843137);
   padding: 4px 8px;
   background: transparent;
@@ -878,7 +885,7 @@ section.default.contact-section .secTtile {
 .our-products .innerbox .four {
   position: absolute;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 17px;
   box-shadow: -4px 8px 20px rgba(0, 0, 0, 0.1607843137);
   padding: 4px 8px;
   background: transparent;
@@ -892,7 +899,7 @@ section.default.contact-section .secTtile {
 .our-products .innerbox .five {
   position: absolute;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 17px;
   box-shadow: -4px 8px 20px rgba(0, 0, 0, 0.1607843137);
   padding: 4px 8px;
   background: transparent;
@@ -906,7 +913,7 @@ section.default.contact-section .secTtile {
 .our-products .innerbox .six {
   position: absolute;
   font-weight: normal;
-  font-size: 20px;
+  font-size: 17px;
   box-shadow: -4px 8px 20px rgba(0, 0, 0, 0.1607843137);
   padding: 4px 8px;
   background: transparent;
@@ -1529,22 +1536,25 @@ section.default.contact-section .secTtile {
   width: 100%;
   overflow: hidden;
   padding: 10px 0;
-  white-space: nowrap;
-  position: relative;
+  text-align: center;
 }
+
 .marquee-container .marquee {
   display: inline-flex;
-  animation: marquee 20s linear infinite;
-  color: #fff;
   gap: 10px;
+  animation: none;
 }
+
 .marquee-container .marquee div {
   text-align: center;
   font-size: 20px;
-  white-space: nowrap;
   width: 150px;
   background: lightgrey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 .marquee-container .marquee div img {
   width: 100%;
 }
@@ -1865,4 +1875,13 @@ section.default.contact-section .secTtile {
     .cookie-buttons button {
         width: 100%;
     }
+}
+
+.blogBox {
+    height: 235px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-bottom: 350px;
 }

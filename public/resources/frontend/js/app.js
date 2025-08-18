@@ -3,6 +3,20 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 
+function scroller() {
+
+  let p = window.pageYOffset;
+
+  if (p > 200) {
+    let k = document.getElementById('header');
+    k.classList.add('active')
+  } else {
+    let k = document.getElementById('header');
+    k.classList.remove('active')
+  }
+
+}
+
 $(".testimonial-section").ripples({
     resolution: 256,
     perturbance: 0.01,
@@ -44,73 +58,37 @@ $(function () {
 });
 
 $(document).ready(function () {
-
-  $('.testimonial').slick({
-    autoplay: true,
-    autoplaySpeed: 3000,
-    centerMode: true,
-    centerPadding: '0px',
-    slidesToShow: 2,
-    slidesToScroll: 1,
-    draggable: true,
-    swipeToSlide: true,
-    arrows: false,
-    dots: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          arrows: true,
-        }
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          arrows: false,
-          dots: true,
-          centerMode: true,
-          centerPadding: '0px',
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          arrows: false,
-          dots: true,
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          arrows: false,
-          dots: true,
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      },
-    ]
-  });
-
+    if ($('.testimonial').length > 0) {
+        $('.testimonial').slick({
+            autoplay: false,
+            centerMode: true,
+            centerPadding: '0px',
+            slidesToShow: 2,
+            slidesToScroll: 1,
+            arrows: false,
+            dots: true,
+            adaptiveHeight: true,
+            responsive: [
+                { breakpoint: 1024, settings: { slidesToShow: 2, arrows: true } },
+                { breakpoint: 768, settings: { slidesToShow: 1, centerMode: true, centerPadding: '0px', arrows: false, dots: true } },
+                { breakpoint: 600, settings: { slidesToShow: 1, arrows: false, dots: true } },
+                { breakpoint: 480, settings: { slidesToShow: 1, arrows: false, dots: true } }
+            ]
+        });
+    }
 });
 
 new WOW().init();
 
 var linkbtn = document.getElementsByClassName('link-btn');
 
-for (let i = 0; i <= linkbtn.length; i++) {
+for (let i = 0; i < linkbtn.length; i++) {
   linkbtn[i].addEventListener("click", function () {
     for (var j = 0; j < linkbtn.length; j++) {
       linkbtn[j].classList.remove('active');
     }
     this.classList.add('active');
   });
-
 }
 
 function openBox(idToShow) {

@@ -28,22 +28,6 @@
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/magnific-popup.css') }}">
 </head>
 
-<script>
-  function scroller() {
-
-    let p = window.pageYOffset;
-
-    if (p > 200) {
-      let k = document.getElementById('header');
-      k.classList.add('active')
-    } else {
-      let k = document.getElementById('header');
-      k.classList.remove('active')
-    }
-
-  }
-</script>
-
 <body onscroll="scroller()">
     <!-- Header Start -->
     @include('frontend.header')

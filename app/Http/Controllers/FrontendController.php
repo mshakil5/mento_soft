@@ -130,8 +130,8 @@ class FrontendController extends Controller
           ->get();
         $products = Product::with(['features' => function($q){
             $q->where('status', 1)
-              ->orderByRaw('sl = 0, sl ASC')
-              ->orderBy('id', 'desc');
+              ->inRandomOrder()
+              ->take(6);
         }])
           ->where('status', 1)
           ->orderByRaw('sl = 0, sl ASC')
@@ -236,8 +236,11 @@ class FrontendController extends Controller
 
         $otherProducts = Product::with(['features' => function($q) {
             $q->where('status', 1)
-              ->orderByRaw('sl = 0, sl ASC')
-              ->orderBy('id', 'desc');
+              // ->orderByRaw('sl = 0, sl ASC')
+              // ->orderBy('id', 'desc')
+              // ->take(6);
+              ->inRandomOrder()
+              ->take(6);
         }])
           ->where('status', 1)
           ->where('id', '!=', $product->id)

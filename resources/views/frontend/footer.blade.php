@@ -47,52 +47,31 @@
               </ul>
 
             </div>
-            <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center text-md-start">
-                <span class="title d-block mb-3">Follow Us</span>
-                <ul class="social_icon justify-content-center justify-content-md-start list-unstyled d-flex mb-4">
-                    @if (isset($company->facebook))
-                    <li>
-                        <a href="{{ $company->facebook }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
+                <span class="title">Follow Us</span>
+                <ul class="social_icon justify-content-center justify-conent-md-start">
+                    @if(isset($company->facebook))
+                    <li class="me-2">
+                        <a href="{{ $company->facebook }}" target="_blank" rel="noopener noreferrer">
                             <iconify-icon icon="devicon:facebook" width="48" height="48"></iconify-icon>
                         </a>
                     </li>
                     @endif
-                    @if (isset($company->instagram))
-                    <li>
-                        <a href="{{ $company->instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    @if(isset($company->instagram))
+                    <li class="me-2">
+                        <a href="{{ $company->instagram }}" target="_blank" rel="noopener noreferrer">
                             <iconify-icon icon="skill-icons:instagram" width="48" height="48"></iconify-icon>
                         </a>
                     </li>
                     @endif
-                    @if (isset($company->linkedin))   
+                    @if(isset($company->linkedin))
                     <li>
-                        <a href="{{ $company->linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <a href="{{ $company->linkedin }}" target="_blank" rel="noopener noreferrer">
                             <iconify-icon icon="skill-icons:linkedin" width="48" height="48"></iconify-icon>
                         </a>
                     </li>
                     @endif
                 </ul>
-
-                @if (isset($company->email2))
-                <span class="d-block mb-2">Email</span>
-                <ul class="my-0 list-unstyled mb-4">
-                    <li>
-                        <a href="mailto:{{ $company->email2 }}">
-                            <span class="txt-ternary">{{ $company->email2 }}</span>
-                        </a>
-                    </li>
-                </ul>
-                @endif
-                @if (isset($company->phone2))
-                <span class="d-block mb-2">Phone</span>
-                <ul class="my-0 list-unstyled">
-                    <li>
-                        <a href="tel:{{ $company->phone2 }}">
-                            <span class="txt-ternary">{{ $company->phone2 }}</span>
-                        </a>
-                    </li>
-                </ul>
-                @endif
             </div>
         </div>
     </div>

@@ -19,7 +19,7 @@
                     {!! $landingPage->long_description !!}
                 </p>
                 <div class="my-4">
-                    <h4 class="txt-bold title-font wow fadeIn">Our Services: <span
+                    <h4 class="txt-bold title-font wow fadeIn"><span
                             class="typed txt-ternary fw-bold "> </span>
                     </h4>
                 </div>
@@ -168,6 +168,9 @@
                               {{ $service->title }}
                               <div class="crossbtn px-2" onclick="closeModule()">Close</div>
                           </div>
+                          @if($service->short_desc)
+                              <p class="m-0 p-3">{{ $service->short_desc }}</p>
+                          @endif
 
                           @if ($service->youtube_link)
                               <iframe width="100%" height="380"
@@ -201,12 +204,12 @@
                       </a>
                       
                       @php
-                          $allClasses = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+                          $allClasses = ['one', 'two', 'three', 'four', 'five', 'six'];
                           $bgClasses = ['bg-dark text-light', ''];
                           
                           shuffle($allClasses);
                           
-                          $features = $product->features->take(8);
+                          $features = $product->features;
                       @endphp
                       
                       @foreach($features as $index => $feature)
@@ -222,6 +225,11 @@
                       @endforeach
                   </div>
               </div>
+              @if($loop->iteration % 2 == 0)
+                <div class="w-100 my-3">
+                    <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
+                </div>
+              @endif
           @endforeach
       </div>
   </section>

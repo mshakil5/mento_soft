@@ -193,12 +193,12 @@
                     </a>
                     
                     @php
-                        $allClasses = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+                        $allClasses = ['one', 'two', 'three', 'four', 'five', 'six'];
                         $bgClasses = ['bg-dark text-light', ''];
                         
                         shuffle($allClasses);
                         
-                        $features = $product->features->take(8);
+                        $features = $product->features;
                     @endphp
                     
                     @foreach($features as $index => $feature)
@@ -214,6 +214,11 @@
                     @endforeach
                 </div>
             </div>
+            @if($loop->iteration % 2 == 0)
+                <div class="w-100 my-3">
+                    <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
+                </div>
+            @endif
         @endforeach
     </div>
 </section>
