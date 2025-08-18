@@ -828,8 +828,8 @@ section.default.contact-section .secTtile {
   }
 }
 .our-products .innerbox div {
-  width: 130px;
-  height: 45px;
+  width: 150px;
+  height: 50px;
   border-radius: 30px !important;
   display: flex;
   align-items: center;

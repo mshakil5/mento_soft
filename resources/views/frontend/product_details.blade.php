@@ -81,7 +81,7 @@
                         <iconify-icon class="text-ternary" icon="emojione-monotone:ledger" width="50" height="50"></iconify-icon>
                     @endif
 
-                    <h4>{{ $feature->title }}</h4>
+                    <h5>{{ $feature->title }}</h5>
                     <p class="small text-muted">{!! Str::limit($feature->description ?? '', 100) !!}</p>
                 </div>
             </div>
