@@ -88,3 +88,7 @@
       </div>
     </div>
 </section>
+
+<a href="https://wa.me/{{ $company->whatsapp }}" target="_blank" class="material-whatsapp" aria-label="WhatsApp">
+    <img src="{{ asset('resources/frontend/images/whatsapp.png') }}" alt="WhatsApp" style="width:24px; height:24px;">
+</a>

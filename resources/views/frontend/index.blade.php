@@ -197,7 +197,11 @@
       </div>
       <div class="row g-0">
           @foreach($products as $product)
-              <div class="col-lg-6">
+              <div class="col-lg-6" style="position: relative;">
+                    @if($loop->iteration % 2 == 1 && !$loop->last)
+                      <div style="position: absolute; top: 0; right: 0;width: 2px; height: 100%; background: linear-gradient(to bottom, rgba(255,163,15,0) 0%, rgba(255,163,15,0.8) 50%, rgba(255,163,15,0) 100%);
+                      "></div>
+                    @endif
                   <div class="innerbox {{ $loop->odd ? 'accounting' : 'ai' }}">
                       <a href="{{ route('productDetails', $product->slug) }}" class="productitle">
                           {{ $product->title }}

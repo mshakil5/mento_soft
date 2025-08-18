@@ -1883,5 +1883,30 @@ section.default.contact-section .secTtile {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-bottom: 350px;
+    padding-bottom: 300px;
+}
+
+.material-whatsapp {
+    position: fixed;
+    width: 55px;
+    height: 55px;
+    font-size: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    z-index: 1000;
+    bottom: 140px;
+    right: 27px;
+    background-color: #FF6D33;
+    color: white;
+}
+
+.material-whatsapp:hover {
+    background-color: #e65a1a;
+    transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }

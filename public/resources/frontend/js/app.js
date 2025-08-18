@@ -143,3 +143,11 @@ function closeModule() {
         }
     });
 }
+
+$(window).on('scroll', function() {
+    if ($(this).scrollTop() > 100) {
+        $('.material-whatsapp').css('display', 'flex');
+    } else {
+        $('.material-whatsapp').css('display', 'none');
+    }
+});

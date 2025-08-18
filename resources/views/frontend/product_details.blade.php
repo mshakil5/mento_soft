@@ -56,7 +56,7 @@
 </div>
 
 @if ($product->features->count() > 0)
-<section class="modules" style="background: linear-gradient(45deg, rgba(255, 187, 136, 0.5607843137), rgb(255 246 210 / 87%)), url(./images/light-blue-overlay.jpg); background-size: cover; background-attachment: fixed; padding: 60px 0px; background-position: 80% 80%;">
+<section class="modules" style="background: linear-gradient(45deg, rgba(255, 187, 136, 0.56), rgb(255 246 210 / 87%)), url('{{ asset('resources/frontend/images/light-blue-overlay.jpg') }}'); background-size: cover; background-attachment: fixed; padding: 60px 0; background-position: 80% 80%;">
     <div class="container">
         <div class="row g-2">
             <div class="col-lg-12 mb-4">
@@ -186,7 +186,11 @@
     </div>
     <div class="row g-0">
         @foreach($otherProducts as $product)
-            <div class="col-lg-6">
+            <div class="col-lg-6" style="position: relative;">
+                  @if($loop->iteration % 2 == 1 && !$loop->last)
+                    <div style="position: absolute; top: 0; right: 0;width: 2px; height: 100%; background: linear-gradient(to bottom, rgba(255,163,15,0) 0%, rgba(255,163,15,0.8) 50%, rgba(255,163,15,0) 100%);
+                    "></div>
+                  @endif
                 <div class="innerbox {{ $loop->odd ? 'accounting' : 'ai' }}">
                     <a href="{{ route('productDetails', $product->slug) }}" class="productitle">
                         {{ $product->title }}
