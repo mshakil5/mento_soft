@@ -27,17 +27,25 @@
                             
                             <div class="row">
                                 <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label>Title <span class="text-danger">*</span></label>
+                                    <select name="title" id="title" class="form-control">
+                                      <option value="Mr">Mr</option>
+                                      <option value="Mrs">Mrs</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Name <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="name" name="name" placeholder="Enter client name" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Video Link</label>
-                                        <input type="url" class="form-control" id="video_link" name="video_link" placeholder="Enter video URL (YouTube, Vimeo, etc.)">
-                                    </div>
-                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Video Link</label>
+                                <input type="url" class="form-control" id="video_link" name="video_link" placeholder="Enter video URL (YouTube, Vimeo, etc.)">
                             </div>
                             
                             <div class="form-group">
@@ -86,6 +94,7 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Image</th>
+                                    <th>Title</th>
                                     <th>Name</th>
                                     <th>Sort No.</th>
                                     <th>Status</th>
@@ -124,6 +133,7 @@
 
         $("#addBtn").click(function(){
             var form_data = new FormData();
+            form_data.append("title", $("#title").val());
             form_data.append("name", $("#name").val());
             form_data.append("review", $("#review").val());
             form_data.append("video_link", $("#video_link").val());
@@ -198,6 +208,7 @@
         });
 
         function populateForm(data){
+            $("#title").val(data.title);
             $("#name").val(data.name);
             $("#review").val(data.review);
             $("#video_link").val(data.video_link);
@@ -289,6 +300,7 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 {data: 'image', name: 'image', orderable: false, searchable: false},
+                {data: 'title', name: 'title'},
                 {data: 'name', name: 'name'},
                 {data: 'sl', name: 'sl'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},

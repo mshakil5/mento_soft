@@ -64,6 +64,7 @@ class ClientReviewController extends Controller
         }
 
         $data = new ClientReview;
+        $data->title = $request->title;
         $data->name = $request->name;
         $data->review = $request->review;
         $data->video_link = $request->video_link;
@@ -142,6 +143,7 @@ class ClientReviewController extends Controller
             ], 404);
         }
 
+        $review->title = $request->title;
         $review->name = $request->name;
         $review->review = $request->review;
         $review->video_link = $request->video_link;
