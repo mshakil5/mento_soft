@@ -11,6 +11,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Validator;
 use App\Models\ProjectSlider;
 use App\Models\ProjectType;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -68,7 +69,7 @@ class ProjectController extends Controller
         $validator = Validator::make($request->all(), [
             'service_id' => 'nullable|exists:services,id',
             'project_type_id' => 'required|exists:project_types,id',
-            'title' => 'required|string|max:255',
+            'title' => ['required', 'string', 'max:255', Rule::unique('projects')->whereNull('deleted_at')],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'demo_video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200', // 50MB
             'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -85,7 +86,7 @@ class ProjectController extends Controller
         $data->service_id = $request->service_id;
         $data->project_type_id = $request->project_type_id;
         $data->title = $request->title;
-        $data->slug = Str::slug($request->title) . '-' . Str::random(6);
+        $data->slug = Str::slug($request->title);
         $data->sub_title = $request->sub_title;
         $data->project_url = $request->project_url;
         $data->short_desc = $request->short_desc;
@@ -226,7 +227,7 @@ class ProjectController extends Controller
         $validator = Validator::make($request->all(), [
             'service_id' => 'nullable|exists:services,id',
             'project_type_id' => 'required|exists:project_types,id',
-            'title' => 'required|string|max:255',
+            'title' => ['required','string','max:255', Rule::unique('projects')->ignore($request->codeid)->whereNull('deleted_at')],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'demo_video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200', // 50MB
             'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -250,7 +251,7 @@ class ProjectController extends Controller
         $project->service_id = $request->service_id;
         $project->project_type_id = $request->project_type_id;
         $project->title = $request->title;
-        $project->title = $request->title;
+        $project->slug = Str::slug($request->title);
         $project->sub_title = $request->sub_title;
         $project->project_url = $request->project_url;
         $project->short_desc = $request->short_desc;

@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use Yajra\DataTables\Facades\DataTables;
 use Validator;
+use Illuminate\Validation\Rule;
 
 class ServiceController extends Controller
 {
@@ -72,7 +73,7 @@ class ServiceController extends Controller
     public function serviceStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
+            'title' => ['required', 'string', 'max:255', Rule::unique('services')->whereNull('deleted_at')],
             'video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200',
         ]);
 
@@ -86,7 +87,7 @@ class ServiceController extends Controller
         $data = new Service;
         $data->sl = $request->sl;
         $data->title = $request->title;
-        $slug = Str::slug($request->title) . '-' . Str::random(6);
+        $data->slug = Str::slug($request->title);
         $data->short_desc = $request->short_desc;
         $data->long_desc = $request->long_desc;
         $data->youtube_link = $request->youtube_link;
@@ -193,7 +194,7 @@ class ServiceController extends Controller
     public function serviceUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|' . Rule::unique('services', 'title')->ignore($request->codeid)->whereNull('deleted_at'),
             'video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200',
         ]);
 
@@ -207,6 +208,7 @@ class ServiceController extends Controller
         $service = Service::find($request->codeid);
         $service->sl = $request->sl;
         $service->title = $request->title;
+        $service->slug = Str::slug($request->title);
         $service->short_desc = $request->short_desc;
         $service->long_desc = $request->long_desc;
         $service->youtube_link = $request->youtube_link;

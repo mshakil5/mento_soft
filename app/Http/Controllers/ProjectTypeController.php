@@ -7,6 +7,7 @@ use App\Models\ProjectType;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use Validator;
+use Illuminate\Validation\Rule;
 
 class ProjectTypeController extends Controller
 {
@@ -42,7 +43,7 @@ class ProjectTypeController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:project_types,name',
+            'name' => ['required', 'string', 'max:255', Rule::unique('project_types')->whereNull('deleted_at')],
             'description' => 'nullable|string',
         ]);
 
@@ -88,7 +89,7 @@ class ProjectTypeController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:project_types,name,'.$request->codeid,
+            'name' => ['required', 'string', 'max:255', Rule::unique('project_types')->ignore($request->codeid)->whereNull('deleted_at')],
             'description' => 'nullable|string',
         ]);
 

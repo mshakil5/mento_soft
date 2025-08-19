@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use Yajra\DataTables\Facades\DataTables;
 use Validator;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -61,7 +62,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
+            'title' => ['required', 'string', 'max:255', Rule::unique('products')->whereNull('deleted_at')],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200', // 50MB
             'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -76,7 +77,7 @@ class ProductController extends Controller
 
         $data = new Product;
         $data->title = $request->title;
-        $data->slug = Str::slug($request->title) . '-' . Str::random(6);
+        $data->slug = Str::slug($request->title);
         $data->sub_title = $request->sub_title;
         $data->url = $request->url;
         $data->short_description = $request->short_description;
@@ -174,7 +175,7 @@ class ProductController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|' . Rule::unique('products', 'title')->ignore($request->codeid)->whereNull('deleted_at'),
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video' => 'nullable|file|mimetypes:video/mp4,video/webm|max:51200',
             'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -196,7 +197,7 @@ class ProductController extends Controller
         }
 
         $product->title = $request->title;
-        $product->slug = Str::slug($request->title) . '-' . Str::random(6);
+        $product->slug = Str::slug($request->title);
         $product->sub_title = $request->sub_title;
         $product->url = $request->url;
         $product->short_description = $request->short_description;
