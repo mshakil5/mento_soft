@@ -1,4 +1,4 @@
-<section class="py-5 footer-main text-center text-md-start">
+<section class="py-2 footer-main text-center text-md-start">
     <div class="container">
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3">
@@ -9,7 +9,8 @@
                 </p>
                 <small>{{ $company->footer_content }} </small>
             </div>
-            <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3">
+
+            <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2">
                 <span class="title">Company</span> <br>
                 <ul>
                     <li><a href="/">Home</a></li>
@@ -17,8 +18,15 @@
                     <li><a href="{{ route('homepage') }}#about">About</a></li>
                     <li><a href="{{ route('homepage') }}#products">Products</a></li>
                     <li><a href="{{ route('portfolio') }}">Portfolio</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 pt-lg-4 pt-xl-4">
+                <ul>
                     <li><a href="{{ route('homepage') }}#contact">Contact</a></li>
                     <li><a href="{{ route('quotation') }}">Get Quotation</a></li>
+                    <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('terms-and-conditions') }}">Terms & Conditions</a></li>
+                    <li><a href="{{ route('frequently-asked-questions') }}">FAQ</a></li>
                 </ul>
             </div>
 
@@ -47,7 +55,8 @@
               </ul>
 
             </div>
-            <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
+            
+            <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 text-center">
                 <span class="title">Follow Us</span>
                 <ul class="social_icon justify-content-center justify-conent-md-start">
                     @if(isset($company->facebook))
@@ -81,9 +90,15 @@
     <div class="container py-2">
       <div class="row justify-content-center">
           <div class="col-auto text-center">
-              <small>
-                  &copy; {{ date('Y') }} Mentosoftware.co.uk, All rights reserved!
-              </small>
+            <small>
+                &copy; {{ date('Y') }} {{ $company->business_name ?? '' }}
+                @if(!empty($company->company_reg_number))
+                    | COMPANY NUMBER: {{ $company->company_reg_number }}
+                @endif
+                @if(!empty($company->vat_number))
+                    | VAT No: {{ $company->vat_number }}
+                @endif
+            </small>
           </div>
       </div>
     </div>

@@ -151,3 +151,7 @@ $(window).on('scroll', function() {
         $('.material-whatsapp').css('display', 'none');
     }
 });
+
+$('.navbar-collapse .nav-link').click(function() {
+    $('.navbar-collapse').collapse('hide');
+});

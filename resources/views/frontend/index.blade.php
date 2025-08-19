@@ -42,54 +42,35 @@
             <div class="col-lg-6">
                 <div class="row g-3" id="counter">
                     <div class="col-sm-12 col-md-6 col-lg-6">
-                        <div class="bg-light box-gradient-counter txt-ternary p-3 rounded-3 d-flex align-items-center gap-3 box-model wow fadeInRight"
-                            data-wow-delay=".5s">
-                            <div>
-                                <span class="display-3 fw-bold count" data-number="10"></span>
-                                <span class="display-3 fw-bold ">X</span>
-                                <br> <span class="fs-5 text-dark">Take <br> Faster Delivery </span>
-                            </div>
-                            <iconify-icon icon="bitcoin-icons:rocket-outline" width="90" height="90"></iconify-icon>
+                        <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".25s">
+                            <h3 class="fw-bold mb-2">15+ Years of Expertise</h3>
+                            <p class="fs-6 text-dark m-0">
+                                Decades of proven success delivering high-quality software solutions across industries.
+                            </p>
                         </div>
-
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-6">
-
-                        <div class="bg-light box-gradient-counter txt-ternary p-3 rounded-3 d-flex align-items-center gap-3 box-model wow fadeInRight"
-                            data-wow-delay=".50s">
-                            <div>
-                                <span class="display-3 fw-bold count" data-number="11"> </span>
-                                <span class="display-3 fw-bold"> + </span>
-                                <br> <span class="fs-5 text-dark"> Years of <br> Experience </span>
-                            </div>
-                            <iconify-icon icon="lets-icons:sun-light" width="90" height="90"></iconify-icon>
+                        <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".35s">
+                            <h3 class="fw-bold mb-2">Tailored Solutions</h3>
+                            <p class="fs-6 text-dark m-0">
+                                We adapt our approach to match your vision, goals, and evolving needs.
+                            </p>
                         </div>
-
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-6">
-
-                        <div class="bg-light box-gradient-counter txt-ternary p-3 rounded-3 d-flex align-items-center gap-3 box-model wow fadeInRight"
-                            data-wow-delay=".25s">
-                            <div>
-                                <span class="display-3 fw-bold count" data-number="30"></span>
-                                <span class="display-3 fw-bold ">+</span>
-                                <br> <span class="fs-5 text-dark"> Customers <br>Worldwide </span>
-                            </div>
-                            <iconify-icon icon="arcticons:world-geography-alt" width="90"
-                                height="90"></iconify-icon>
+                        <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".45s">
+                            <h3 class="fw-bold mb-2">Agile & Efficient Delivery</h3>
+                            <p class="fs-6 text-dark m-0">
+                                Flexible development ensures faster turnaround without compromising quality.
+                            </p>
                         </div>
-
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-6">
-
-                        <div class="bg-light box-gradient-counter txt-ternary p-3 rounded-3 d-flex align-items-center gap-3 box-model wow fadeInRight"
-                            data-wow-delay=".35s">
-                            <div>
-                                <span class="display-3 fw-bold count" data-number="99"> </span>
-                                <span class="display-3 fw-bold  "> % </span>
-                                <br> <span class="fs-5 text-dark">Our <br> Sucess Rate </span>
-                            </div>
-                            <iconify-icon icon="ph:certificate-thin" width="90" height="90"></iconify-icon>
+                        <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".55s">
+                            <h3 class="fw-bold mb-2">Trusted Partnerships</h3>
+                            <p class="fs-6 text-dark m-0">
+                                Long-term relationships built on transparency, collaboration, and measurable results.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -164,7 +145,7 @@
 
                   @if ($hasVideo)
                       <div id="{{ $class }}-box" class="visualBox">
-                          <div class="border mt-4 p-1 ps-2 position-relative mb-3 d-flex align-items-center justify-content-between">
+                          <div class="border mt-4 p-1 ps-2 position-relative mb-3 d-flex align-items-center justify-content-between txt-ternary fw-bold">
                               {{ $service->title }}
                               <div class="crossbtn px-2" onclick="closeModule()">Close</div>
                           </div>
@@ -230,7 +211,13 @@
                   </div>
               </div>
               @if($loop->iteration % 2 == 0 && !$loop->last)
-                <div class="w-100 my-3">
+                <div class="w-100 my-3 d-none d-md-block">
+                    <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
+                </div>
+              @endif
+
+              @if(!$loop->last)
+                <div class="w-100 my-3 d-block d-md-none">
                     <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
                 </div>
               @endif

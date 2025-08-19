@@ -18,6 +18,7 @@ use SEOMeta;
 use OpenGraph;
 use Twitter;
 use App\Models\CompanyDetails;
+use App\Models\FaqQuestion;
 
 class FrontendController extends Controller
 {
@@ -278,6 +279,24 @@ class FrontendController extends Controller
         if ($image) {
             OpenGraph::addImage($image);
         }
+    }
+
+    public function privacyPolicy()
+    {
+        $companyDetails = CompanyDetails::select('privacy_policy')->first();
+        return view('frontend.privacy', compact('companyDetails'));
+    }
+
+    public function termsAndConditions()
+    {
+        $companyDetails = CompanyDetails::select('terms_and_conditions')->first();
+        return view('frontend.terms', compact('companyDetails'));
+    }
+
+    public function frequentlyAskedQuestions()
+    {
+        $faqQuestions = FaqQuestion::orderBy('id', 'asc')->get();
+        return view('frontend.faq', compact('faqQuestions'));
     }
 
 }

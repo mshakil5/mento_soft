@@ -3,7 +3,6 @@
     ->orderByRaw('sl = 0, sl ASC')
     ->orderBy('id', 'desc')
     ->get();
-  $company = \App\Models\CompanyDetails::first();
 @endphp
 @if ($testimonials->count() > 0)
   <section class="default testimonial-section wow fadeIn" id="testimonial">
@@ -19,8 +18,10 @@
                       <div class="p-3 fadeInUp wow">
                           <div class="blogBox">
                               <div class="content text-center text-light">
-                                  <img src="{{ $item->image && file_exists(public_path('images/client-reviews/' . $item->image)) ? asset('images/client-reviews/' . $item->image) : asset('images/company/' . $company->company_logo) }}" class="rounded-circle mx-auto mb-3" width="90px">
-                                  <h5>{{ $item->name }} - </h5>
+                                  <img src="{{ $item->image && file_exists(public_path('images/client-reviews/' . $item->image)) ? asset('images/client-reviews/' . $item->image) : asset('/resources/frontend/images/' . ($item->title == 'Mr' ? 'man.png' : 'woman.png')) }}" class="rounded-circle mx-auto mb-3" width="90px">
+                                  
+                                  <h5>{{ $item->name }}</h5>
+
                                   <p class="m-0">
                                       <iconify-icon icon="bxs:quote-left" width="25" height="25" style="color: #fff"></iconify-icon>
                                       {!! $item->review !!}

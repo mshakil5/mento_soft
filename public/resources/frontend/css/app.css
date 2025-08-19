@@ -205,7 +205,7 @@ body::-webkit-scrollbar-thumb {
 }
 @media (max-width: 1023px) {
   .hero {
-    min-height: 100vh;
+    min-height: 85vh;
   }
 }
 .hero .hero-left {
@@ -487,6 +487,11 @@ section.default.what-we-do {
   overflow: hidden;
   background-attachment: fixed;
 }
+@media (max-width: 1023px) {
+  section.default.what-we-do {
+    min-height: 80vh;
+  }
+}
 section.default.what-we-do .inner {
   width: 450px;
   height: 450px;
@@ -726,7 +731,26 @@ section.default.contact-section .secTtile {
   top: 0;
   background: linear-gradient(45deg, rgb(224, 232, 255), rgb(255, 210, 170));
   z-index: 10;
-  padding: 10px;
+  padding: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .floating-link {
+    padding: 5px 0;
+    font-size: 14px;
+  }
+  .floating-link h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+  .floating-link .link-btn {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+  .floating-link .d-flex {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
 }
 
 .portfolio {
@@ -739,13 +763,13 @@ section.default.contact-section .secTtile {
   transition: transform 0.3s ease-in-out;
 }
 .portfolio .portfolio-card img {
-  filter: grayscale(1);
+  filter: grayscale(0);
 }
 .portfolio .portfolio-card:hover {
   transform: translateY(-3px);
 }
 .portfolio .portfolio-card:hover img {
-  filter: grayscale(0);
+  filter: grayscale(1);
 }
 .portfolio .portfolio-card:hover .btn-theme {
   background: #333;
@@ -1883,7 +1907,7 @@ section.default.contact-section .secTtile {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-bottom: 300px;
+    padding-bottom: 333px;
 }
 
 .material-whatsapp {

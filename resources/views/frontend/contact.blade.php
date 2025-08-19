@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="col-12 form-group">
-                            <textarea name="message" class="textarea form-control" rows="3" placeholder="Message *" required>{{ old('message') }} @if(isset($product)) I want to see a demo of {{ $product->title ?? '' }}@endif</textarea>
+                            <textarea name="message" class="textarea form-control" rows="3" placeholder="Message *" required>{{ old('message') }}@if(isset($product))I want to see a demo of {{ $product->title ?? '' }}@endif</textarea>
                             @error('message') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 

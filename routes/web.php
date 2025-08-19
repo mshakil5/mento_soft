@@ -33,3 +33,6 @@ Route::post('/quotation/store', [FrontendController::class, 'storeQuotation'])->
 Route::get('/portfolio', [FrontendController::class, 'portfolio'])->name('portfolio');
 Route::get('/portfolio/{slug}', [FrontendController::class, 'portfolioDetails'])->name('portfolioDetails');
 Route::get('/product/{slug}', [FrontendController::class, 'productDetails'])->name('productDetails');
+Route::get('/privacy-policy', [FrontendController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-and-conditions', [FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
+Route::get('/frequently-asked-questions', [FrontendController::class, 'frequentlyAskedQuestions'])->name('frequently-asked-questions');
