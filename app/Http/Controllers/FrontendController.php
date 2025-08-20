@@ -90,7 +90,7 @@ class FrontendController extends Controller
             Mail::to($contactEmail)->send(new ContactMail($contact));
         }
 
-        return back()->with('success', 'Your message has been sent successfully!');
+        return back()->with('success', 'Your message has been sent successfully!')->withFragment('contact');
     }
 
     public function storeQuotation(Request $request)

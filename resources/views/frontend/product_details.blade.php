@@ -89,7 +89,7 @@
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFeature{{ $feature->id }}" aria-labelledby="offcanvasFeatureLabel{{ $feature->id }}">
                 <div class="offcanvas-header"></div>
                 <div class="offcanvas-body small">
-                    <h5 class="border p-2 d-flex justify-content-between align-items-center">
+                    <h5 class="border p-2 d-flex justify-content-between align-items-center txt-ternary fw-bold">
                         {{ $feature->title }}
                         <span data-bs-dismiss="offcanvas" class="btn btn-sm btn-danger">close</span>
                     </h5>
