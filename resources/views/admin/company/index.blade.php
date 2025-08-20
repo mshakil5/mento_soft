@@ -157,7 +157,7 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-4 d-none">
+                    <div class="col-sm-4">
                         <div class="form-group">
                         <label>LinkedIn</label>
                         <input type="text" class="form-control @error('linkedin') is-invalid @enderror" id="linkedin" name="linkedin" value="{{$data->linkedin}}">
