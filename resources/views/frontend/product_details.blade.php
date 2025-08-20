@@ -82,7 +82,7 @@
                     @endif
 
                     <h5>{{ $feature->title }}</h5>
-                    <p class="small text-muted">{!! Str::limit($feature->description ?? '', 100) !!}</p>
+                    <p class="small text-muted">{{ Str::limit($feature->short_description ?? '', 120) }}</p>
                 </div>
             </div>
 
@@ -91,7 +91,7 @@
                 <div class="offcanvas-body small">
                     <h5 class="border p-2 d-flex justify-content-between align-items-center txt-ternary fw-bold">
                         {{ $feature->title }}
-                        <span data-bs-dismiss="offcanvas" class="btn btn-sm btn-danger">close</span>
+                        <span data-bs-dismiss="offcanvas" class="btn btn-sm btn-danger">Close</span>
                     </h5>
                     <p>{!! $feature->description !!}</p>
                 </div>

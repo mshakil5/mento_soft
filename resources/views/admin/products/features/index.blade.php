@@ -48,14 +48,20 @@
                             </div>
                             
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Feature Image</label>
                                         <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
                                         <img id="preview-image" src="#" alt="" style="max-width: 300px; width: 100%; height: auto; margin-top: 20px;">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-5">
+                                  <div class="form-group">
+                                    <label>Short Description</label>
+                                    <textarea class="form-control" id="short_description" name="short_description" rows="3" placeholder="Enter short description"></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
                                   <div class="form-group">
                                     <label>Icon (icon class)  
                                       <small style="font-weight: normal; font-size: 0.85em; margin-left: 5px;">
@@ -105,6 +111,7 @@
                                     <th>Sl</th>
                                     <th>Image</th>
                                     <th>Title</th>
+                                    <th>Short Des</th>
                                     <th>Sort No.</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -173,6 +180,7 @@
           form_data.append("title", $("#title").val());
           form_data.append("icon", $("#icon").val());
           form_data.append("description", $("#description").val());
+          form_data.append("short_description", $("#short_description").val());
           form_data.append("sl", $("#sl").val());
 
           // Handle image upload
@@ -246,6 +254,7 @@
       function populateForm(data){
           $("#title").val(data.title);
           $("#icon").val(data.icon);
+          $("#short_description").val(data.short_description);
           $("#description").summernote('code', data.description);
           $("#sl").val(data.sl);
           $("#codeid").val(data.id);
@@ -338,6 +347,7 @@
               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
               {data: 'image', name: 'image', orderable: false, searchable: false},
               {data: 'title', name: 'title'},
+              {data: 'short_description', name: 'short_description'},
               {data: 'sl', name: 'sl'},
               {data: 'status', name: 'status', orderable: false, searchable: false},
               {data: 'action', name: 'action', orderable: false, searchable: false},

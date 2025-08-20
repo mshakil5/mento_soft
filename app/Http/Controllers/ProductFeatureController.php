@@ -66,6 +66,7 @@ class ProductFeatureController extends Controller
         $data = new ProductFeature;
         $data->product_id = $request->product_id;
         $data->title = $request->title;
+        $data->short_description = $request->short_description;
         $data->icon = $request->icon;
         $data->description = $request->description;
         $data->sl = $request->sl ?? 0;
@@ -141,6 +142,7 @@ class ProductFeatureController extends Controller
         }
 
         $feature->title = $request->title;
+        $feature->short_description = $request->short_description;
         $feature->icon = $request->icon;
         $feature->description = $request->description;
         $feature->sl = $request->sl ?? 0;
