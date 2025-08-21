@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="row mt-5 text-center text-md-start">
-            <div class='col-lg-6 text-white wow fadeIn'>
+            <div class='col-lg-6 text-white wow fadeIn text-justify mb-5 mb-lg-0'>
                 {!! $whyChooseUs->long_description !!}
             </div>
             <div class="col-lg-6">
@@ -44,7 +44,7 @@
                     <div class="col-sm-12 col-md-6 col-lg-6">
                         <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".25s">
                             <h3 class="fw-bold mb-2">15+ Years of Expertise</h3>
-                            <p class="fs-6 text-dark m-0">
+                            <p class="fs-6 text-dark m-0 text-justify">
                                 Decades of proven success delivering high-quality software solutions across industries.
                             </p>
                         </div>
@@ -52,7 +52,7 @@
                     <div class="col-sm-12 col-md-6 col-lg-6">
                         <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".35s">
                             <h3 class="fw-bold mb-2">Tailored Solutions</h3>
-                            <p class="fs-6 text-dark m-0">
+                            <p class="fs-6 text-dark m-0 text-justify">
                                 We adapt our approach to match your vision, goals, and evolving needs.
                             </p>
                         </div>
@@ -60,7 +60,7 @@
                     <div class="col-sm-12 col-md-6 col-lg-6">
                         <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".45s">
                             <h3 class="fw-bold mb-2">Agile & Efficient Delivery</h3>
-                            <p class="fs-6 text-dark m-0">
+                            <p class="fs-6 text-dark m-0 text-justify">
                                 Flexible development ensures faster turnaround without compromising quality.
                             </p>
                         </div>
@@ -68,7 +68,7 @@
                     <div class="col-sm-12 col-md-6 col-lg-6">
                         <div class="bg-light box-gradient-counter txt-ternary p-4 rounded-3 d-flex flex-column align-items-start h-100 wow fadeInRight" data-wow-delay=".55s">
                             <h3 class="fw-bold mb-2">Trusted Partnerships</h3>
-                            <p class="fs-6 text-dark m-0">
+                            <p class="fs-6 text-dark m-0 text-justify">
                                 Long-term relationships built on transparency, collaboration, and measurable results.
                             </p>
                         </div>
@@ -122,7 +122,7 @@
 
           <div class="w-100 d-flex">
               <div class="inner">
-                  <div class="circle fadeIn wow "></div>
+                  <div class="circle fadeIn wow" style="width:400px; height:400px; border-radius:50%; background: url('{{ asset('resources/frontend/images/OF71Y80.png') }}') center center / contain no-repeat; animation: blink 10s linear infinite;"></div>
 
                   @foreach ($services as $index => $service)
                       @php
@@ -139,7 +139,7 @@
 
               @foreach ($services as $index => $service)
                   @php
-                      $hasVideo = $service->youtube_link || $service->video;
+                      $hasVideo = $service->video || $service->youtube_link;
                       $class = $serviceMap[$service->id] ?? $classes[$index % count($classes)];
                   @endphp
 
@@ -150,18 +150,13 @@
                               <div class="crossbtn px-2" onclick="closeModule()">Close</div>
                           </div>
                           @if($service->short_desc)
-                              <p class="m-0 p-3">{{ $service->short_desc }}</p>
+                              <p class="m-0 p-1">{{ $service->short_desc }}</p>
                           @endif
 
-                          @if ($service->youtube_link)
-                              <iframe width="100%" height="380"
-                                  data-src="{{ $service->youtube_link }}"
-                                  title="YouTube video player" frameborder="0"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  allowfullscreen></iframe>
-                          @elseif ($service->video)
-                              <video width="100%" height="380" controls data-src="{{ asset('images/service/videos/' . $service->video) }}">
-                              </video>
+                          @if ($service->video)
+                              <video width="100%" controls data-src="{{ asset('images/service/videos/' . $service->video) }}"></video>
+                          @elseif ($service->youtube_link)
+                              <iframe width="100%" data-src="{{ $service->youtube_link }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                           @endif
                       </div>
                   @endif
@@ -212,13 +207,13 @@
               </div>
               @if($loop->iteration % 2 == 0 && !$loop->last)
                 <div class="w-100 my-3 d-none d-md-block">
-                    <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
+                    <div style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
                 </div>
               @endif
 
               @if(!$loop->last)
                 <div class="w-100 my-3 d-block d-md-none">
-                    <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
+                    <div style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
                 </div>
               @endif
           @endforeach

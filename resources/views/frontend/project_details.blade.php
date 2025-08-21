@@ -1,21 +1,5 @@
 @extends('frontend.master')
 
-@if($project->meta_title)
-  @section('meta_title', $project->meta_title)
-@endif
-
-@if($project->meta_description)
-  @section('meta_description', $project->meta_description)
-@endif
-
-@if($project->meta_keywords)
-  @section('meta_keywords', $project->meta_keywords)
-@endif
-
-@if($project->meta_image)
-  @section('meta_image', asset('images/projects/meta/' . $project->meta_image))
-@endif
-
 @section('content')
 <section class="project-details"
     style="background-image: url('{{ asset('resources/frontend/images/pattern-1.svg') }}'), linear-gradient(16deg, #040b16, #0a2d66);">

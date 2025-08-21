@@ -518,7 +518,7 @@ section.default.what-we-do .inner .circle {
   height: 400px;
   background: #000;
   border-radius: 50%;
-  background: url("../images/OF71Y80.png");
+  /* background: url("../images/OF71Y80.png"); */
   background-size: contain;
   background-position: center center;
   animation: blink 10s linear infinite;
@@ -652,6 +652,9 @@ section.default.what-we-do .visualBox.active {
   section.default.what-we-do .visualBox.active {
     width: 97%;
     position: absolute;
+    transform: translate(-50%, -50%); 
+    top: 50%; 
+    left: 50%;
   }
 }
 section.default.what-we-do .visualBox .crossbtn {
@@ -1933,4 +1936,18 @@ section.default.contact-section .secTtile {
     background-color: #e65a1a;
     transform: scale(1.1);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+video, iframe {
+    height: 380px;
+}
+
+@media (max-width: 768px) {
+    video, iframe {
+        height: 300px;
+    }
 }

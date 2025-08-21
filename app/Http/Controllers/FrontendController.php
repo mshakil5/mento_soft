@@ -121,10 +121,12 @@ class FrontendController extends Controller
     }
 
     public function index()
-    { 
-        $landingPage = Master::where('name', 'landing page')->first();
-        $whyChooseUs = Master::where('name', 'Why Choose Us')->first();
-        $ourFlexible = Master::where('name', 'our flexible')->first();
+    {   
+        $masters = Master::whereIn('name', ['landing page', 'Why Choose Us', 'our flexible'])->get();
+
+        $landingPage = $masters->firstWhere('name', 'landing page');
+        $whyChooseUs = $masters->firstWhere('name', 'Why Choose Us');
+        $ourFlexible = $masters->firstWhere('name', 'our flexible');
         $services = Service::where('status', 1)
           ->orderByRaw('sl = 0, sl ASC')
           ->orderBy('id', 'desc')->limit(6)

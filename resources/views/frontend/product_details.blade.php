@@ -1,21 +1,5 @@
 @extends('frontend.master')
 
-@if($product->meta_title)
-  @section('meta_title', $product->meta_title)
-@endif
-
-@if($product->meta_description)
-  @section('meta_description', $product->meta_description)
-@endif
-
-@if($product->meta_keywords)
-  @section('meta_keywords', $product->meta_keywords)
-@endif
-
-@if($product->meta_image)
-  @section('meta_image', asset('images/projects/meta/' . $product->meta_image))
-@endif
-
 @section('content')
 
 <section>
@@ -32,7 +16,7 @@
                 <div class="block-area bg-white p-4 h-100">
                     <h2 class="secTtile fw-bold wow bounce">{{ $product->short_description }}</h2>
                     @if($product->long_description)
-                        <p class="mb-3 text-muted small">
+                        <p class="mb-3 text-muted small text-justify">
                             {!! $product->long_description !!}
                         </p>
                     @endif
@@ -68,7 +52,7 @@
             
             @foreach($product->features as $feature)
             <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
-                <div class="p-3 rounded-3 shadow-sm module-box fadeInUp wow"
+                <div class="p-3 rounded-3 shadow-sm module-box fadeInUp wow m-1 m-sm-0"
                     style="cursor: pointer; height: 300px;"
                     type="button"
                     data-bs-toggle="offcanvas"
@@ -93,7 +77,7 @@
                         {{ $feature->title }}
                         <span data-bs-dismiss="offcanvas" class="btn btn-sm btn-danger">Close</span>
                     </h5>
-                    <p>{!! $feature->description !!}</p>
+                    <p class="text-justify">{!! $feature->description !!}</p>
                 </div>
             </div>
             @endforeach
@@ -108,16 +92,12 @@
         <div class="row">
             <h3 class="secTtile text-center text-uppercase fw-bold title-font wow bounce"><span class="txt-ternary">Who are using</span> this product</h3>
         </div>
-        <div class="row mt-4">
-            <div class="marquee-container">
-                <div class="marquee">
-                    @foreach($product->clients as $client)
-                    <div>
-                        <img src="{{ asset('images/product-clients/'.$client->image) }}" class="img-fluid" alt="{{ $product->name }} client">
-                    </div>
-                    @endforeach
+        <div class="row mt-3 g-2">
+            @foreach($product->clients as $client)
+                <div class="col-6 col-md-2 d-flex justify-content-center align-items-center">
+                    <img src="{{ asset('images/product-clients/'.$client->image) }}" class="img-fluid" alt="{{ $product->name }} client">
                 </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -180,52 +160,60 @@
 </section>
 @endif
 
-<section class="our-products" style="background-image: url(../images/pattern-1.svg), linear-gradient(16deg, rgb(4, 11, 22), rgb(10, 45, 102)); background-size: 100% 100%; background-position: 100% 100%;" id="products">
-    <div class="row px-2 text-center py-5">
-        <h2 class="secTtile text-light text-uppercase fw-bold title-font wow bounce mb-0">Other Products</h2>
-    </div>
-    <div class="row g-0">
-        @foreach($otherProducts as $product)
-            <div class="col-lg-6" style="position: relative;">
-                  @if($loop->iteration % 2 == 1 && !$loop->last)
-                    <div style="position: absolute; top: 0; right: 0;width: 2px; height: 100%; background: linear-gradient(to bottom, rgba(255,163,15,0) 0%, rgba(255,163,15,0.8) 50%, rgba(255,163,15,0) 100%);
-                    "></div>
-                  @endif
-                <div class="innerbox {{ $loop->odd ? 'accounting' : 'ai' }}">
-                    <a href="{{ route('productDetails', $product->slug) }}" class="productitle">
-                        {{ $product->title }}
-                    </a>
-                    
-                    @php
-                        $allClasses = ['one', 'two', 'three', 'four', 'five', 'six'];
-                        $bgClasses = ['bg-dark text-light', ''];
-                        
-                        shuffle($allClasses);
-                        
-                        $features = $product->features;
-                    @endphp
-                    
-                    @foreach($features as $index => $feature)
-                        @php
-                            $bgClass = $bgClasses[$index % count($bgClasses)];
-                            $positionClass = $allClasses[$index % count($allClasses)];
-                            $animationClass = $index === 0 ? 'fadeInUp wow' : '';
-                        @endphp
-                        
-                        <div class="{{ $positionClass }} {{ $bgClass }} {{ $animationClass }}">
-                            {{ $feature->title }}
-                        </div>
-                    @endforeach
+@if ($otherProducts->count() > 0)
+  <section class="our-products" style="background-image: url(../images/pattern-1.svg), linear-gradient(16deg, rgb(4, 11, 22), rgb(10, 45, 102)); background-size: 100% 100%; background-position: 100% 100%;" id="products">
+      <div class="row px-2 text-center py-5">
+          <h2 class="secTtile text-light text-uppercase fw-bold title-font wow bounce mb-0">our products</h2>
+      </div>
+      <div class="row g-0">
+          @foreach($otherProducts as $product)
+              <div class="col-lg-6" style="position: relative;">
+                    @if($loop->iteration % 2 == 1 && !$loop->last)
+                      <div style="position: absolute; top: 0; right: 0;width: 2px; height: 100%; background: linear-gradient(to bottom, rgba(255,163,15,0) 0%, rgba(255,163,15,0.8) 50%, rgba(255,163,15,0) 100%);
+                      "></div>
+                    @endif
+                  <div class="innerbox {{ $loop->odd ? 'accounting' : 'ai' }}">
+                      <a href="{{ route('productDetails', $product->slug) }}" class="productitle">
+                          {{ $product->title }}
+                      </a>
+                      
+                      @php
+                          $allClasses = ['one', 'two', 'three', 'four', 'five', 'six'];
+                          $bgClasses = ['bg-dark text-light', ''];
+                          
+                          shuffle($allClasses);
+                          
+                          $features = $product->features;
+                      @endphp
+                      
+                      @foreach($features as $index => $feature)
+                          @php
+                              $bgClass = $bgClasses[$index % count($bgClasses)];
+                              $positionClass = $allClasses[$index % count($allClasses)];
+                              $animationClass = $index === 0 ? 'fadeInUp wow' : '';
+                          @endphp
+                          
+                          <div class="{{ $positionClass }} {{ $bgClass }} {{ $animationClass }}">
+                              {{ $feature->title }}
+                          </div>
+                      @endforeach
+                  </div>
+              </div>
+              @if($loop->iteration % 2 == 0 && !$loop->last)
+                <div class="w-100 my-3 d-none d-md-block">
+                    <div style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
                 </div>
-            </div>
-            @if($loop->iteration % 2 == 0 && !$loop->last)
-                <div class="w-100 my-3">
-                    <div class="divider" style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
+              @endif
+
+              @if(!$loop->last)
+                <div class="w-100 my-3 d-block d-md-none">
+                    <div style="height: 2px; background: linear-gradient(90deg, rgba(12,29,77,0) 0%, rgba(12,29,77,1) 20%, rgba(255,163,15,1) 50%, rgba(12,29,77,1) 80%, rgba(12,29,77,0) 100%);"></div>
                 </div>
-            @endif
-        @endforeach
-    </div>
-</section>
+              @endif
+          @endforeach
+      </div>
+  </section>
+@endif
 
 @include('frontend.reviews')
 
