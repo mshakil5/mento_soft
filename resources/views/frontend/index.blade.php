@@ -223,6 +223,8 @@
 
 @include('frontend.reviews')
 
+@include('frontend.team_members')
+
 @include('frontend.contact', ['product' => null])
 
 @endsection
