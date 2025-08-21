@@ -39,5 +39,14 @@ class Client extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function emailLogs()
+    {
+        return $this->hasMany(ClientEmailLog::class, 'client_id');
+    }
+
+    public function invoiceEmails()
+    {
+        return $this->emailLogs()->whereNotNull('invoice_id');
+    }
     
 }

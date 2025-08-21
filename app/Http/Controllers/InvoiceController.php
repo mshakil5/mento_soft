@@ -13,6 +13,8 @@ use DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoiceMail;
 use App\Models\Transaction;
+use App\Models\ClientEmailLog;
+use App\Models\CompanyDetails;
 
 class InvoiceController extends Controller
 {
@@ -34,7 +36,7 @@ class InvoiceController extends Controller
     private function invoiceDataTable(Request $request, string $filter)
     {
         if ($request->ajax()) {
-            $query = Invoice::with('client')->latest();
+            $query = Invoice::with('client')->withCount('emailLogs')->latest();
 
             if ($request->client_id) {
                 $query->where('client_id', $request->client_id);
@@ -54,17 +56,25 @@ class InvoiceController extends Controller
                 ->addColumn('client_name', fn($row) => $row->client->business_name ?? 'N/A')
                 ->addColumn('action', function ($row) {
                     $clientEmail = $row->client->email ?? null;
+                    $emailCount = $row->email_logs_count;
                     $emailBtn = $clientEmail 
-                        ? '<button class="btn btn-sm btn-warning send-email" data-id="'.$row->id.'" data-email="'.$clientEmail.'">
-                                <span class="spinner-border spinner-border-sm d-none"></span>Send Email
-                          </button>' 
-                        : '';
+                      ? '<button class="btn btn-sm btn-warning send-email" 
+                                  data-id="'.$row->id.'" 
+                                  data-email="'.$clientEmail.'" 
+                                  title="'.($emailCount > 0 ? "{$emailCount} emails sent" : 'Send first email').'">
+                              <span class="spinner-border spinner-border-sm d-none"></span>
+                              Send Email' 
+                              . ($emailCount > 0 ? " ({$emailCount})" : '') .
+                        '</button>' 
+                      : '';
 
                     $btn = '';
                     if ($row->isPending()) {
 
                         $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+
+                        $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button> ';
 
                         $btn .= '
                         <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1" role="dialog" aria-hidden="true">
@@ -98,11 +108,7 @@ class InvoiceController extends Controller
                           </div>
                         </div>
                         ';
-                    } else {
-                        $btn .= '<button class="btn btn-sm btn-success" disabled>Receive</button> ';
-                        $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
                     }
-                    $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button> ';
                     $btn .= '<a href="'.route('invoices.show', $row->id).'" class="btn btn-sm btn-primary view" target="_blank">View</a> ';
                     $btn .= $emailBtn;
 
@@ -257,7 +263,21 @@ class InvoiceController extends Controller
             throw new \Exception('Client email not found');
         }
 
-        Mail::to($invoice->client->email)->send(new InvoiceMail($invoice));
+        try {
+            Mail::to($invoice->client->email)->queue(new InvoiceMail($invoice));
+
+            ClientEmailLog::create([
+                'client_id'       => $invoice->client_id,
+                'invoice_id'      => $invoice->id,
+                'recipient_email' => $invoice->client->email,
+                'subject'         => 'Your Invoice from ' . (optional(CompanyDetails::first())->business_name ?? config('app.name')),
+                'message'         => view('emails.invoice', compact('invoice'))->render(),
+                'status'          => 1,
+                'created_by'      => auth()->id(),
+            ]);
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     public function show($id)
@@ -458,9 +478,13 @@ class InvoiceController extends Controller
             return response()->json(['message' => 'Client email not found.'], 422);
         }
 
-        Mail::to($invoice->client->email)->send(new InvoiceMail($invoice));
+        try {
+            $this->sendInvoiceEmail($invoice);
 
-        return response()->json(['message' => 'Invoice email sent successfully.']);
+            return response()->json(['message' => 'Invoice email sent successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to send email: ' . $e->getMessage()], 500);
+        }
     }
 
     public function receive(Request $request, Invoice $invoice)

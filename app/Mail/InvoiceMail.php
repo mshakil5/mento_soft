@@ -5,10 +5,11 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Invoice;
 use App\Models\CompanyDetails;
 
-class InvoiceMail extends Mailable
+class InvoiceMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
