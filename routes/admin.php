@@ -38,6 +38,7 @@ use App\Http\Controllers\ProjectServiceDetailController;
 use App\Http\Controllers\DaybookController;
 use App\Http\Controllers\FinancialStatementController;
 use App\Http\Controllers\TeamMemberController;
+use App\Http\Controllers\FileController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -184,6 +185,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/team-members/{id}', [TeamMemberController::class, 'destroy']);
     Route::post('/team-members/status', [TeamMemberController::class, 'toggleStatus'])->name('team-members.status');
 
+    Route::post('/remove-file', [FileController::class, 'removeFile'])->name('remove.file');
+    
     //Software Part
 
     // Client Types

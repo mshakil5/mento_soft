@@ -317,28 +317,64 @@
           $("#meta_keywords").val(data.meta_keywords);
           $("#codeid").val(data.id);
           
-          // Set preview images
+          // Image preview
           if (data.image) {
               $("#preview-image").attr("src", '/images/products/' + data.image).show();
-          }
-          if (data.meta_image) {
-              $("#preview-meta-image").attr("src", '/images/products/meta/' + data.meta_image).show();
-          }
-          
-          // Handle video preview
-          if (data.video) {
-              $("#video-preview").html(`
-                  <div class="alert alert-info">
-                      Current video: ${data.video}
-                      <button type="button" class="close" id="remove-video" data-id="${data.id}">
-                          <span>&times;</span>
-                      </button>
-                  </div>
-              `);
+              if(!$("#preview-image").next('.remove-file').length){
+                  $("<button/>", {
+                      type: "button",
+                      class: "btn btn-danger remove-file position-absolute top-0 end-0",
+                      html: '<i class="fas fa-times"></i>',
+                      "data-filename": data.image,
+                      "data-path": "images/products",
+                      "data-model": "Product",
+                      "data-id": data.id,
+                      "data-col": "image"
+                  }).insertAfter("#preview-image");
+                  $("#preview-image").parent().css('position', 'relative');
+              }
+          } else {
+              $("#preview-image").attr("src", '').hide();
+              $("#preview-image").next('.remove-file').remove();
           }
 
-          $("#addBtn").val('Update');
-          $("#addBtn").html('Update');
+          // Meta Image preview
+          if (data.meta_image) {
+              $("#preview-meta-image").attr("src", '/images/products/meta/' + data.meta_image).show();
+              if(!$("#preview-meta-image").next('.remove-file').length){
+                  $("<button/>", {
+                      type: "button",
+                      class: "btn btn-danger remove-file position-absolute top-0 end-0",
+                      html: '<i class="fas fa-times"></i>',
+                      "data-filename": data.meta_image,
+                      "data-path": "images/products/meta",
+                      "data-model": "Product",
+                      "data-id": data.id,
+                      "data-col": "meta_image"
+                  }).insertAfter("#preview-meta-image");
+                  $("#preview-meta-image").parent().css('position', 'relative');
+              }
+          } else {
+              $("#preview-meta-image").attr("src", '').hide();
+              $("#preview-meta-image").next('.remove-file').remove();
+          }
+
+          // Video preview
+          $(".video-remove-btn").remove();
+          if (data.video) {
+              $("<button/>", {
+                  type: "button",
+                  class: "btn btn-danger remove-file video-remove-btn",
+                  html: '<i class="fas fa-times"></i> Remove Video',
+                  "data-filename": data.video,
+                  "data-path": "images/products/videos",
+                  "data-model": "Product",
+                  "data-id": data.id,
+                  "data-col": "video"
+              }).insertAfter("#video");
+          }
+
+          $("#addBtn").val('Update').html('Update');
           $("#addThisFormContainer").show(300);
           $("#newBtn").hide(100);
       }
@@ -355,6 +391,8 @@
           $('#preview-image').attr('src', '#');
           $('#preview-meta-image').attr('src', '#');
           $("#cardTitle").text('Add new product');
+          $('#createThisForm').find('.remove-file').remove();
+          reloadTable();
       }
       
       previewImage('#image', '#preview-image');

@@ -399,26 +399,63 @@
           $("#codeid").val(data.id);
           
           // Set preview images
-          if (data.image) {
+          if(data.image){
               $("#preview-image").attr("src", '/images/projects/' + data.image).show();
+              if(!$("#preview-image").next('.remove-file').length){
+                  $("<button/>", {
+                      type: "button",
+                      class: "btn btn-danger remove-file position-absolute top-0 end-0",
+                      html: '<i class="fas fa-times"></i>',
+                      "data-filename": data.image,
+                      "data-path": "images/projects",
+                      "data-model": "Project",
+                      "data-id": data.id,
+                      "data-col": "image"
+                  }).insertAfter("#preview-image");
+                  $("#preview-image").parent().css('position', 'relative');
+              }
+          } else {
+              $("#preview-image").attr("src", '').hide();
+              $("#preview-image").next('.remove-file').remove();
           }
-          if (data.thumbnail_image) {
-              $("#preview-thumbnail").attr("src", '/images/projects/thumbnails/' + data.thumbnail_image).show();
-          }
-          if (data.meta_image) {
+
+          if(data.meta_image){
               $("#preview-meta-image").attr("src", '/images/projects/meta/' + data.meta_image).show();
+              if(!$("#preview-meta-image").next('.remove-file').length){
+                  $("<button/>", {
+                      type: "button",
+                      class: "btn btn-danger remove-file position-absolute top-0 end-0",
+                      html: '<i class="fas fa-times"></i>',
+                      "data-filename": data.meta_image,
+                      "data-path": "images/projects/meta",
+                      "data-model": "Project",
+                      "data-id": data.id,
+                      "data-col": "meta_image"
+                  }).insertAfter("#preview-meta-image");
+                  $("#preview-meta-image").parent().css('position', 'relative');
+              }
+          } else {
+              $("#preview-meta-image").attr("src", '').hide();
+              $("#preview-meta-image").next('.remove-file').remove();
           }
           
           // Handle video preview
-          if (data.demo_video) {
+          if(data.demo_video){
               $("#video-preview").html(`
-                  <div class="alert alert-info">
-                      Current video: ${data.demo_video}
-                      <button type="button" class="close" id="remove-video" data-id="${data.id}">
-                          <span>&times;</span>
+                  <div class="alert alert-info d-flex justify-content-between align-items-center position-relative">
+                      <span>Current video: ${data.demo_video}</span>
+                      <button type="button" class="btn btn-danger remove-file position-absolute top-0 end-0"
+                          data-filename="${data.demo_video}"
+                          data-path="images/projects/videos"
+                          data-model="Project"
+                          data-id="${data.id}"
+                          data-col="demo_video">
+                          <i class="fas fa-times"></i>
                       </button>
                   </div>
               `);
+          } else {
+              $("#video-preview").html('');
           }
 
           $('#slider-preview').empty();

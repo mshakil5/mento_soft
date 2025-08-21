@@ -259,13 +259,27 @@
           $("#sl").val(data.sl);
           $("#codeid").val(data.id);
           
-          // Set preview image
           if (data.image) {
               $("#preview-image").attr("src", '/images/product-features/' + data.image).show();
+              if(!$("#preview-image").next('.remove-file').length){
+                  $("<button/>", {
+                      type: "button",
+                      class: "btn btn-danger remove-file position-absolute top-0 end-0",
+                      html: '<i class="fas fa-times"></i>',
+                      "data-filename": data.image,
+                      "data-path": "images/product-features",
+                      "data-model": "ProductFeature",
+                      "data-id": data.id,
+                      "data-col": "image"
+                  }).insertAfter("#preview-image");
+                  $("#preview-image").parent().css('position', 'relative');
+              }
+          } else {
+              $("#preview-image").attr("src", '').hide();
+              $("#preview-image").next('.remove-file').remove();
           }
 
-          $("#addBtn").val('Update');
-          $("#addBtn").html('Update');
+          $("#addBtn").val('Update').html('Update');
           $("#addThisFormContainer").show(300);
           $("#newBtn").hide(100);
       }
@@ -280,6 +294,8 @@
           $('#preview-image').attr('src', '#');
           $("#cardTitle").text('Add new feature');
           $("#iconPreview").html('');
+          $('#createThisForm').find('.remove-file').remove();
+          reloadTable();
       }
       
       previewImage('#image', '#preview-image');

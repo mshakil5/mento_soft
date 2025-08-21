@@ -22,9 +22,9 @@ class ProjectController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('thumbnail', function($row) {
-                    if ($row->thumbnail_image) {
-                        return '<a href="'.asset("images/projects/thumbnails/".$row->thumbnail_image).'" target="_blank">
-                                    <img src="'.asset("images/projects/thumbnails/".$row->thumbnail_image).'" style="max-width:80px; height:auto;">
+                    if ($row->image) {
+                        return '<a href="'.asset("images/projects/".$row->image).'" target="_blank">
+                                    <img src="'.asset("images/projects/".$row->image).'" style="max-width:80px; height:auto;">
                                 </a>';
                     }
                     return '';
@@ -126,16 +126,16 @@ class ProjectController extends Controller
             $data->image = $imageName;
 
             // Save thumbnail
-            $thumbnailName = 'thumb_' . $imageName;
-            Image::make($image)
-                ->resize(400, 300, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
-                ->encode('webp', 80)
-                ->save($thumbPath . $thumbnailName);
+            // $thumbnailName = 'thumb_' . $imageName;
+            // Image::make($image)
+            //     ->resize(400, 300, function ($constraint) {
+            //         $constraint->aspectRatio();
+            //         $constraint->upsize();
+            //     })
+            //     ->encode('webp', 80)
+            //     ->save($thumbPath . $thumbnailName);
 
-            $data->thumbnail_image = $thumbnailName;
+            // $data->thumbnail_image = $thumbnailName;
         }
 
         // Handle demo video
@@ -270,9 +270,9 @@ class ProjectController extends Controller
             if ($project->image && file_exists(public_path('images/projects/' . $project->image))) {
                 unlink(public_path('images/projects/' . $project->image));
             }
-            if ($project->thumbnail_image && file_exists(public_path('images/projects/thumbnails/' . $project->thumbnail_image))) {
-                unlink(public_path('images/projects/thumbnails/' . $project->thumbnail_image));
-            }
+            // if ($project->thumbnail_image && file_exists(public_path('images/projects/thumbnails/' . $project->thumbnail_image))) {
+            //     unlink(public_path('images/projects/thumbnails/' . $project->thumbnail_image));
+            // }
 
             $image = $request->file('image');
             $imageName = time() . '.webp';
@@ -290,16 +290,16 @@ class ProjectController extends Controller
             $project->image = $imageName;
 
             // Create and save thumbnail from main image
-            $thumbnailName = 'thumb_' . $imageName;
-            Image::make($image)
-                ->resize(400, 300, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
-                ->encode('webp', 80)
-                ->save($path . 'thumbnails/' . $thumbnailName);
+            // $thumbnailName = 'thumb_' . $imageName;
+            // Image::make($image)
+            //     ->resize(400, 300, function ($constraint) {
+            //         $constraint->aspectRatio();
+            //         $constraint->upsize();
+            //     })
+            //     ->encode('webp', 80)
+            //     ->save($path . 'thumbnails/' . $thumbnailName);
 
-            $project->thumbnail_image = $thumbnailName;
+            // $project->thumbnail_image = $thumbnailName;
         }
 
         // Handle demo video update
@@ -389,9 +389,9 @@ class ProjectController extends Controller
             unlink(public_path('images/projects/' . $project->image));
         }
         
-        if ($project->thumbnail_image && file_exists(public_path('images/projects/thumbnails/' . $project->thumbnail_image))) {
-            unlink(public_path('images/projects/thumbnails/' . $project->thumbnail_image));
-        }
+        // if ($project->thumbnail_image && file_exists(public_path('images/projects/thumbnails/' . $project->thumbnail_image))) {
+        //     unlink(public_path('images/projects/thumbnails/' . $project->thumbnail_image));
+        // }
         
         if ($project->demo_video && file_exists(public_path('images/projects/videos/' . $project->demo_video))) {
             unlink(public_path('images/projects/videos/' . $project->demo_video));
