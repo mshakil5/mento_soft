@@ -1942,12 +1942,13 @@ section.default.contact-section .secTtile {
     text-align: justify;
 }
 
-video, iframe {
+.responsive-video {
+    width: 100%;
     height: 380px;
 }
 
 @media (max-width: 768px) {
-    video, iframe {
+    .responsive-video {
         height: 300px;
     }
 }

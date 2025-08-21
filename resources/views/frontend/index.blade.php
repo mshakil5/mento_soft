@@ -122,7 +122,7 @@
 
           <div class="w-100 d-flex">
               <div class="inner">
-                  <div class="circle fadeIn wow" style="width:400px; height:400px; border-radius:50%; background: url('{{ asset('resources/frontend/images/OF71Y80.png') }}') center center / contain no-repeat; animation: blink 10s linear infinite;"></div>
+                <div class="circle fadeIn wow" style="background-image: url('{{ asset('resources/frontend/images/OF71Y80.png') }}');"></div>
 
                   @foreach ($services as $index => $service)
                       @php
@@ -154,9 +154,9 @@
                           @endif
 
                           @if ($service->video)
-                              <video width="100%" controls data-src="{{ asset('images/service/videos/' . $service->video) }}"></video>
+                              <video class="responsive-video" controls data-src="{{ asset('images/service/videos/' . $service->video) }}"></video>
                           @elseif ($service->youtube_link)
-                              <iframe width="100%" data-src="{{ $service->youtube_link }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                              <iframe class="responsive-video" data-src="{{ $service->youtube_link }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                           @endif
                       </div>
                   @endif
