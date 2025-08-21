@@ -37,6 +37,7 @@ use App\Http\Controllers\ProjectServiceController;
 use App\Http\Controllers\ProjectServiceDetailController;
 use App\Http\Controllers\DaybookController;
 use App\Http\Controllers\FinancialStatementController;
+use App\Http\Controllers\TeamMemberController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -174,6 +175,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/products/client-videos/update', [ProductClientVideoController::class, 'update']);
     Route::get('/products/client-videos/{id}', [ProductClientVideoController::class, 'destroy']);
     Route::post('/products/client-videos/status', [ProductClientVideoController::class, 'toggleStatus'])->name('products.client-videos.status');
+
+    // Team Members
+    Route::get('/team-members', [TeamMemberController::class, 'index'])->name('team-members.index');
+    Route::post('/team-members', [TeamMemberController::class, 'store']);
+    Route::get('/team-members/{id}/edit', [TeamMemberController::class, 'edit']);
+    Route::post('/team-members/update', [TeamMemberController::class, 'update']);
+    Route::get('/team-members/{id}', [TeamMemberController::class, 'destroy']);
+    Route::post('/team-members/status', [TeamMemberController::class, 'toggleStatus'])->name('team-members.status');
 
     //Software Part
 

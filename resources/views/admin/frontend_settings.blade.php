@@ -72,8 +72,8 @@
         </ul>
     </li>
 
-    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
             <p>
                 Settings <i class="fas fa-angle-left right"></i>
@@ -132,6 +132,12 @@
                 <a href="{{ route('client-reviews.index') }}" class="nav-link {{ Route::is('client-reviews.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-comments"></i>
                     <p>Client Reviews</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('team-members.index') }}" class="nav-link {{ Route::is('team-members.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-users"></i>
+                    <p>Our Team</p>
                 </a>
             </li>
         </ul>
