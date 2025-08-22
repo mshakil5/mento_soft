@@ -150,10 +150,10 @@ class FrontendController extends Controller
         $company = CompanyDetails::first();
 
         $this->seo(
-            $company->meta_title,
-            $company->meta_description,
-            $company->meta_keywords,
-            $company->meta_image ? asset('images/company/meta/' . $company->meta_image) : null
+            $company?->meta_title ?? '',
+            $company?->meta_description ?? '',
+            $company?->meta_keywords ?? '',
+            $company?->meta_image ? asset('images/company/meta/' . $company->meta_image) : null
         );
 
         return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'products'));
