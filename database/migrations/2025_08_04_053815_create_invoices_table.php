@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('discount_percent')->default(0);
             $table->string('discount_amount')->default(0);
             $table->string('net_amount')->default(0);
-            $table->boolean('status')->default(1);
+            $table->boolean('status')->default(1); // 1 = pending, 2 = paid
             $table->longText('description')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();

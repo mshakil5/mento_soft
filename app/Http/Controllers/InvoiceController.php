@@ -508,6 +508,8 @@ class InvoiceController extends Controller
         $transaction->tran_id = 'AT' . date('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT);
         $transaction->save();
 
+        $invoice->status = 2;
+        $invoice->save();
         return back()->with('success', 'Invoice received successfully.');
     }
 }

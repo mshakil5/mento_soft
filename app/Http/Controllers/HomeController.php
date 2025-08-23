@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\ClientProject;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -12,8 +15,12 @@ class HomeController extends Controller
     }
     
     public function adminHome()
-    {
-        return view('admin.dashboard');
+    {   
+        $totalClients = Client::count();
+        $activeProjects = ClientProject::where('status', 2)->count();
+        $onGoingServices = 0;
+        $totalPending = Invoice::where('status', 2)->sum('net_amount');
+        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'totalPending'));
     }
 
     public function managerHome()
