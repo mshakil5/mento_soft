@@ -100,3 +100,77 @@ $(document).on('click', '.remove-file', function() {
         }
     });
 });
+
+function openTaskModal(projectId = null) {
+    let $select = $('#projectSelect');
+
+    if(projectId){
+        $select.val(projectId).trigger('change').prop('disabled', true);
+    } else {
+        $select.val('').trigger('change').prop('disabled', false);
+    }
+
+    $('#tasksModal').modal('show');
+}
+
+$(document).on('shown.bs.modal', '.modal', function () {
+    $(this).find('.modal-select2').each(function () {
+        if (!$(this).hasClass('select2-hidden-accessible')) {
+            $(this).select2({
+                width: '100%',
+                dropdownParent: $(this).closest('.modal')
+            });
+        }
+    });
+});
+
+$('#tasksModal form').submit(function(e) {
+    e.preventDefault();
+
+    const $form = $(this);
+    const projectId = $('#projectSelect').val();
+    const employeeSelect = $('#employeeSelect').val();
+
+    if(!projectId) {
+        error('Please select a project!');
+        return;
+    }
+
+    if(!employeeSelect) {
+        error('Please select an employee!');
+        return;
+    }
+
+    $.ajax({
+        url: `/admin/client-projects/${projectId}/tasks`,
+        type: 'POST',
+        data: $form.serialize(),
+        success: function(res) {
+          success(res.message);
+          pageTop();
+          clearTaskModal();
+          setTimeout(function() {
+              location.reload();
+          }, 1000);
+        },
+        error: function(xhr) {
+          console.error(xhr.responseText);
+          pageTop();
+          if (xhr.responseJSON && xhr.responseJSON.errors)
+            error(Object.values(xhr.responseJSON.errors)[0][0]);
+          else
+            error();
+        }
+    });
+});
+
+$('#tasksModal').on('hidden.bs.modal', function () {
+    clearTaskModal();
+});
+
+function clearTaskModal() {
+    $('#tasksModal').modal('hide');
+    $('#tasksModal form')[0].reset();
+    $('.summernote').summernote('reset');
+    $('#tasksModal select').val('').trigger('change');
+}

@@ -58,6 +58,18 @@
                                         <input type="date" class="form-control" id="due_date" name="due_date" min="{{ date('Y-m-d') }}" required>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Status <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="status" name="status" required>
+                                            <option value="1">Planned</option>
+                                            <option value="2">In Progress</option>
+                                            <option value="3">Done</option>
+                                            <option value="4">On Hold</option>
+                                            <option value="5">Cancelled</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -135,6 +147,7 @@
             form_data.append("employee_id", $("#employee_id").val());
             form_data.append("priority", $("#priority").val());
             form_data.append("due_date", $("#due_date").val());
+            form_data.append("status", $("#status").val());
 
             if($(this).val() == 'Create') {
                 // Create
@@ -203,6 +216,7 @@
             $("#employee_id").val(data.employee_id).trigger('change');
             $("#task").summernote('code', data.task);
             $("#priority").val(data.priority);
+            $("#status").val(data.status);
             $("#due_date").val(data.due_date);
             $("#codeid").val(data.id);
 
@@ -224,26 +238,52 @@
         }
         
         // Status toggle
-        $(document).on('change', '.toggle-status', function() {
-            var task_id = $(this).data('id');
-            var status = $(this).prop('checked') ? 1 : 0;
-            var toggleUrl = "/admin/client-projects-task/" + task_id + "/toggle-status";
+        // $(document).on('change', '.toggle-status', function() {
+        //     var task_id = $(this).data('id');
+        //     var status = $(this).prop('checked') ? 1 : 0;
+        //     var toggleUrl = "/admin/client-projects-task/" + task_id + "/toggle-status";
 
 
+        //     $.ajax({
+        //         url: toggleUrl,
+        //         method: "POST",
+        //         data: {
+        //             status: status,
+        //             _token: "{{ csrf_token() }}"
+        //         },
+        //         success: function(res) {
+        //           success(res.message);
+        //           reloadTable();
+        //         },
+        //         error: function(xhr, status, error) {
+        //           console.error(xhr.responseText);
+        //           error('Failed to update status');
+        //         }
+        //     });
+        // });
+
+        $(document).on('click', '.status-change', function(e) {
+            e.preventDefault();
+
+            var taskId = $(this).data('id');
+            var status = $(this).data('status');
+            var toggleUrl = "/admin/client-projects-task/" + taskId + "/toggle-status";
+            
             $.ajax({
                 url: toggleUrl,
                 method: "POST",
                 data: {
+                    task_id: taskId,
                     status: status,
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(res) {
-                  success(res.message);
-                  reloadTable();
+                    success(res.message);
+                    reloadTable();
                 },
-                error: function(xhr, status, error) {
-                  console.error(xhr.responseText);
-                  error('Failed to update status');
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    error('Failed to update task status.');
                 }
             });
         });

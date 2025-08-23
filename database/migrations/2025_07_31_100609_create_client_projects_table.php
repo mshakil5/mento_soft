@@ -23,7 +23,7 @@ return new class extends Migration
             $table->longText('additional_info')->nullable();
             $table->string('start_date')->nullable();
             $table->string('end_date')->nullable();
-            $table->boolean('status')->default(1);
+            $table->boolean('status')->default(1); //1 = planned 2 = in progress 3 = blocked 4 = done
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();

@@ -49,7 +49,7 @@
                             </div>
                             
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <div class="form-group">
                                         <label>Domain</label>
                                         <input type="text" class="form-control" id="domain" name="domain" placeholder="Enter domain">
@@ -61,10 +61,8 @@
                                         <input type="url" class="form-control" id="project_url" name="project_url" placeholder="Enter project URL">
                                     </div>
                                 </div>
-                            </div>
                             
-                            <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <div class="form-group">
                                         <label>Tech Stack (comma separated)</label>
                                         <input type="text" class="form-control" id="tech_stack" name="tech_stack" placeholder="e.g. PHP,Laravel,MySQL">
@@ -74,32 +72,38 @@
                                     <div class="form-group">
                                         <label>Status <span class="text-danger">*</span></label>
                                         <select class="form-control" id="status" name="status" required>
-                                            <option value="1">Pending</option>
+                                            <option value="1">Planned</option>
                                             <option value="2">In Progress</option>
-                                            <option value="3">Completed</option>
-                                            <option value="4">On Hold</option>
+                                            <option value="3">Blocked</option>
+                                            <option value="4">Done</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Start Date</label>
                                         <input type="date" class="form-control" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>End Date</label>
-                                        <input type="date" class="form-control" id="end_date" name="end_date">
+                                        <label>Due Date</label>
+                                        <input type="date" class="form-control" id="due_date" name="due_date">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Amount(£)</label>
+                                        <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter amount">
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="form-group">
-                                <label>Description</label>
+                                <label>Project Concept / Idea</label>
                                 <textarea class="form-control summernote" id="description" name="description" rows="5" placeholder="Enter project description"></textarea>
                             </div>
                             
@@ -135,20 +139,23 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Client Projects</h3>
+                        <h3 class="card-title">Projects</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table cell-border table-striped">
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Date</th>
-                                    <th>Image</th>
-                                    <th>Title</th>
+                                    {{-- <th>Date</th> --}}
+                                    {{-- <th>Image</th> --}}
+                                    <th>Project</th>
                                     <th>Client</th>
-                                    <th>Domain</th>
+                                    <th>Start</th>
+                                    <th>Due</th>
+                                    {{-- <th>Domain</th> --}}
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                         </table>
@@ -191,7 +198,8 @@
             form_data.append("description", $("#description").val());
             form_data.append("additional_info", $("#additional_info").val());
             form_data.append("start_date", $("#start_date").val());
-            form_data.append("end_date", $("#end_date").val());
+            form_data.append("due_date", $("#due_date").val());
+            form_data.append("amount", $("#amount").val());
             form_data.append("status", $("#status").val());
 
             // Handle image upload
@@ -272,7 +280,8 @@
             $("#description").summernote('code', data.description);
             $("#additional_info").summernote('code', data.additional_info);
             $("#start_date").val(data.start_date);
-            $("#end_date").val(data.end_date);
+            $("#due_date").val(data.due_date);
+            $("#amount").val(data.amount);
             $("#status").val(data.status);
             $("#codeid").val(data.id);
             
@@ -363,12 +372,15 @@
             },
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                {data: 'date', name: 'date'},
-                {data: 'image', name: 'image', orderable: false, searchable: false},
+                //{data: 'date', name: 'date'},
+                //{data: 'image', name: 'image', orderable: false, searchable: false},
                 {data: 'title', name: 'title'},
                 {data: 'client_name', name: 'client_name'},
-                {data: 'domain', name: 'domain'},
+                {data: 'start_date', name: 'start_date'},
+                {data: 'due_date', name: 'due_date'},
+                // {data: 'domain', name: 'domain'},
                 {data: 'status', name: 'status', orderable: false},
+                {data: 'amount', name: 'amount'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],
             responsive: true,
@@ -379,6 +391,10 @@
         function reloadTable() {
           table.ajax.reload(null, false);
         }
+
+        $('.details-modal').on('hidden.bs.modal', function () {
+            reloadTable();
+        });
     });
 </script>
 @endsection

@@ -49,12 +49,33 @@ class ProjectTaskController extends Controller
                     return '<span class="badge '.$badgeClass.'">'.ucfirst($row->priority).'</span>';
                 })
                 ->addColumn('status', function($row) {
-                    $checked = $row->status == 1 ? 'checked' : '';
-                    
-                    return '<div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
-                                <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
-                            </div>';
+                    $statuses = [
+                        1 => 'Planned',
+                        2 => 'In Progress',
+                        3 => 'Done',
+                        4 => 'On Hold',
+                        5 => 'Cancelled'
+                    ];
+
+                    $currentStatus = $statuses[$row->status] ?? 'Unknown';
+
+                    $html = '
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+                            id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            '.$currentStatus.'
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">';
+                        
+                        foreach ($statuses as $value => $label) {
+                            $html .= '<a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="'.$value.'">'.$label.'</a>';
+                        }
+
+                    $html .= '
+                        </div>
+                    </div>';
+
+                    return $html;
                 })
                 ->addColumn('action', function($row) {
                     return '
@@ -66,7 +87,7 @@ class ProjectTaskController extends Controller
                 ->make(true);
         }
 
-        $employees = User::where('status', 1)->get();
+        $employees = User::where('status', 1)->latest()->get();
         return view('admin.client-projects.tasks', compact('project', 'employees'));
     }
 
@@ -92,6 +113,7 @@ class ProjectTaskController extends Controller
             'employee_id' => $request->employee_id,
             'priority' => $request->priority,
             'due_date' => $request->due_date,
+            'status' => $request->status,
             'created_by' => auth()->id(),
         ]);
 
@@ -119,7 +141,7 @@ class ProjectTaskController extends Controller
             'task' => 'required|string',
             'employee_id' => 'required|exists:users,id',
             'priority' => 'required|in:high,medium,low',
-            'due_date' => ['required', 'date', 'after_or_equal:today'],
+            'due_date' => ['required', 'date'],
         ]);
 
         if ($validator->fails()) {
@@ -132,6 +154,7 @@ class ProjectTaskController extends Controller
         $task->task = $request->task;
         $task->employee_id = $request->employee_id;
         $task->priority = $request->priority;
+        $task->status = $request->status;
         $task->due_date = $request->due_date;
         $task->updated_by = auth()->id();
 

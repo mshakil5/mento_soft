@@ -40,7 +40,6 @@ class ProductController extends Controller
                     return '
                     <div class="dropdown">
                       <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        &#x22EE;
                       </button>
                       <div class="dropdown-menu p-2" aria-labelledby="actionMenu'.$row->id.'" style="min-width: 160px;">
                         <a class="btn btn-success btn-sm btn-block mb-1" href="'.route('products.features.index', $row->id).'">Features</a>

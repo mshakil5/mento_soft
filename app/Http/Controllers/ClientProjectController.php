@@ -16,7 +16,20 @@ class ClientProjectController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = ClientProject::with('client')->withCount(['recentUpdates', 'services'])->latest();
+            $data = ClientProject::with([
+                  'client',
+                  'recentUpdates' => function($query) {
+                      $query->latest();
+                  },
+                  'services' => function($query) {
+                      $query->latest();
+                  },
+                  'tasks' => function($query) {
+                      $query->latest()->take(5)->with('employee');
+                  }
+              ])
+              ->withCount(['recentUpdates', 'services', 'tasks'])
+              ->latest();
 
             if ($request->client_id) {
                 $data->where('client_id', $request->client_id);
@@ -34,6 +47,15 @@ class ClientProjectController extends Controller
                 })
                 ->addColumn('date', function($row) {
                     return Carbon::parse($row->created_at)->format('d-m-Y');
+                })
+                ->addColumn('start_date', function($row) {
+                    return $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '';
+                })
+                ->addColumn('due_date', function($row) {
+                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
+                })
+                ->addColumn('amount', function($row) {
+                    return '£' . number_format($row->amount, 0);
                 })
                 ->addColumn('client_name', function($row) {
                     return $row->client->business_name ?? 'N/A';
@@ -54,10 +76,10 @@ class ClientProjectController extends Controller
                             '.$currentStatus.'
                         </button>
                         <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="1">Pending</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="1">Planned</a>
                             <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="2">In Progress</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Completed</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">On Hold</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Blocked</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">Done</a>
                         </div>
                     </div>
                     ';
@@ -71,22 +93,35 @@ class ClientProjectController extends Controller
                         $badgeClass = 'bg-danger';
                     }
 
+                    $details = view('admin.client-projects.partials.details-modal', ['row' => $row])->render();
+
                     return '
-                      <a href="'.route('client-projects.tasks', $row->id).'" class="btn btn-sm '.$badgeClass.'">
-                        Tasks
-                        <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
-                      </a>
-                      <a href="'.route('client-projects.services', $row->id).'" class="btn btn-sm btn-secondary">
-                          Services'.($row->services_count > 0 ? ' <span class="badge badge-light ml-1">'.$row->services_count.'</span>' : '').'
-                      </a>
-                      <a href="'.route('client-projects.updates', $row->id).'" class="btn btn-sm btn-primary">
-                        Updates'.($row->recent_updates_count > 0 ? ' <span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '').'
-                      </a>
-                      <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
-                      <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                        <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
+                            View Details
+                        </a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu p-2" style="min-width: 160px;">
+                                <a class="btn btn-success btn-sm btn-block mb-1" href="' . route('client-projects.tasks', $row->id) . '">
+                                    Tasks
+                                    <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
+                                </a>
+                                <a class="btn btn-info btn-sm btn-block mb-1" href="' . route('client-projects.services', $row->id) . '">
+                                    Services ' . ($row->services_count > 0 ? '<span class="badge badge-light ml-1">'.$row->services_count.'</span>' : '') . '
+                                </a>
+                                <a class="btn btn-warning btn-sm btn-block mb-1" href="' . route('client-projects.updates', $row->id) . '">
+                                    Updates ' . ($row->recent_updates_count > 0 ? '<span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '') . '
+                                </a>
+                                <hr class="dropdown-divider">
+                                <button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>
+                                <button class="btn btn-outline-danger btn-sm btn-block delete" data-id="'.$row->id.'">Delete</button>
+                            </div>
+                        </div>
+                        '.$details.'
                     ';
                 })
-
                 ->rawColumns(['image', 'status', 'action'])
                 ->make(true);
         }
@@ -106,7 +141,7 @@ class ClientProjectController extends Controller
             'tech_stack' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'due_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|in:1,2,3,4',
         ]);
 
@@ -126,7 +161,8 @@ class ClientProjectController extends Controller
         $data->description = $request->description;
         $data->additional_info = $request->additional_info;
         $data->start_date = $request->start_date;
-        $data->end_date = $request->end_date;
+        $data->due_date = $request->due_date;
+        $data->amount = $request->amount;
         $data->status = $request->status;
         $data->created_by = auth()->id();
 
@@ -186,7 +222,7 @@ class ClientProjectController extends Controller
             'tech_stack' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'due_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|in:1,2,3,4',
         ]);
 
@@ -213,7 +249,8 @@ class ClientProjectController extends Controller
         $project->description = $request->description;
         $project->additional_info = $request->additional_info;
         $project->start_date = $request->start_date;
-        $project->end_date = $request->end_date;
+        $project->due_date = $request->due_date;
+        $project->amount = $request->amount;
         $project->status = $request->status;
         $project->updated_by = auth()->id();
 

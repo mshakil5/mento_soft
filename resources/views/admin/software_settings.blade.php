@@ -15,7 +15,7 @@
     <li class="nav-item">
         <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') || Route::is('client-projects.updates') || Route::is('client-projects.services') || Route::is('client-project-services.details') ? 'active' : '' }}">
             <i class="fas fa-project-diagram nav-icon"></i>
-            <p>Client Projects</p>
+            <p>Projects</p>
         </a>
     </li>
 

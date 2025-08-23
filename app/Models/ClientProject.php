@@ -51,7 +51,7 @@ class ClientProject extends Model
     public function getCompletedPercentageAttribute()
     {
         $total = $this->tasks()->count();
-        $completed = $this->tasks()->where('status', 1)->count();
+        $completed = $this->tasks()->where('status', 3)->count();
 
         return $total > 0 ? round(($completed / $total) * 100) : 0;
     }

@@ -88,6 +88,8 @@
     @yield('content')
   </div>
 
+  @include('admin.client-projects.partials.task-modal')
+
 </div>
 
 <script src="{{ asset('resources/admin/js/jquery.min.js')}}"></script>

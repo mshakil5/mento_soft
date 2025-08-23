@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('employee_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->longText('task')->nullable();
             $table->dateTime('due_date')->nullable();
-            $table->tinyInteger('status')->default(0); // 0 = incomplete, 1 = complete
+            $table->tinyInteger('status')->default(0); // 1 = planned, 2 = in progress, 3 = done, 4 = on hold, 5 = cancelled
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
