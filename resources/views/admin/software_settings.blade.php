@@ -13,6 +13,13 @@
     </li>
 
     <li class="nav-item">
+        <a href="#" class="nav-link">
+            <i class="fas fa-tasks nav-icon"></i>
+            <p>Tasks</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
         <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
             <i class="fas fa-user nav-icon"></i>
             <p>Clients</p>
