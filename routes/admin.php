@@ -199,7 +199,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     // Clients
     Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
-    Route::post('/clients', [ClientController::class, 'store']);
+    Route::post('/clients', [ClientController::class, 'store'])->name('admin.clients.store');
     Route::get('/clients/{id}/edit', [ClientController::class, 'edit']);
     Route::post('/clients/update', [ClientController::class, 'update']);
     Route::get('/clients/{id}', [ClientController::class, 'destroy']);

@@ -183,15 +183,46 @@ $(document).ready(function(){
 
     $wrapper.css('display', isVisible ? 'block' : 'none');
     $btn.text(isVisible ? 'Hide Accounting' : 'Show Accounting')
-        .toggleClass('btn-success', !isVisible)
+        .toggleClass('btn-info', !isVisible)
         .toggleClass('btn-warning', isVisible);
 
     $btn.on('click', function(){
         $wrapper.toggle();
         var visible = $wrapper.is(':visible');
         $btn.text(visible ? 'Hide Accounting' : 'Show Accounting')
-            .toggleClass('btn-success', !visible)
+            .toggleClass('btn-info', !visible)
             .toggleClass('btn-warning', visible);
         localStorage.setItem('accountingMenuVisible', visible);
+    });
+});
+
+$(document).ready(function(){
+    $('.ajaxForm').on('submit', function(e){
+        e.preventDefault();
+
+        var $form = $(this);
+        var url = $form.attr('action');
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: url,
+            method: $form.attr('method') || 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res){
+                $form.closest('.modal').modal('hide');
+                $form[0].reset();
+                success(res.message);
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                pageTop();
+                if (xhr.responseJSON && xhr.responseJSON.errors)
+                    error(Object.values(xhr.responseJSON.errors)[0][0]);
+                else
+                    error();
+            }
+        });
     });
 });

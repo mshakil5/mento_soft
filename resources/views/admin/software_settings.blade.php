@@ -46,8 +46,20 @@
             <p>Reports</p>
         </a>
     </li>
+    <li class="nav-header">QUICK ACTIONS</li>
 
-    <button id="toggleAccounting" class="btn btn-success mb-2">
+    <button class="btn btn-success mb-2" data-toggle="modal" data-target="#quickClientModal">
+        <i class="fas fa-plus"></i> New Client
+    </button>
+
+    <button class="btn btn-success mb-2">
+        <i class="fas fa-plus"></i> New Project
+    </button>
+    <button class="btn btn-success mb-2">
+        <i class="fas fa-plus"></i> Create Invoice
+    </button>
+
+    <button id="toggleAccounting" class="btn btn-info my-2">
         Show Accounting
     </button>
 
