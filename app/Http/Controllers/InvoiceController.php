@@ -36,7 +36,7 @@ class InvoiceController extends Controller
     private function invoiceDataTable(Request $request, string $filter)
     {
         if ($request->ajax()) {
-            $query = Invoice::with('client')->withCount('emailLogs')->latest();
+            $query = Invoice::with(['client', 'details'])->withCount('emailLogs')->latest();
 
             if ($request->client_id) {
                 $query->where('client_id', $request->client_id);
@@ -54,6 +54,21 @@ class InvoiceController extends Controller
                 ->addIndexColumn()
                 ->addColumn('date', fn($row) => date('d-m-Y', strtotime($row->invoice_date)))
                 ->addColumn('client_name', fn($row) => $row->client->business_name ?? 'N/A')
+                ->addColumn('project', function($row) {
+                    return $row->details->map(fn($detail) => $detail->project_name ?? '')->implode('<br>');
+                })
+                ->addColumn('status', function($row) {
+                    $invoiceDate = \Carbon\Carbon::parse($row->invoice_date)->startOfDay();
+                    $today = \Carbon\Carbon::today();
+
+                    if ($row->status == 2) {
+                        return '<span class="badge bg-success">Received</span>';
+                    } elseif ($row->status == 1 && $invoiceDate < $today) {
+                        return '<span class="badge bg-danger">Overdue</span>';
+                    } else {
+                        return '<span class="badge bg-warning">Pending</span>';
+                    }
+                })
                 ->addColumn('action', function ($row) {
                     $clientEmail = $row->client->email ?? null;
                     $emailCount = $row->email_logs_count;
@@ -114,7 +129,7 @@ class InvoiceController extends Controller
 
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action', 'status', 'project'])
                 ->make(true);
         }
 

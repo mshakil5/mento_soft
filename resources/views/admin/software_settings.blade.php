@@ -1,16 +1,16 @@
 <nav class="mt-2">
   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
+    <a href="{{ route('toggle.sidebar') }}" class="btn btn-info my-2">
+        Switch to Frontend Settings <i class="fas fa-arrow-right"></i>
+    </a>
+
     <li class="nav-item">
         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ Route::is('admin.dashboard') ? 'active' : '' }}">
             <i class="nav-icon fas fa-tachometer-alt"></i>
             <p>Dashboard</p>
         </a>
     </li>
-
-    <a href="{{ route('toggle.sidebar') }}" class="btn btn-info my-2">
-        Switch to Frontend Settings <i class="fas fa-arrow-right"></i>
-    </a>
 
     <li class="nav-item">
         <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
@@ -27,46 +27,29 @@
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('employees.index') }}" class="nav-link {{ Route::is('employees.index') ? 'active' : '' }}">
-            <i class="fas fa-users nav-icon"></i>
-            <p>Employees</p>
-        </a>
-    </li>
-
-    <li class="nav-item">
         <a href="{{ route('project-services.index') }}" class="nav-link {{ Route::is('project-services.index') ? 'active' : '' }}">
             <i class="fas fa-concierge-bell nav-icon"></i>
             <p>Services</p>
         </a>
     </li>
 
-    <li class="nav-item dropdown {{ request()->routeIs('invoices.*') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-file-alt"></i>
-            <p>
-                Invoice <i class="fas fa-angle-left right"></i>
-            </p>
+    <li class="nav-item">
+        <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.index') || request()->routeIs('invoices.due') || request()->routeIs('invoices.received') ? 'active' : '' }}">
+            <i class="fas fa-file-alt nav-icon"></i>
+            <p>Invoices</p>
         </a>
-        <ul class="nav nav-treeview">
-            <li class="nav-item">
-                <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
-                    <i class="fas fa-list nav-icon"></i>
-                    <p>All Invoices</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('invoices.due') }}" class="nav-link {{ request()->routeIs('invoices.due') ? 'active' : '' }}">
-                    <i class="fas fa-hourglass-half nav-icon"></i>
-                    <p>Due Invoices</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('invoices.received') }}" class="nav-link {{ request()->routeIs('invoices.received') ? 'active' : '' }}">
-                    <i class="fas fa-check-circle nav-icon"></i>
-                    <p>Received Invoices</p>
-                </a>
-            </li>
-        </ul>
+    </li>
+
+    <button id="toggleAccounting" class="btn btn-success mb-2">
+        Show Accounting
+    </button>
+
+    <div id="accountingWrapper" style="display: none;">
+    <li class="nav-item">
+        <a href="{{ route('employees.index') }}" class="nav-link {{ Route::is('employees.index') ? 'active' : '' }}">
+            <i class="fas fa-users nav-icon"></i>
+            <p>Employees</p>
+        </a>
     </li>
 
     <li class="nav-item">
@@ -163,6 +146,8 @@
             </li>
         </ul>
     </li>
+
+    </div>
 
     <li class="nav-item" style="margin-top: 200px">
     </li>

@@ -5,10 +5,25 @@
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-2">
+            <div class="col-6">
                   @if(request()->client_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
+                <a href="{{ route('invoices.index') }}" 
+                    class="btn btn-secondary my-3 {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
+                    All Invoices
+                  </a>
+
+                  <a href="{{ route('invoices.due') }}" 
+                    class="btn btn-secondary my-3 {{ request()->routeIs('invoices.due') ? 'active' : '' }}">
+                    Due Invoices
+                  </a>
+
+                  <a href="{{ route('invoices.received') }}" 
+                    class="btn btn-secondary my-3 {{ request()->routeIs('invoices.received') ? 'active' : '' }}">
+                    Received Invoices
+                  </a>
+
                 <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
             </div>
         </div>
@@ -38,7 +53,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Invoice Date <span class="text-danger">*</span></label>
+                                        <label>Due Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="invoice_date" name="invoice_date" required value="{{ date('Y-m-d') }}">
                                     </div>
                                 </div>
@@ -185,11 +200,12 @@
                         <table id="example1" class="table cell-border table-striped">
                             <thead>
                                 <tr>
-                                    <th>Sl</th>
                                     <th>Invoice No</th>
-                                    <th>Date</th>
                                     <th>Client</th>
+                                    <th>Project</th>
+                                    <th>Due</th>
                                     <th>Amount</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -729,13 +745,15 @@
                 }
             },
             columns: [
-                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                // {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'invoice_number', name: 'invoice_number'},
-                {data: 'date', name: 'date'},
                 {data: 'client_name', name: 'client_name'},
+                {data: 'project', name: 'project'},
                 {data: 'net_amount', name: 'net_amount', render: function(data) {
                     return '£' + parseFloat(data).toFixed(2);
                 }},
+                {data: 'date', name: 'date'},
+                {data: 'status', name: 'status'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],
             responsive: true,

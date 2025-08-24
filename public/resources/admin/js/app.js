@@ -174,3 +174,24 @@ function clearTaskModal() {
     $('.summernote').summernote('reset');
     $('#tasksModal select').val('').trigger('change');
 }
+
+// Accounting hide
+$(document).ready(function(){
+    var $btn = $('#toggleAccounting');
+    var $wrapper = $('#accountingWrapper');
+    var isVisible = localStorage.getItem('accountingMenuVisible') === 'true';
+
+    $wrapper.css('display', isVisible ? 'block' : 'none');
+    $btn.text(isVisible ? 'Hide Accounting' : 'Show Accounting')
+        .toggleClass('btn-success', !isVisible)
+        .toggleClass('btn-warning', isVisible);
+
+    $btn.on('click', function(){
+        $wrapper.toggle();
+        var visible = $wrapper.is(':visible');
+        $btn.text(visible ? 'Hide Accounting' : 'Show Accounting')
+            .toggleClass('btn-success', !visible)
+            .toggleClass('btn-warning', visible);
+        localStorage.setItem('accountingMenuVisible', visible);
+    });
+});
