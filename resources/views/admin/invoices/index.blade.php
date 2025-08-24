@@ -203,8 +203,8 @@
                                     <th>Invoice No</th>
                                     <th>Client</th>
                                     <th>Project</th>
-                                    <th>Due</th>
                                     <th>Amount</th>
+                                    <th>Due</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>

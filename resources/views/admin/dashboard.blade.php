@@ -4,6 +4,7 @@
 
 <section class="content">
   <div class="container-fluid">
+
     <div class="row pt-3">
       <div class="col-md-3 col-sm-6 col-12">
         <div class="info-box shadow-lg">
@@ -38,11 +39,36 @@
           <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
           <div class="info-box-content">
             <span class="info-box-text">Pending Dues</span>
-            <span class="info-box-number">£{{ number_format($totalPending, 2) }}</span>
+            <span class="info-box-number">£{{ number_format($totalPending, 0) }}</span>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="row mt-4 d-none">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header">
+            <h2 class="card-title">Upcoming Deadlines</h2>
+          </div>
+          <div class="card-body">
+            <table class="table cell-border table-striped">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Item</th>
+                  <th>Client</th>
+                  <th>Due</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 

@@ -40,6 +40,13 @@
         </a>
     </li>
 
+    <li class="nav-item">
+        <a href="#" class="nav-link">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <p>Reports</p>
+        </a>
+    </li>
+
     <button id="toggleAccounting" class="btn btn-success mb-2">
         Show Accounting
     </button>
