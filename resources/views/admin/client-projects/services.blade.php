@@ -6,7 +6,6 @@
     <div class="container-fluid">
         <div class="row">
             <div class="d-flex gap-2 my-3">
-              <a href="{{ route('client-projects.index') }}" class="btn btn-secondary mr-2">Back to Projects</a>
               <button type="button" class="btn btn-secondary" id="newBtn">Add new Service</button>
             </div>
         </div>
@@ -19,13 +18,12 @@
             <div class="col-md-10">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="cardTitle">Add new Service for {{ $project->title }}</h3>
+                        <h3 class="card-title" id="cardTitle">Add new Service</h3>
                     </div>
                     <div class="card-body">
                         <form id="createThisForm">
                             @csrf
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
-                            <input type="hidden" name="client_project_id" value="{{ $project->id }}">
 
                             <div class="form-group">
                                 <label>Service Name <span class="text-danger">*</span></label>
@@ -54,7 +52,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Services for Project: {{ $project->title }}</h3>
+                        <h3 class="card-title">All Services</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table cell-border table-striped">
@@ -95,12 +93,11 @@ $(document).ready(function () {
 
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-    var url = "/admin/client-projects/{{ $project->id }}/services";
-    var upurl = "/admin/client-projects-service/:id";
+    var url = "/admin/project-services";
+    var upurl = "/admin/project-services/:id";
 
     $("#addBtn").click(function(){
         var form_data = new FormData();
-        form_data.append("client_project_id", "{{ $project->id }}");
         form_data.append("name", $("#name").val());
         form_data.append("description", $("#description").val());
 
@@ -160,7 +157,7 @@ $(document).ready(function () {
     $("#contentContainer").on('click','.edit', function(){
         $("#cardTitle").text('Update this service');
         var codeid = $(this).data('id');
-        var info_url = "/admin/client-projects-service/" + codeid + "/edit";
+        var info_url = "/admin/project-services/" + codeid + "/edit";
         $.get(info_url, {}, function(d){
             populateForm(d);
         });
@@ -183,14 +180,14 @@ $(document).ready(function () {
         $("#addBtn").html('Create');
         $("#addThisFormContainer").slideUp(200);
         $("#newBtn").slideDown(200);
-        $("#cardTitle").text('Add new Service for {{ $project->title }}');
+        $("#cardTitle").text('Add new Service');
     }
 
     // Status toggle
     $(document).on('change', '.toggle-status', function() {
         var service_id = $(this).data('id');
         var status = $(this).prop('checked') ? 1 : 0;
-        var toggleUrl = "/admin/client-projects-service/" + service_id + "/toggle-status";
+        var toggleUrl = "/admin/project-services/" + service_id + "/toggle-status";
 
         $.ajax({
             url: toggleUrl,
@@ -214,7 +211,7 @@ $(document).ready(function () {
     $("#contentContainer").on('click','.delete', function(){
         if(!confirm('Are you sure you want to delete this service?')) return;
         var codeid = $(this).data('id');
-        var info_url = "/admin/client-projects-service/" + codeid;
+        var info_url = "/admin/project-services/" + codeid;
         $.ajax({
             url: info_url,
             method: "DELETE",
@@ -242,7 +239,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('client-projects.services', $project->id) }}" + window.location.search,
+            url: "{{ route('project-services.index') }}" + window.location.search,
             type: "GET",
             error: function (xhr, status, error) {
                 console.error(xhr.responseText);

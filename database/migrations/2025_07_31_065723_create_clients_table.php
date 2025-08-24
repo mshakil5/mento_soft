@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('client_type_id')->nullable()->constrained('client_types')->nullOnDelete();
             $table->string('image')->nullable();
             $table->text('additional_fields')->nullable();
-            $table->boolean('status')->default(1);
+            $table->boolean('status')->default(1); // 1 = active, 2 = paused, 3 = proposed, 4 = pending
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();

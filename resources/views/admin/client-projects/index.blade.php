@@ -11,6 +11,15 @@
                   @endif
                 <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
             </div>
+            <div class="col-4 my-3 d-flex">
+                <select id="statusFilter" class="form-control ml-2 select2">
+                    <option value="">All</option>
+                    <option value="1">Planned</option>
+                    <option value="2">In Progress</option>
+                    <option value="3">Blocked</option>
+                    <option value="4">Done</option>
+                </select>
+            </div>
         </div>
     </div>
 </section>
@@ -145,7 +154,7 @@
                         <table id="example1" class="table cell-border table-striped">
                             <thead>
                                 <tr>
-                                    <th>Sl</th>
+                                    {{-- <th>Sl</th> --}}
                                     {{-- <th>Date</th> --}}
                                     {{-- <th>Image</th> --}}
                                     <th>Project</th>
@@ -366,12 +375,15 @@
             ajax: {
                 url: "{{ route('client-projects.index') }}" + window.location.search,
                 type: "GET",
+                data: function (d) {
+                    d.status = $('#statusFilter').val();
+                },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
                 }
             },
             columns: [
-                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                // {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 //{data: 'date', name: 'date'},
                 //{data: 'image', name: 'image', orderable: false, searchable: false},
                 {data: 'title', name: 'title'},
@@ -391,6 +403,10 @@
         function reloadTable() {
           table.ajax.reload(null, false);
         }
+
+        $('#statusFilter').on('change', function() {
+            table.ajax.reload();
+        });
 
         $('.details-modal').on('hidden.bs.modal', function () {
             reloadTable();

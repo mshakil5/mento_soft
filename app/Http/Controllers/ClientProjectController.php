@@ -21,18 +21,19 @@ class ClientProjectController extends Controller
                   'recentUpdates' => function($query) {
                       $query->latest();
                   },
-                  'services' => function($query) {
-                      $query->latest();
-                  },
                   'tasks' => function($query) {
                       $query->latest()->take(5)->with('employee');
                   }
               ])
-              ->withCount(['recentUpdates', 'services', 'tasks'])
+              ->withCount(['recentUpdates', 'tasks'])
               ->latest();
 
             if ($request->client_id) {
                 $data->where('client_id', $request->client_id);
+            }
+
+            if ($request->status) {
+                $data->where('status', $request->status);
             }
 
             return DataTables::of($data)
@@ -62,10 +63,10 @@ class ClientProjectController extends Controller
                 })
                 ->addColumn('status', function($row) {
                     $statuses = [
-                        1 => 'Pending',
+                        1 => 'Planned',
                         2 => 'In Progress',
-                        3 => 'Completed',
-                        4 => 'On Hold'
+                        3 => 'Blocked',
+                        4 => 'Done',
                     ];
                     
                     $currentStatus = $statuses[$row->status] ?? 'Unknown';
@@ -107,9 +108,6 @@ class ClientProjectController extends Controller
                                 <a class="btn btn-success btn-sm btn-block mb-1" href="' . route('client-projects.tasks', $row->id) . '">
                                     Tasks
                                     <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
-                                </a>
-                                <a class="btn btn-info btn-sm btn-block mb-1" href="' . route('client-projects.services', $row->id) . '">
-                                    Services ' . ($row->services_count > 0 ? '<span class="badge badge-light ml-1">'.$row->services_count.'</span>' : '') . '
                                 </a>
                                 <a class="btn btn-warning btn-sm btn-block mb-1" href="' . route('client-projects.updates', $row->id) . '">
                                     Updates ' . ($row->recent_updates_count > 0 ? '<span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '') . '

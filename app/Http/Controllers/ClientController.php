@@ -15,10 +15,14 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Client::with(['clientType', 'projects', 'invoices'])->latest();
+            $data = Client::with(['clientType', 'projects', 'invoices'])->withCount('projects')->latest();
 
             if ($request->client_type_id) {
                 $data->where('client_type_id', $request->client_type_id);
+            }
+
+            if ($request->status) {
+                $data->where('status', $request->status);
             }
 
             return DataTables::of($data)
@@ -34,32 +38,70 @@ class ClientController extends Controller
                 ->addColumn('date', function($row) {
                     return Carbon::parse($row->created_at)->format('d-m-Y');
                 })
+                ->addColumn('projects_count', function($row) {
+                    return $row->projects_count ?? 0;
+                })
+                ->addColumn('outstanding_amount', function($row) {
+                    return '£' . $row->invoices->where('status', 1)->sum('net_amount');
+                })
                 // ->addColumn('client_type', function($row) {
                 //     return $row->clientType->name ?? 'N/A';
                 // })
                 ->addColumn('status', function($row) {
-                    $checked = $row->status == 1 ? 'checked' : '';
-                    return '<div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
-                                <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
-                            </div>';
+                    $statuses = [
+                        1 => 'Active',
+                        2 => 'Paused',
+                        3 => 'Proposed',
+                        4 => 'Pending'
+                    ];
+                    
+                    $currentStatus = $statuses[$row->status] ?? 'Unknown';
+                    
+                    return '
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            '.$currentStatus.'
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="1">Active</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="2">Paused</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Proposed</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">Pending</a>
+                        </div>
+                    </div>
+                    ';
                 })
                 ->addColumn('action', function($row) {
+                    $details = view('admin.clients.partials.details-modal', ['row' => $row])->render();
+
                     $buttons = '
-                      <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
-                      <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
-                    ';
+                        <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
+                            View Details
+                        </a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu p-2" style="min-width: 180px;">
+                                <button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>
+                                <button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
 
                     if ($row->projects->count()) {
-                        $buttons .= '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" class="btn btn-sm btn-success">
+                        $buttons .= '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" class="btn btn-success btn-sm btn-block mb-1">
                                         Projects ('.$row->projects->count().')
                                     </a>';
                     }
+
                     if ($row->invoices->count()) {
-                        $buttons .= '<a href="'.route('invoices.index', ['client_id' => $row->id]).'" class="btn btn-sm btn-primary ml-1">
+                        $buttons .= '<a href="'.route('invoices.index', ['client_id' => $row->id]).'" class="btn btn-primary btn-sm btn-block">
                                         Invoices ('.$row->invoices->count().')
                                     </a>';
                     }
+
+                    $buttons .= '
+                            </div>
+                        </div>
+                        '.$details;
 
                     return $buttons;
                 })
@@ -75,11 +117,15 @@ class ClientController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'business_name' => 'required|string|max:255',
+            'primary_contact' => 'required|string|max:255',
             'email' => 'required|email',
             'phone1' => 'required|string|max:20',
-            'phone2' => 'nullable|string|max:20',
+            // 'phone2' => 'nullable|string|max:20',
             // 'client_type_id' => 'nullable|exists:client_types,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ],[
+            'business_name.required' => 'Name is required',
+            'phone1.required'        => 'Phone is required',
         ]);
 
         if ($validator->fails()) {
@@ -93,12 +139,13 @@ class ClientController extends Controller
         $data->name = $request->name;
         $data->email = $request->email;
         $data->phone1 = $request->phone1;
-        $data->phone2 = $request->phone2;
-        $data->on_going = $request->on_going;
-        $data->one_of = $request->one_of;
+        // $data->phone2 = $request->phone2;
+        // $data->on_going = $request->on_going;
+        // $data->one_of = $request->one_of;
         $data->address = $request->address;
         $data->business_name = $request->business_name;
-        $data->client_type_id = $request->client_type_id;
+        $data->primary_contact = $request->primary_contact;
+        // $data->client_type_id = $request->client_type_id;
         $data->additional_fields = $request->additional_fields;
         $data->created_by = auth()->id();
 
@@ -153,11 +200,15 @@ class ClientController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'business_name' => 'required|string|max:255',
+            'primary_contact' => 'required|string|max:255',
             'email' => 'required|email',
             'phone1' => 'required|string|max:20',
             'phone2' => 'nullable|string|max:20',
             // 'client_type_id' => 'nullable|exists:client_types,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ],[
+            'business_name.required' => 'Name is required',
+            'phone1.required'        => 'Phone is required',
         ]);
 
         if ($validator->fails()) {
@@ -175,15 +226,16 @@ class ClientController extends Controller
             ], 404);
         }
 
-        $client->name = $request->name;
+        // $client->name = $request->name;
         $client->email = $request->email;
         $client->phone1 = $request->phone1;
-        $client->phone2 = $request->phone2;
-        $client->on_going = $request->on_going;
-        $client->one_of = $request->one_of;
+        // $client->phone2 = $request->phone2;
+        // $client->on_going = $request->on_going;
+        // $client->one_of = $request->one_of;
         $client->address = $request->address;
         $client->business_name = $request->business_name;
-        $client->client_type_id = $request->client_type_id;
+        $client->primary_contact = $request->primary_contact;
+        // $client->client_type_id = $request->client_type_id;
         $client->additional_fields = $request->additional_fields;
         $client->updated_by = auth()->id();
 

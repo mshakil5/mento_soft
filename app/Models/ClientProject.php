@@ -61,9 +61,4 @@ class ClientProject extends Model
         return $this->hasMany(InvoiceDetail::class);
     }
     
-    public function services()
-    {
-        return $this->hasMany(ProjectService::class);
-    }
-    
 }

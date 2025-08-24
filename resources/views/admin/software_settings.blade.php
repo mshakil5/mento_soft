@@ -13,6 +13,13 @@
     </a>
 
     <li class="nav-item">
+        <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
+            <i class="fas fa-user nav-icon"></i>
+            <p>Clients</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
         <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') || Route::is('client-projects.updates') || Route::is('client-projects.services') || Route::is('client-project-services.details') ? 'active' : '' }}">
             <i class="fas fa-project-diagram nav-icon"></i>
             <p>Projects</p>
@@ -23,13 +30,6 @@
         <a href="{{ route('employees.index') }}" class="nav-link {{ Route::is('employees.index') ? 'active' : '' }}">
             <i class="fas fa-users nav-icon"></i>
             <p>Employees</p>
-        </a>
-    </li>
-
-    <li class="nav-item">
-        <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
-            <i class="fas fa-user nav-icon"></i>
-            <p>Clients</p>
         </a>
     </li>
 

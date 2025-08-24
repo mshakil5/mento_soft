@@ -3,78 +3,44 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ClientProject;
 use App\Models\ProjectService;
 use Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProjectServiceController extends Controller
 {
-    public function index(ClientProject $project, Request $request)
+    public function index(Request $request)
     {
-          if ($request->ajax()) {
-              $today = \Carbon\Carbon::today();
-              $warningDate = $today->copy()->addWeek();
+        if ($request->ajax()) {
+            $data = ProjectService::latest();
 
-              $data = ProjectService::with('details')
-                  ->withCount('details')
-                  ->with(['details' => function($q) {
-                      $q->where('status', 1)
-                        ->orderByDesc('end_date')
-                        ->limit(1);
-                  }])
-                  ->where('client_project_id', $project->id)
-                  ->latest();
+            if ($request->status !== null) {
+                $data->where('status', $request->status);
+            }
 
-              if ($request->status !== null) {
-                  $data->where('status', $request->status);
-              }
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status', function($row) {
+                    $checked = $row->status ? 'checked' : '';
+                    return '<div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
+                                <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
+                            </div>';
+                })
+                ->addColumn('action', function($row) {
+                    return '
+                        <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
+                        <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                    ';
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
 
-              return DataTables::of($data)
-                  ->addIndexColumn()
-                  ->addColumn('status', function($row) {
-                      $checked = $row->status ? 'checked' : '';
-                      return '<div class="custom-control custom-switch">
-                                  <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
-                                  <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
-                              </div>';
-                  })
-                  ->addColumn('action', function($row) use ($today, $warningDate) {
-                      $detailsUrl = route('client-project-services.details', $row->id);
-
-                      $total = $row->details_count;
-
-                      $lastDetail = $row->details->first();
-                      $statusBadge = '';
-
-                      if ($lastDetail) {
-                          if ($lastDetail->end_date < $today) {
-                              $statusBadge = "<span class='badge badge-danger ml-1'>Expired</span>";
-                          } elseif ($lastDetail->end_date >= $today && $lastDetail->end_date <= $warningDate) {
-                              $statusBadge = "<span class='badge badge-warning ml-1'>Near Expiry</span>";
-                          } else {
-                              $statusBadge = "<span class='badge badge-success ml-1'>Active</span>";
-                          }
-                      }
-
-                      $countBadge = $total ? "<span class='badge badge-light ml-1'>{$total}</span>" : '';
-
-                      return '
-                          <a href="'.$detailsUrl.'" class="btn btn-sm btn-primary">
-                              Details '.$countBadge.' '.$statusBadge.'
-                          </a>
-                          <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
-                          <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
-                      ';
-                  })
-                  ->rawColumns(['status', 'action'])
-                  ->make(true);
-          }
-
-        return view('admin.client-projects.services', compact('project'));
+        return view('admin.client-projects.services');
     }
 
-    public function store(ClientProject $project, Request $request)
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -86,7 +52,6 @@ class ProjectServiceController extends Controller
         }
 
         $service = ProjectService::create([
-            'client_project_id' => $project->id,
             'name' => $request->name,
             'description' => $request->description,
             'status' => true,

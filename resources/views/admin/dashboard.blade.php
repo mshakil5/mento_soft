@@ -9,7 +9,7 @@
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-info"><i class="far fa-user"></i></span>
           <div class="info-box-content">
-            <span class="info-box-text">Total Cliets</span>
+            <span class="info-box-text">Total Clients</span>
             <span class="info-box-number">{{ $totalClients }}</span>
           </div>
         </div>

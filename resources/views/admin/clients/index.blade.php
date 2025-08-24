@@ -11,6 +11,15 @@
                   @endif
                 <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
             </div>
+            <div class="col-4 my-3 d-flex">
+                <select id="statusFilter" class="form-control ml-2 select2">
+                    <option value="">All</option>
+                    <option value="1">Active</option>
+                    <option value="2">Paused</option>
+                    <option value="3">Proposed</option>
+                    <option value="4">Pending</option>
+                </select>
+            </div>
         </div>
     </div>
 </section>
@@ -31,44 +40,26 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Business Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="business_name" name="business_name" placeholder="Enter business name">
+                                        <label>Client Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="business_name" name="business_name" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Primary Contact <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="primary_contact" name="primary_contact" placeholder="">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="">
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Phone 1 <span class="text-danger">*</span></label>
+                                        <label>Phone <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="phone1" name="phone1" placeholder="Enter primary phone">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Phone 2</label>
-                                        <input type="text" class="form-control" id="phone2" name="phone2" placeholder="Enter secondary phone">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row d-none">
-                                <div class="col-md-6">
-                                    <div class="form-control">
-                                        <input type="checkbox" class="form-control-input" id="on_going" name="on_going" value="1">
-                                        <label>On Going</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-control">
-                                        <input type="checkbox" class="form-control-input" id="one_of" name="one_of" value="1">
-                                        <label>One Of</label>
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +74,7 @@
                                 <textarea class="form-control summernote" id="additional_fields" name="additional_fields" rows="5" placeholder="Enter additional information"></textarea>
                             </div>
                             
-                            <div class="row">
+                            <div class="row d-none">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Client Image (400x400 recommended)</label>
@@ -116,10 +107,14 @@
                         <table id="example1" class="table cell-border table-striped">
                             <thead>
                                 <tr>
-                                    <th>Sl</th>
-                                    <th>Date</th>
-                                    <th>Business Name</th>
-                                    <th>Image</th>
+                                    {{-- <th>Sl</th> --}}
+                                    {{-- <th>Date</th> --}}
+                                    <th>Client</th>
+                                    <th>Contact</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Projects</th>
+                                    <th>Outstanding</th>
                                     {{-- <th>Name</th> --}}
                                     {{-- <th>Client Type</th> --}}
                                     <th>Status</th>
@@ -161,11 +156,12 @@
             // form_data.append("name", $("#name").val());
             form_data.append("email", $("#email").val());
             form_data.append("phone1", $("#phone1").val());
-            form_data.append("phone2", $("#phone2").val());
-            form_data.append("on_going", $("#on_going").is(":checked") ? 1 : 0);
-            form_data.append("one_of", $("#one_of").is(":checked") ? 1 : 0);
+            // form_data.append("phone2", $("#phone2").val());
+            // form_data.append("on_going", $("#on_going").is(":checked") ? 1 : 0);
+            // form_data.append("one_of", $("#one_of").is(":checked") ? 1 : 0);
             form_data.append("address", $("#address").val());
             form_data.append("business_name", $("#business_name").val());
+            form_data.append("primary_contact", $("#primary_contact").val());
             // form_data.append("client_type_id", $("#client_type_id").val());
             form_data.append("additional_fields", $("#additional_fields").val());
 
@@ -246,6 +242,7 @@
             $("#one_of").prop("checked", data.one_of == 1);
             $("#address").val(data.address);
             $("#business_name").val(data.business_name);
+            $("#primary_contact").val(data.primary_contact);
             // $("#client_type_id").val(data.client_type_id);
             $("#additional_fields").summernote('code', data.additional_fields);
             $("#codeid").val(data.id);
@@ -275,9 +272,10 @@
         previewImage('#image', '#preview-image');
 
         // Status toggle
-        $(document).on('change', '.toggle-status', function() {
+        $(document).on('click', '.status-change', function(e) {
+            e.preventDefault(); 
             var client_id = $(this).data('id');
-            var status = $(this).prop('checked') ? 1 : 0;
+            var status = $(this).data('status');
 
             $.ajax({
                 url: '/admin/clients/status',
@@ -329,15 +327,23 @@
             ajax: {
                 url: "{{ route('clients.index') }}" + window.location.search,
                 type: "GET",
+                data: function (d) {
+                    d.status = $('#statusFilter').val();
+                },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
                 }
             },
             columns: [
-                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                {data: 'date', name: 'date'},
+                //{data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                //{data: 'date', name: 'date'},
                 {data: 'business_name', name: 'business_name'},
-                {data: 'image', name: 'image', orderable: false, searchable: false},
+                {data: 'primary_contact', name: 'primary_contact'},
+                {data: 'email', name: 'email'},
+                {data: 'phone1', name: 'phone1'},
+                {data: 'projects_count', name: 'projects_count'},
+                {data: 'outstanding_amount', name: 'outstanding_amount'},
+                // {data: 'image', name: 'image', orderable: false, searchable: false},
                 // {data: 'name', name: 'name'},
                 //{data: 'client_type', name: 'client_type'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
@@ -346,6 +352,10 @@
             responsive: true,
             lengthChange: false,
             autoWidth: false,
+        });
+
+        $('#statusFilter').on('change', function() {
+            table.ajax.reload();
         });
 
         function reloadTable() {
