@@ -27,9 +27,19 @@ class ProjectServiceDetail extends Model
         'status' => 'boolean'
     ];
 
-    public function projectService()
+    public function serviceType()
     {
-        return $this->belongsTo(ProjectService::class);
+        return $this->belongsTo(ProjectService::class, 'project_service_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(ClientProject::class, 'client_project_id');
     }
 
     public function transactions()

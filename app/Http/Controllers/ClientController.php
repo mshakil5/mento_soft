@@ -50,9 +50,9 @@ class ClientController extends Controller
                 ->addColumn('status', function($row) {
                     $statuses = [
                         1 => 'Active',
-                        2 => 'Paused',
-                        3 => 'Proposed',
-                        4 => 'Pending'
+                        2 => 'Pending',
+                        3 => 'Paused',
+                        4 => 'Prospect'
                     ];
                     
                     $currentStatus = $statuses[$row->status] ?? 'Unknown';
@@ -64,9 +64,9 @@ class ClientController extends Controller
                         </button>
                         <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">
                             <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="1">Active</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="2">Paused</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Proposed</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">Pending</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="2">Pending</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Paused</a>
+                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">Prospect</a>
                         </div>
                     </div>
                     ';

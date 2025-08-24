@@ -36,6 +36,8 @@ class AutoCreateProjectServiceDetails extends Command
             $newDetail->last_auto_run = now();
             $newDetail->created_at = now();
             $newDetail->updated_at = now();
+            $newDetail->client_id = $detail->client_id;
+            $newDetail->client_project_id = $detail->client_project_id;
 
             $nextStart = Carbon::parse($endDate)->addDay();
             if ($detail->cycle_type === 1) {

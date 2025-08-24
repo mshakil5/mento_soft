@@ -15,9 +15,9 @@
                 <select id="statusFilter" class="form-control ml-2 select2">
                     <option value="">All</option>
                     <option value="1">Active</option>
-                    <option value="2">Paused</option>
-                    <option value="3">Proposed</option>
-                    <option value="4">Pending</option>
+                    <option value="2">Pending</option>
+                    <option value="3">Paused</option>
+                    <option value="4">Prospect</option>
                 </select>
             </div>
         </div>

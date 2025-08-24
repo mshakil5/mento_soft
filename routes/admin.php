@@ -244,6 +244,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::delete('/service-type/{service}', [ServiceTypeController::class, 'destroy']);
     Route::post('/service-type/{service}/toggle-status', [ServiceTypeController::class, 'toggleStatus']);
 
+    // Project Services
+    Route::get('/project-services', [ProjectServiceController::class, 'index'])->name('project-services.index');
+    Route::post('/project-services', [ProjectServiceController::class, 'store']);
+    Route::get('/project-services/{service}/edit', [ProjectServiceController::class, 'edit']);
+    Route::post('/project-services/{service}', [ProjectServiceController::class, 'update']);
+    Route::delete('/project-services/{service}', [ProjectServiceController::class, 'destroy']);
+    Route::post('/project-services/{service}/toggle-status', [ProjectServiceController::class, 'toggleStatus']);
+    Route::post('/project-service/{id}/receive', [ProjectServiceController::class, 'receive'])->name('project-service.receive');
+    Route::get('/clients/{client}/projects', [ProjectServiceController::class, 'projects'])->name('clients.projects');
+
     // Project Service Details
     Route::get('/client-project-services/{service}/details', [ProjectServiceDetailController::class, 'index'])->name('client-project-services.details');
     Route::post('/client-project-services/{service}/details', [ProjectServiceDetailController::class, 'store']);

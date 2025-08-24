@@ -33,12 +33,12 @@
         </a>
     </li>
 
-    {{-- <li class="nav-item">
+    <li class="nav-item">
         <a href="{{ route('project-services.index') }}" class="nav-link {{ Route::is('project-services.index') ? 'active' : '' }}">
             <i class="fas fa-concierge-bell nav-icon"></i>
             <p>Services</p>
         </a>
-    </li> --}}
+    </li>
 
     <li class="nav-item dropdown {{ request()->routeIs('invoices.*') ? 'menu-open' : '' }}">
         <a href="#" class="nav-link dropdown-toggle {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
