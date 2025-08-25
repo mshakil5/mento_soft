@@ -40,6 +40,7 @@ use App\Http\Controllers\FinancialStatementController;
 use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ServiceTypeController;
+use App\Http\Controllers\TaskController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -220,6 +221,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/client-projects-task/{task}', [ProjectTaskController::class, 'update']);
     Route::delete('/client-projects-task/{task}', [ProjectTaskController::class, 'destroy']);
     Route::post('/client-projects-task/{task}/toggle-status', [ProjectTaskController::class, 'toggleStatus']);
+
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 
     // Project Updates
     Route::get('/client-projects/{project}/updates', [ProjectRecentUpdateController::class, 'index'])->name('client-projects.updates');

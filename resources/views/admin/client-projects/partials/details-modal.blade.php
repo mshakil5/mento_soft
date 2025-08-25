@@ -60,11 +60,9 @@
                                     <span><strong>Status:</strong> 
                                         @php
                                             $statuses = [
-                                                1 => ['label' => 'Planned'],
+                                                1 => ['label' => 'To Do'],
                                                 2 => ['label' => 'In Progress'],
-                                                3 => ['label' => 'Done'],
-                                                4 => ['label' => 'On Hold'],
-                                                5 => ['label' => 'Cancelled'],
+                                                3 => ['label' => 'Done']
                                             ];
                                         @endphp
                                         {{ $statuses[$task->status]['label'] ?? '' }}

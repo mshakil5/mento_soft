@@ -13,7 +13,7 @@
     </li>
 
     <li class="nav-item">
-        <a href="#" class="nav-link">
+        <a href="{{ route('tasks.index') }}" class="nav-link {{ Route::is('tasks.index') ? 'active' : '' }}">
             <i class="fas fa-tasks nav-icon"></i>
             <p>Tasks</p>
         </a>
