@@ -62,11 +62,9 @@
                                     <div class="form-group">
                                         <label>Status <span class="text-danger">*</span></label>
                                         <select class="form-control" id="status" name="status" required>
-                                            <option value="1">Planned</option>
+                                            <option value="1">To Do</option>
                                             <option value="2">In Progress</option>
                                             <option value="3">Done</option>
-                                            <option value="4">On Hold</option>
-                                            <option value="5">Cancelled</option>
                                         </select>
                                     </div>
                                 </div>

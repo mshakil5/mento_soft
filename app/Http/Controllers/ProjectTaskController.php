@@ -50,11 +50,9 @@ class ProjectTaskController extends Controller
                 })
                 ->addColumn('status', function($row) {
                     $statuses = [
-                        1 => 'Planned',
+                        1 => 'To Do',
                         2 => 'In Progress',
-                        3 => 'Done',
-                        4 => 'On Hold',
-                        5 => 'Cancelled'
+                        3 => 'Done'
                     ];
 
                     $currentStatus = $statuses[$row->status] ?? 'Unknown';
