@@ -160,7 +160,7 @@ class ClientProjectController extends Controller
         $data->additional_info = $request->additional_info;
         $data->start_date = $request->start_date;
         $data->due_date = $request->due_date;
-        $data->amount = $request->amount;
+        $data->amount = $request->amount ?? 0;
         $data->status = $request->status;
         $data->created_by = auth()->id();
 
@@ -188,7 +188,7 @@ class ClientProjectController extends Controller
         if ($data->save()) {
             return response()->json([
                 'status' => 200,
-                'message' => 'Client Project created successfully.'
+                'message' => 'Project created successfully.'
             ], 201);
         } else {
             return response()->json([
@@ -248,7 +248,7 @@ class ClientProjectController extends Controller
         $project->additional_info = $request->additional_info;
         $project->start_date = $request->start_date;
         $project->due_date = $request->due_date;
-        $project->amount = $request->amount;
+        $project->amount = $request->amount ?? 0;
         $project->status = $request->status;
         $project->updated_by = auth()->id();
 
@@ -277,7 +277,7 @@ class ClientProjectController extends Controller
         if ($project->save()) {
             return response()->json([
                 'status' => 200,
-                'message' => 'Client Project updated successfully.'
+                'message' => 'Project updated successfully.'
             ], 200);
         } else {
             return response()->json([

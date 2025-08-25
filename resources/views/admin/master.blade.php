@@ -90,6 +90,7 @@
 
   @include('admin.client-projects.partials.task-modal')
   @include('admin.clients.partials.new_client-modal')
+  @include('admin.client-projects.partials.new_project-modal')
 
 </div>
 

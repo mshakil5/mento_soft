@@ -208,7 +208,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     // Client Projects
     Route::get('/client-projects', [ClientProjectController::class, 'index'])->name('client-projects.index');
-    Route::post('/client-projects', [ClientProjectController::class, 'store']);
+    Route::post('/client-projects', [ClientProjectController::class, 'store'])->name('admin.client-projects.store');
     Route::get('/client-projects/{id}/edit', [ClientProjectController::class, 'edit']);
     Route::post('/client-projects/update', [ClientProjectController::class, 'update']);
     Route::get('/client-projects/{id}', [ClientProjectController::class, 'destroy']);

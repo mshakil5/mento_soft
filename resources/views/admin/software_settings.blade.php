@@ -59,7 +59,7 @@
         <i class="fas fa-plus"></i> New Client
     </button>
 
-    <button class="btn btn-success mb-2">
+    <button class="btn btn-success mb-2" data-toggle="modal" data-target="#createProjectModal">
         <i class="fas fa-plus"></i> New Project
     </button>
     <button class="btn btn-success mb-2">
