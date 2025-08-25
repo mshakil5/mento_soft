@@ -219,49 +219,59 @@
 @section('script')
 <script>
     $(document).ready(function () {
-        $("#addThisFormContainer").hide();
-        $("#newBtn").click(function(){
-            clearform();
-            $("#newBtn").hide(100);
-            $("#addThisFormContainer").show(300);
-            
-            // Generate temporary invoice number
-            $("#invoice_number").val('Loading...');
-            
-            // Load clients
-            loadClients();
-        });
-        
-        $("#FormCloseBtn").click(function(){
-            $("#addThisFormContainer").hide(200);
-            $("#newBtn").show(100);
-            clearform();
-        });
+
+      $("#addThisFormContainer").hide();
+          $("#newBtn").show();
+
+          function openNewForm() {
+              clearform();
+              $("#newBtn").hide(100);
+              $("#addThisFormContainer").show(300);
+
+              $("#invoice_number").val('Loading...');
+              return loadClients(); // return the promise so we can wait
+          }
+
+          // Bind click
+          $("#newBtn").off('click').on('click', function() {
+              openNewForm();
+          });
+
+          if (localStorage.getItem('autoclickNewBtn') === '1') {
+              localStorage.removeItem('autoclickNewBtn');
+              $.when(openNewForm()).done(function() {
+                  console.log('Form opened and clients loaded.');
+              });
+          }
+
+          $("#FormCloseBtn").click(function() {
+              $("#addThisFormContainer").hide(200);
+              $("#newBtn").show(100);
+              clearform();
+          });
+
+          function loadClients() {
+              return $.ajax({
+                  url: "{{URL::to('/admin/invoices')}}/create",
+                  method: "GET",
+                  success: function(res) {
+                      $('#client_id').empty().append('<option value="">Select Client</option>');
+                      $.each(res.clients, function(key, value) {
+                          $('#client_id').append('<option value="'+value.id+'">'+value.business_name+'</option>');
+                      });
+
+                      $('#client_id').select2({ width: '100%' });
+
+                      $("#invoice_number").val(res.invoice_number);
+                  }
+              });
+          }
 
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
         
         var url = "{{URL::to('/admin/invoices')}}";
         var upurl = "{{URL::to('/admin/invoices/update')}}";
-        
-        // Load clients for dropdown
 
-        function loadClients() {
-            return $.ajax({
-                url: url + '/create',
-                method: "GET",
-                success: function(res) {
-                    $('#client_id').empty().append('<option value="">Select Client</option>');
-                    $.each(res.clients, function(key, value) {
-                        $('#client_id').append('<option value="'+value.id+'">'+value.business_name+'</option>');
-                    });
-
-                    // Set actual invoice number
-                    $("#invoice_number").val(res.invoice_number);
-                }
-            });
-        }
-
-        // Create client
         $('#newClientForm').on('submit', function(e) {
             e.preventDefault();
 
@@ -635,6 +645,7 @@
                 populateForm(data.invoice);
                 loadClients().then(function() {
                     $('#client_id').val(data.invoice.client_id).trigger('change.select2');
+                    $("#invoice_number").val(data.invoice.invoice_number);
                 });
 
                 $.get(url + '/client-projects/' + data.invoice.client_id, function(projects) {
@@ -656,7 +667,6 @@
         function populateForm(data){
             pageTop();
             $("#codeid").val(data.id);
-            $("#invoice_number").val(data.invoice_number);
             $("#invoice_date").val(data.invoice_date);
             $("#description").val(data.description);
             $("#vat_percent").val(data.vat_percent);
@@ -815,5 +825,6 @@
         });
 
     });
+    
 </script>
 @endsection

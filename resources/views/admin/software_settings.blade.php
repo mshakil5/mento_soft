@@ -62,9 +62,16 @@
     <button class="btn btn-success mb-2" data-toggle="modal" data-target="#createProjectModal">
         <i class="fas fa-plus"></i> New Project
     </button>
-    <button class="btn btn-success mb-2">
+    <button class="btn btn-success mb-2" id="createInvoiceBtn">
         <i class="fas fa-plus"></i> Create Invoice
     </button>
+
+    <script>
+        document.getElementById('createInvoiceBtn').addEventListener('click', function() {
+            localStorage.setItem('autoclickNewBtn', '1');
+            window.location.href = "{{ route('invoices.index') }}";
+        });
+    </script>
 
     <button id="toggleAccounting" class="btn btn-info my-2">
         Show Accounting
