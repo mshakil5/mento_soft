@@ -46,10 +46,11 @@ class ProjectServiceController extends Controller
                 })
                 ->addColumn('action', function($row) {
                     $btn = '';
-                    if ($row->isPending()) {
 
+                    if ($row->isPending()) {
                         $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+                        $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>';
 
                         $btn .= '
                         <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1" role="dialog" aria-hidden="true">
@@ -84,11 +85,9 @@ class ProjectServiceController extends Controller
                         </div>
                         ';
                     } else {
-                        $btn .= '<button class="btn btn-sm btn-success" disabled>Receive</button> ';
-                        $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+                        $btn .= '<button class="btn btn-sm btn-success" disabled>Received</button> ';
                     }
 
-                    $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>';
                     return $btn;
                 })
                 ->rawColumns(['status', 'action'])
@@ -153,6 +152,8 @@ class ProjectServiceController extends Controller
             'next_end_date' => $nextEndDate,
             'created_by' => auth()->id(),
         ]);
+        
+        $service = ProjectService::find($request->service_type_id);
 
         $transaction = new Transaction();
         $transaction->date = $startDate;
@@ -240,6 +241,7 @@ class ProjectServiceController extends Controller
         $detail->updated_by = auth()->id();
 
         if ($detail->save()) {
+           $service = ProjectService::find($request->service_type_id);
             $transaction = Transaction::where('project_service_detail_id', $detail->id)->first();
             if ($transaction) {
                 $transaction->date = $startDate;
