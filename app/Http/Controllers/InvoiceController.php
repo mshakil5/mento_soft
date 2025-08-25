@@ -15,38 +15,28 @@ use App\Mail\InvoiceMail;
 use App\Models\Transaction;
 use App\Models\ClientEmailLog;
 use App\Models\CompanyDetails;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        return $this->invoiceDataTable($request, 'all');
-    }
-
-    public function due(Request $request)
-    {
-        return $this->invoiceDataTable($request, 'due');
-    }
-
-    public function received(Request $request)
-    {
-        return $this->invoiceDataTable($request, 'received');
-    }
-
-    private function invoiceDataTable(Request $request, string $filter)
-    {
         if ($request->ajax()) {
-            $query = Invoice::with(['client', 'details'])->withCount('emailLogs')->latest();
+            $query = Invoice::with(['client', 'details'])
+                            ->withCount('emailLogs')
+                            ->latest();
 
             if ($request->client_id) {
                 $query->where('client_id', $request->client_id);
             }
 
+            $filter = $request->status;
+
             $invoices = $query->get();
 
-            if ($filter === 'due') {
+            if ($filter == 'due') {
                 $invoices = $invoices->filter->isPending();
-            } elseif ($filter === 'received') {
+            } elseif ($filter == 'received') {
                 $invoices = $invoices->reject->isPending();
             }
 
@@ -54,75 +44,64 @@ class InvoiceController extends Controller
                 ->addIndexColumn()
                 ->addColumn('date', fn($row) => date('d-m-Y', strtotime($row->invoice_date)))
                 ->addColumn('client_name', fn($row) => $row->client->business_name ?? 'N/A')
-                ->addColumn('project', function($row) {
-                    return $row->details->map(fn($detail) => $detail->project_name ?? '')->implode('<br>');
-                })
+                ->addColumn('project', fn($row) => $row->details->pluck('project_name')->implode('<br>'))
                 ->addColumn('status', function($row) {
-                    $invoiceDate = \Carbon\Carbon::parse($row->invoice_date)->startOfDay();
-                    $today = \Carbon\Carbon::today();
+                    $invoiceDate = Carbon::parse($row->invoice_date)->startOfDay();
+                    $today = Carbon::today();
 
-                    if ($row->status == 2) {
-                        return '<span class="badge bg-success">Received</span>';
-                    } elseif ($row->status == 1 && $invoiceDate < $today) {
-                        return '<span class="badge bg-danger">Overdue</span>';
-                    } else {
-                        return '<span class="badge bg-warning">Pending</span>';
-                    }
+                    if ($row->status == 2) return '<span class="badge bg-success">Received</span>';
+                    if ($row->status == 1 && $invoiceDate < $today) return '<span class="badge bg-danger">Overdue</span>';
+                    return '<span class="badge bg-warning">Due</span>';
                 })
-                ->addColumn('action', function ($row) {
-                    $clientEmail = $row->client->email ?? null;
-                    $emailCount = $row->email_logs_count;
-                    $emailBtn = $clientEmail 
-                      ? '<button class="btn btn-sm btn-warning send-email" 
-                                  data-id="'.$row->id.'" 
-                                  data-email="'.$clientEmail.'" 
-                                  title="'.($emailCount > 0 ? "{$emailCount} emails sent" : 'Send first email').'">
-                              <span class="spinner-border spinner-border-sm d-none"></span>
-                              Send Email' 
-                              . ($emailCount > 0 ? " ({$emailCount})" : '') .
-                        '</button>' 
-                      : '';
+                ->addColumn('action', function($row) {
+                    $emailBtn = $row->client->email 
+                        ? '<button class="btn btn-sm btn-warning send-email" 
+                                data-id="'.$row->id.'" 
+                                data-email="'.$row->client->email.'" 
+                                title="'.($row->email_logs_count > 0 ? "{$row->email_logs_count} emails sent" : 'Send first email').'">
+                            <span class="spinner-border spinner-border-sm d-none"></span>
+                            Send Email' 
+                            . ($row->email_logs_count > 0 ? " ({$row->email_logs_count})" : '') .
+                          '</button>'
+                        : '';
 
                     $btn = '';
                     if ($row->isPending()) {
-
                         $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
-
                         $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button> ';
 
                         $btn .= '
-                        <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1" role="dialog" aria-hidden="true">
-                          <div class="modal-dialog">
-                            <form method="POST" action="'.route('invoices.receive', $row->id).'" class="receive-form">
-                              '.csrf_field().'
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title">Mark This Invoice as Received</h5>
-                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                  <div class="mb-3">
-                                    <label>Payment Type <span class="text-danger"> *</span></label>
-                                    <select name="payment_type" class="form-control" required>
-                                      <option value="Cash">Cash</option>
-                                      <option value="Bank">Bank</option>
-                                    </select>
-                                  </div>
-                                  <div class="mb-3">
-                                    <label>Note</label>
-                                    <textarea name="note" class="form-control"></textarea>
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="submit" class="btn btn-success">Submit</button>
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </div>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                        ';
+                        <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1">
+                            <div class="modal-dialog">
+                                <form method="POST" action="'.route('invoices.receive', $row->id).'" class="receive-form">
+                                    '.csrf_field().'
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Mark This Invoice as Received</h5>
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label>Payment Type <span class="text-danger">*</span></label>
+                                                <select name="payment_type" class="form-control" required>
+                                                    <option value="Cash">Cash</option>
+                                                    <option value="Bank">Bank</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label>Note</label>
+                                                <textarea name="note" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Submit</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>';
                     }
                     $btn .= '<a href="'.route('invoices.show', $row->id).'" class="btn btn-sm btn-primary view" target="_blank">View</a> ';
                     $btn .= $emailBtn;

@@ -5,26 +5,18 @@
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-6">
-                  @if(request()->client_id)
+            <div class="col-2">
+                  @if(request()->client_type_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
-                <a href="{{ route('invoices.index') }}" 
-                    class="btn btn-secondary my-3 {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
-                    All Invoices
-                  </a>
-
-                  <a href="{{ route('invoices.due') }}" 
-                    class="btn btn-secondary my-3 {{ request()->routeIs('invoices.due') ? 'active' : '' }}">
-                    Due Invoices
-                  </a>
-
-                  <a href="{{ route('invoices.received') }}" 
-                    class="btn btn-secondary my-3 {{ request()->routeIs('invoices.received') ? 'active' : '' }}">
-                    Received Invoices
-                  </a>
-
                 <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
+            </div>
+            <div class="col-4 my-3 d-flex">
+                <select id="statusFilter" class="form-control ml-2 select2">
+                    <option value="">All</option>
+                    <option value="due">Due</option>
+                    <option value="received">Received</option>
+                </select>
             </div>
         </div>
     </div>
@@ -740,13 +732,17 @@
             ajax: {
                 url: ajaxUrl + window.location.search,
                 type: "GET",
+                data: function (d) {
+                    d.status = $('#statusFilter').val();
+                    console.log(d.status);
+                },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
                 }
             },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                {data: 'invoice_number', name: 'invoice_number'},
+                {data: 'invoice_number', name: 'invoice_number', orderable: false},
                 {data: 'client_name', name: 'client_name'},
                 {data: 'project', name: 'project'},
                 {data: 'net_amount', name: 'net_amount', render: function(data) {
@@ -764,6 +760,10 @@
         function reloadTable() {
           table.ajax.reload(null, false);
         }
+
+        $('#statusFilter').on('change', function() {
+            table.ajax.reload();
+        });
 
         $(document).on('click', '.send-email', function () {
             let $btn = $(this);
