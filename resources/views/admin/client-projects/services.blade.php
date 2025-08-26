@@ -3,16 +3,16 @@
 @section('content')
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" id="newBtn">
            <div class="d-flex gap-2 my-3 col-4">
-              <button type="button" class="btn btn-secondary mr-2" id="newBtn">Add Service</button>
+              <button type="button" class="btn btn-secondary mr-2">Add Service</button>
               <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service Types</a>
            </div>
         </div>
     </div>
 </section>
 
-<section class="content mt-3" id="addThisFormContainer">
+<section class="content pt-3" id="addThisFormContainer">
     <div class="container-fluid">
         <div class="row justify-content-md-center">
             <div class="col-md-8">

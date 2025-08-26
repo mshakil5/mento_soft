@@ -4,12 +4,12 @@
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" id="newBtn">
             <div class="col-2">
                   @if(request()->client_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
-                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
+                <button type="button" class="btn btn-secondary my-3">Add new</button>
             </div>
             <div class="col-4 my-3 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
@@ -24,7 +24,7 @@
     </div>
 </section>
 
-<section class="content mt-3" id="addThisFormContainer">
+<section class="content pt-3" id="addThisFormContainer">
     <div class="container-fluid">
         <div class="row justify-content-md-center">
             <div class="col-md-10">
