@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\ClientController;
 
 require __DIR__.'/admin.php';
 require __DIR__.'/manager.php';
@@ -36,3 +37,6 @@ Route::get('/product/{slug}', [FrontendController::class, 'productDetails'])->na
 Route::get('/privacy-policy', [FrontendController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/terms-and-conditions', [FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
 Route::get('/frequently-asked-questions', [FrontendController::class, 'frequentlyAskedQuestions'])->name('frequently-asked-questions');
+
+Route::get('/client-login', [ClientController::class, 'showLoginForm'])->name('client.login');
+Route::post('/client-login', [ClientController::class, 'login']);

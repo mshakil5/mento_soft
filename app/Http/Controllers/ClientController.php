@@ -11,6 +11,7 @@ use Validator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\LoginRecord;
 
 class ClientController extends Controller
 {
@@ -335,4 +336,41 @@ class ClientController extends Controller
 
         return response()->json(['status' => 200, 'message' => 'Status updated successfully']);
     }
+
+    public function showLoginForm()
+    {
+        return view('auth.client-login');
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $email = $request->email;
+        $password = $request->password;
+
+        $user = User::where('email', $email)->where('user_type', 3)->first();
+
+        if ($user) {
+            if ($user->status != 1) {
+                return back()->withInput($request->only('email'))
+                            ->withErrors(['email' => 'Your client account is inactive.']);
+            }
+
+            if (auth()->attempt(['email' => $email, 'password' => $password])) {
+                LoginRecord::create(['user_id' => auth()->id()]);
+                return redirect()->route('user.dashboard');
+            }
+
+            return back()->withInput($request->only('email'))
+                        ->withErrors(['password' => 'Wrong password.']);
+        }
+
+        return back()->withInput($request->only('email'))
+                    ->withErrors(['email' => 'Credential error.']);
+    }
+
 }
