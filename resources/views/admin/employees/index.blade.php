@@ -54,19 +54,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Employee Type <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="is_type" name="is_type" required>
-                                            <option value="1">Admin</option>
-                                            <option value="2">Manager</option>
-                                            <option value="3">User</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
                         </form>
                     </div>
                     <div class="card-footer">
@@ -95,7 +82,6 @@
                                     <th>Date</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Employee Type</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -136,8 +122,7 @@
                     name: $("#name").val(),
                     email: $("#email").val(),
                     password: $("#password").val(),
-                    password_confirmation: $("#password_confirmation").val(),
-                    is_type: $("#is_type").val()
+                    password_confirmation: $("#password_confirmation").val()
                 };
                 
                 $.ajax({
@@ -167,7 +152,6 @@
                     email: $("#email").val(),
                     password: $("#password").val(),
                     password_confirmation: $("#password_confirmation").val(),
-                    is_type: $("#is_type").val(),
                     codeid: $("#codeid").val()
                 };
                 
@@ -210,7 +194,6 @@
             pageTop();
             $("#name").val(data.name);
             $("#email").val(data.email);
-            $("#is_type").val(data.is_type);
             $("#codeid").val(data.id);
             
             $("#addBtn").val('Update');
@@ -294,7 +277,6 @@
                 {data: 'date', name: 'date'},
                 {data: 'name', name: 'name'},
                 {data: 'email', name: 'email'},
-                {data: 'user_type', name: 'user_type'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],

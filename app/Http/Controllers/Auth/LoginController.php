@@ -20,44 +20,35 @@ class LoginController extends Controller
     }
 
     public function login(Request $request)
-    {   
-        $input = $request->all();
-     
-        $this->validate($request, [
+    {
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
-    
-        $chksts = User::where('email', $input['email'])->first();
-        if ($chksts) {
-            if ($chksts->status == 1) {
-                if (auth()->attempt(['email' => $input['email'], 'password' => $input['password']])) {
 
-                    LoginRecord::create([
-                      'user_id' => auth()->id(),
-                    ]);
+        $email = $request->email;
+        $password = $request->password;
 
-                    if (auth()->user()->is_type == '1') {
-                        return redirect()->route('admin.dashboard');
-                    } elseif (auth()->user()->is_type == '2') {
-                        return redirect()->route('manager.dashboard');
-                    } elseif (auth()->user()->is_type == '3') {
-                        return redirect()->route('user.dashboard');
-                    }
-                } else {
-                    return redirect()->back()
-                        ->withInput($request->only('email'))
-                        ->withErrors(['password' => 'Wrong Password.']);
-                }
-            } else {
-                return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => 'Your ID is Deactive.']);
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            if ($user->status != 1) {
+                return back()->withInput($request->only('email'))
+                            ->withErrors(['email' => 'Your user account is inactive.']);
             }
-        } else {
-            return redirect()->back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Credential Error. You are not an authenticated user.']);
+
+            if (auth()->attempt(['email' => $email, 'password' => $password])) {
+                LoginRecord::create(['user_id' => auth()->id()]);
+
+                if ($user->is_type == 1) return redirect()->route('admin.dashboard');
+                if ($user->is_type == 2) return redirect()->route('manager.dashboard');
+                if ($user->is_type == 3) return redirect()->route('user.dashboard');
+            }
+
+            return back()->withInput($request->only('email'))->withErrors(['password' => 'Wrong Password.']);
         }
+
+          return back()->withInput($request->only('email'))->withErrors(['email' => 'Credential Error.']);
+
     }
 }

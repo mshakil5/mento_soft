@@ -19,14 +19,6 @@ class EmployeeController extends Controller
                 ->addColumn('date', function($row) {
                     return date('d-m-Y', strtotime($row->created_at));
                 })
-                ->addColumn('user_type', function($row) {
-                    $types = [
-                        1 => 'Admin',
-                        2 => 'Manager',
-                        3 => 'User'
-                    ];
-                    return $types[$row->is_type] ?? 'Unknown';
-                })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">
@@ -53,8 +45,7 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'is_type' => 'required|in:1,2,3',
+            'password' => 'required|string|min:6|confirmed'
         ]);
 
         if ($validator->fails()) {
@@ -68,7 +59,7 @@ class EmployeeController extends Controller
         $data->name = $request->name;
         $data->email = $request->email;
         $data->password = Hash::make($request->password);
-        $data->is_type = $request->is_type;
+        $data->is_type = 1;
         $data->status = 1;
         $data->created_by = auth()->id();
 
@@ -102,8 +93,7 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$request->codeid,
-            'password' => 'nullable|string|min:6|confirmed',
-            'is_type' => 'required|in:1,2,3',
+            'password' => 'nullable|string|min:6|confirmed'
         ]);
 
         if ($validator->fails()) {
@@ -123,7 +113,6 @@ class EmployeeController extends Controller
 
         $employee->name = $request->name;
         $employee->email = $request->email;
-        $employee->is_type = $request->is_type;
         $employee->updated_by = auth()->id();
 
         if ($request->password) {
