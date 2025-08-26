@@ -8,13 +8,22 @@ use App\Models\ClientProject;
 use Illuminate\Foundation\Auth\User;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = ProjectTask::with(['clientProject:id,title', 'employee:id,name']);
+            $userId = auth()->id();
+
+            $query = ProjectTask::with([
+                'clientProject:id,title',
+                'employee:id,name',
+            ])->withCount(['messages as unread_messages_count' => function ($q) use ($userId) {
+                $q->where('user_id', '!=', $userId)
+                  ->whereDoesntHave('views', fn($q) => $q->where('user_id', $userId));
+            }]);
 
             if ($request->status) {
                 $query->where('status', $request->status);
@@ -24,44 +33,85 @@ class TaskController extends Controller
                 $query->where('task', 'like', "%{$request->search}%");
             }
 
-              if ($request->client_project_id) {
-                  $query->where('client_project_id', $request->client_project_id);
-              }
+            if ($request->client_project_id) {
+                $query->where('client_project_id', $request->client_project_id);
+            }
 
             $query->orderBy('created_at', 'desc');
 
             return DataTables::of($query)
-            ->addColumn('task', function ($row) {
-                $taskText = Str::limit($row->task, 100);
+                ->addColumn('task', function ($row) use ($userId) {
+                    $taskText = Str::limit($row->task, 100);
 
-                $priorityClass = '';
-                switch ($row->priority) {
-                    case 'high': $priorityClass = 'badge badge-danger'; break;
-                    case 'medium': $priorityClass = 'badge badge-warning'; break;
-                    case 'low': $priorityClass = 'badge badge-success'; break;
-                }
+                    $priorityClass = match($row->priority) {
+                        'high' => 'badge badge-danger',
+                        'medium' => 'badge badge-warning',
+                        'low' => 'badge badge-success',
+                        default => '',
+                    };
 
-                $projectTitle = $row->clientProject->title ?? 'N/A';
+                    $projectTitle = $row->clientProject->title ?? 'N/A';
 
-                $html = '<div data-toggle="modal" data-target="#taskModal-'.$row->id.'" style="cursor:pointer;">';
-                $html .= '<div class="d-flex flex-column">';
-                $html .= '  <div class="d-flex justify-content-between align-items-start mb-2">';
-                $html .= '      <span class="flex-grow-1">' . $taskText . '</span>';
-                $html .= '      <span class="' . $priorityClass . '">' . ucfirst($row->priority) . '</span>';
-                $html .= '  </div>';
-                $html .= '  <div class="align-self-end text-muted small">' . $projectTitle . '</div>';
-                $html .= '</div>';
-                $html .= '</div>';
+                    $unreadCount = $row->unread_messages_count;
 
-                $html .= view('admin.client-projects.partials.task_list-modal', ['row' => $row])->render();
+                    $html = '<div data-toggle="modal" data-target="#taskModal-'.$row->id.'" style="cursor:pointer;">';
+                    $html .= '<div class="d-flex flex-column">';
+                    $html .= '  <div class="d-flex justify-content-between align-items-start mb-2">';
+                    $html .= '    <span class="flex-grow-1">' . $taskText . '</span>';
+                    $html .= '    <div class="d-flex align-items-center">';
+                    if ($unreadCount > 0) {
+                        $html .= '<span class="badge badge-warning mr-2">' . $unreadCount . '</span>';
+                    }
+                    $html .= '      <span class="' . $priorityClass . '">' . ucfirst($row->priority) . '</span>';
+                    $html .= '    </div>';
+                    $html .= '  </div>';
+                    $html .= '  <div class="align-self-end text-muted small">' . $projectTitle . '</div>';
+                    $html .= '</div>';
+                    $html .= '</div>';
 
-                return $html;
-            })
-            ->rawColumns(['task'])
-            ->make(true);
+                    $html .= view('admin.client-projects.partials.task_list-modal', ['row' => $row])->render();
+
+                    return $html;
+                })
+                ->rawColumns(['task'])
+                ->make(true);
         }
 
         $clientProjects = ClientProject::select('id', 'title')->latest()->get();
         return view('admin.client-projects.task_index', compact('clientProjects'));
+    }
+
+    public function messages(ProjectTask $task)
+    {
+        $userId = auth()->id();
+
+        $messages = $task->messages()->with('sender:id,name')->orderBy('created_at','asc')->get();
+
+        foreach ($messages as $message) {
+            if (!$message->views()->where('user_id', $userId)->exists()) {
+                $message->views()->create(['user_id' => $userId]);
+            }
+        }
+
+        $html = view('admin.client-projects.partials.task_messages', compact('messages'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    public function store(Request $request, ProjectTask $task)
+    {
+        $request->validate([
+            'message' => 'required|string|max:1000'
+        ]);
+
+        $message = $task->messages()->create([
+            'user_id' => Auth::id(),
+            'message' => $request->message
+        ]);
+
+        $messages = $task->messages()->with('sender:id,name')->orderBy('created_at','asc')->get();
+        $html = view('admin.client-projects.partials.task_messages', compact('messages'))->render();
+
+        return response()->json(['html' => $html]);
     }
 }

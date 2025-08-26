@@ -84,6 +84,8 @@ table.dataTable {
 @section('script')
 <script>
     $(document).ready(function () {
+
+      var csrfToken = $('meta[name="csrf-token"]').attr('content');
       
         function loadTable(tableId, status) {
             return $('#' + tableId).DataTable({
@@ -112,11 +114,66 @@ table.dataTable {
         let progressTable = loadTable('progressTable', 2);
         let doneTable     = loadTable('doneTable', 3);
 
-        $('#searchInput, #projectFilter').on('keyup change', function () {
+        $('#searchInput, #projectFilter').on('keyup change', reloadAllTables);
+
+        function reloadAllTables() {
             todoTable.ajax.reload();
             progressTable.ajax.reload();
             doneTable.ajax.reload();
+        }
+
+        function loadTaskMessages(taskId) {
+            $.ajax({
+                url: '/admin/tasks/' + taskId + '/messages',
+                type: 'GET',
+                success: function(res) {
+                    $('#taskModalMessages-' + taskId).html(res.html);
+                    var chat = $('#taskModalMessages-' + taskId);
+                    chat.scrollTop(chat[0].scrollHeight);
+                },
+                error: function(xhr) {
+                    console.error("Error loading messages:", xhr.responseText);
+                }
+            });
+        }
+
+        $(document).on('click', '[data-toggle="modal"]', function() {
+            var targetModalId = $(this).data('target');
+            var taskId = targetModalId.split('-')[1];
+
+            loadTaskMessages(taskId);
+            $(targetModalId).modal('show');
         });
+
+        $(document).on('submit', '.taskMessageForm', function(e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var taskId = form.data('task-id');
+            var message = form.find('input[name="message"]').val().trim();
+
+            if (!message) return;
+
+            $.ajax({
+                url: '/admin/tasks/' + taskId + '/messages',
+                type: 'POST',
+                data: { message: message, _token: csrfToken },
+                success: function(res) {
+                    form.find('input[name="message"]').val('');
+                    $('#taskModalMessages-' + taskId).html(res.html);
+
+                    var chat = $('#taskModalMessages-' + taskId);
+                    chat.scrollTop(chat[0].scrollHeight);
+                },
+                error: function(xhr) {
+                    console.error("Error sending message:", xhr.responseText);
+                }
+            });
+        });
+
+        $(document).on('hidden.bs.modal', '.task-modal', reloadAllTables);
+        setInterval(reloadAllTables, 60000);
+
     });
 </script>
 @endsection

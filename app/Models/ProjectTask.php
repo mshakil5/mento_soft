@@ -43,5 +43,10 @@ class ProjectTask extends Model
     {
         return $this->belongsTo(User::class, 'employee_id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany(TaskMessage::class, 'task_id')->with('sender');
+    }
     
 }

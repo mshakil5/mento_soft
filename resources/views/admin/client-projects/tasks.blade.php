@@ -234,31 +234,6 @@
             $("#employee_id").val(null).trigger('change');
             $("#cardTitle").text('Add new Task for {{ $project->title }}');
         }
-        
-        // Status toggle
-        // $(document).on('change', '.toggle-status', function() {
-        //     var task_id = $(this).data('id');
-        //     var status = $(this).prop('checked') ? 1 : 0;
-        //     var toggleUrl = "/admin/client-projects-task/" + task_id + "/toggle-status";
-
-
-        //     $.ajax({
-        //         url: toggleUrl,
-        //         method: "POST",
-        //         data: {
-        //             status: status,
-        //             _token: "{{ csrf_token() }}"
-        //         },
-        //         success: function(res) {
-        //           success(res.message);
-        //           reloadTable();
-        //         },
-        //         error: function(xhr, status, error) {
-        //           console.error(xhr.responseText);
-        //           error('Failed to update status');
-        //         }
-        //     });
-        // });
 
         $(document).on('click', '.status-change', function(e) {
             e.preventDefault();

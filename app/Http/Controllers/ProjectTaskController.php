@@ -107,6 +107,7 @@ class ProjectTaskController extends Controller
 
         $data = ProjectTask::create([
             'client_project_id' => $project->id,
+            'client_id' => $project->client_id,
             'task' => $request->task,
             'employee_id' => $request->employee_id,
             'priority' => $request->priority,
