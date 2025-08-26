@@ -40,9 +40,9 @@ class LoginController extends Controller
             if (auth()->attempt(['email' => $email, 'password' => $password])) {
                 LoginRecord::create(['user_id' => auth()->id()]);
 
-                if ($user->is_type == 1) return redirect()->route('admin.dashboard');
-                if ($user->is_type == 2) return redirect()->route('manager.dashboard');
-                if ($user->is_type == 3) return redirect()->route('user.dashboard');
+                if ($user->user_type == 1) return redirect()->route('admin.dashboard');
+                if ($user->user_type == 2) return redirect()->route('manager.dashboard');
+                if ($user->user_type == 3) return redirect()->route('user.dashboard');
             }
 
             return back()->withInput($request->only('email'))->withErrors(['password' => 'Wrong Password.']);

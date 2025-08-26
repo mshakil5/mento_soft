@@ -16,7 +16,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_type',
+        'user_type',
         'status',
     ];
 
@@ -50,6 +50,11 @@ class User extends Authenticatable
           $model->save();
         }
       });
+    }
+
+    public function client()
+    {
+        return $this->hasOne(Client::class);
     }
     
 }

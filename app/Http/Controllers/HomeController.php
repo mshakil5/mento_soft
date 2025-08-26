@@ -48,9 +48,9 @@ class HomeController extends Controller
         if (auth()->check()) {
             $user = auth()->user();
 
-            if ($user->is_type == '1') {
+            if ($user->user_type == '1') {
                 return redirect()->route('admin.dashboard');
-            } elseif ($user->is_type == '2') {
+            } elseif ($user->user_type == '2') {
                 return redirect()->route('manager.dashboard');
             } else {
                 return redirect()->route('user.dashboard');

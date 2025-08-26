@@ -9,6 +9,8 @@ use Intervention\Image\Facades\Image;
 use Yajra\DataTables\Facades\DataTables;
 use Validator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class ClientController extends Controller
 {
@@ -120,10 +122,9 @@ class ClientController extends Controller
             'primary_contact' => 'required|string|max:255',
             'email' => 'required|email',
             'phone1' => 'required|string|max:20',
-            // 'phone2' => 'nullable|string|max:20',
-            // 'client_type_id' => 'nullable|exists:client_types,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ],[
+            'password' => 'required|string|min:6',
+        ], [
             'business_name.required' => 'Name is required',
             'phone1.required'        => 'Phone is required',
         ]);
@@ -135,19 +136,34 @@ class ClientController extends Controller
             ], 422);
         }
 
-        $data = new Client;
-        $data->name = $request->name;
-        $data->email = $request->email;
-        $data->phone1 = $request->phone1;
-        // $data->phone2 = $request->phone2;
-        // $data->on_going = $request->on_going;
-        // $data->one_of = $request->one_of;
-        $data->address = $request->address;
-        $data->business_name = $request->business_name;
-        $data->primary_contact = $request->primary_contact;
-        // $data->client_type_id = $request->client_type_id;
-        $data->additional_fields = $request->additional_fields;
-        $data->created_by = auth()->id();
+        $existingUser = User::where('email', $request->email)
+                            ->where('user_type', 3)
+                            ->first();
+        if ($existingUser) {
+            return response()->json([
+                'status' => 422,
+                'errors' => ['email' => 'This email is already registered as a client.']
+            ], 422);
+        }
+
+        $user = User::create([
+            'name' => $request->business_name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'user_type' => 3,
+            'status' => 1,
+        ]);
+
+        $client = new Client();
+        $client->user_id = $user->id;
+        $client->name = $request->business_name;
+        $client->email = $request->email;
+        $client->phone1 = $request->phone1;
+        $client->primary_contact = $request->primary_contact;
+        $client->address = $request->address;
+        $client->business_name = $request->business_name;
+        $client->additional_fields = $request->additional_fields;
+        $client->created_by = auth()->id();
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -155,9 +171,7 @@ class ClientController extends Controller
             $imageName = time() . '.webp';
             $path = public_path('images/clients/');
 
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
+            if (!file_exists($path)) mkdir($path, 0755, true);
 
             Image::make($image)
                 ->resize(400, 400, function ($constraint) {
@@ -167,14 +181,14 @@ class ClientController extends Controller
                 ->encode('webp', 85)
                 ->save($path . $imageName);
 
-            $data->image = $imageName;
+            $client->image = $imageName;
         }
 
-        if ($data->save()) {
+        if ($client->save()) {
             return response()->json([
                 'status' => 200,
                 'message' => 'Client created successfully.',
-                'client' => $data
+                'client' => $client
             ], 201);
         } else {
             return response()->json([
@@ -203,10 +217,9 @@ class ClientController extends Controller
             'primary_contact' => 'required|string|max:255',
             'email' => 'required|email',
             'phone1' => 'required|string|max:20',
-            'phone2' => 'nullable|string|max:20',
-            // 'client_type_id' => 'nullable|exists:client_types,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ],[
+            'password' => 'nullable|string|min:6',
+        ], [
             'business_name.required' => 'Name is required',
             'phone1.required'        => 'Phone is required',
         ]);
@@ -226,22 +239,37 @@ class ClientController extends Controller
             ], 404);
         }
 
-        // $client->name = $request->name;
+        $user = $client->user;
+
+        $existingUser = User::where('email', $request->email)
+                            ->where('user_type', 3)
+                            ->where('id', '!=', $user->id)
+                            ->first();
+        if ($existingUser) {
+            return response()->json([
+                'status' => 422,
+                'errors' => ['email' => 'This email is already registered as a client.']
+            ], 422);
+        }
+
+        $user->name = $request->business_name;
+        $user->email = $request->email;
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+        $user->save();
+
+        $client->name = $request->business_name;
         $client->email = $request->email;
         $client->phone1 = $request->phone1;
-        // $client->phone2 = $request->phone2;
-        // $client->on_going = $request->on_going;
-        // $client->one_of = $request->one_of;
+        $client->primary_contact = $request->primary_contact;
         $client->address = $request->address;
         $client->business_name = $request->business_name;
-        $client->primary_contact = $request->primary_contact;
-        // $client->client_type_id = $request->client_type_id;
         $client->additional_fields = $request->additional_fields;
         $client->updated_by = auth()->id();
 
         // Handle image update
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($client->image && file_exists(public_path('images/clients/' . $client->image))) {
                 unlink(public_path('images/clients/' . $client->image));
             }
@@ -264,7 +292,8 @@ class ClientController extends Controller
         if ($client->save()) {
             return response()->json([
                 'status' => 200,
-                'message' => 'Client updated successfully.'
+                'message' => 'Client updated successfully.',
+                'client' => $client
             ], 200);
         } else {
             return response()->json([

@@ -10,7 +10,7 @@ class IsManager
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->is_type == '2') {
+        if (auth()->check() && auth()->user()->user_type == '2') {
             return $next($request);
         }
         

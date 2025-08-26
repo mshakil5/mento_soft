@@ -4,12 +4,12 @@
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" id="newBtn">
             <div class="col-2">
                   @if(request()->client_type_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
-                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
+                <button type="button" class="btn btn-secondary my-3">Add new</button>
             </div>
             <div class="col-4 my-3 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
@@ -24,7 +24,7 @@
     </div>
 </section>
 
-<section class="content mt-3" id="addThisFormContainer">
+<section class="content pt-3" id="addThisFormContainer">
     <div class="container-fluid">
         <div class="row justify-content-md-center">
             <div class="col-md-10">
@@ -62,6 +62,11 @@
                                         <input type="text" class="form-control" id="phone1" name="phone1" placeholder="Enter primary phone">
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="form-group">
+                              <label>Password <span class="text-danger">*</span></label>
+                              <input type="text" class="form-control" id="password" name="password" placeholder="Enter password">
                             </div>
                             
                             <div class="form-group">
@@ -160,6 +165,7 @@
             // form_data.append("on_going", $("#on_going").is(":checked") ? 1 : 0);
             // form_data.append("one_of", $("#one_of").is(":checked") ? 1 : 0);
             form_data.append("address", $("#address").val());
+            form_data.append("password", $("#password").val());
             form_data.append("business_name", $("#business_name").val());
             form_data.append("primary_contact", $("#primary_contact").val());
             // form_data.append("client_type_id", $("#client_type_id").val());

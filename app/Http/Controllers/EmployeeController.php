@@ -59,7 +59,7 @@ class EmployeeController extends Controller
         $data->name = $request->name;
         $data->email = $request->email;
         $data->password = Hash::make($request->password);
-        $data->is_type = 1;
+        $data->user_type = 1;
         $data->status = 1;
         $data->created_by = auth()->id();
 
