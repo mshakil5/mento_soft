@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\ClientProject;
 use App\Models\ProjectTask;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -86,8 +87,67 @@ class UserController extends Controller
             ->where('client_id', $user->client->id)
             ->latest()
             ->paginate(10);
+        $clientProjects = ClientProject::where('client_id', $user->client->id)->select('id', 'title')->get();
+        return view('user.tasks', compact('tasks', 'clientProjects'));
+    }
 
-        return view('user.tasks', compact('tasks'));
+    public function storeTask(Request $request)
+    {
+        $request->validate([
+            'project_id'  => 'required|exists:client_projects,id',
+            'task'        => 'required|string',
+            'priority'    => 'required|in:high,medium,low',
+            'due_date'    => 'nullable|date',
+            'status'      => 'required|in:1,2,3',
+        ]);
+
+        $project = ClientProject::findOrFail($request->project_id);
+
+        ProjectTask::create([
+            'client_project_id' => $project->id,
+            'client_id'         => $project->client_id,
+            'task'              => $request->task,
+            'priority'          => $request->priority,
+            'due_date'          => $request->due_date,
+            'status'            => $request->status,
+            'created_by'        => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Task created successfully!');
+    }
+
+    public function messages(ProjectTask $task)
+    {
+        $userId = auth()->id();
+
+        $messages = $task->messages()->with('sender:id,name')->orderBy('created_at','asc')->get();
+
+        foreach ($messages as $message) {
+            if (!$message->views()->where('user_id', $userId)->exists()) {
+                $message->views()->create(['user_id' => $userId]);
+            }
+        }
+
+        $html = view('user.task_messages', compact('messages'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    public function storeMessage(Request $request, ProjectTask $task)
+    {
+        $request->validate([
+            'message' => 'required|string|max:1000'
+        ]);
+
+        $message = $task->messages()->create([
+            'user_id' => Auth::id(),
+            'message' => $request->message
+        ]);
+
+        $messages = $task->messages()->with('sender:id,name')->orderBy('created_at','asc')->get();
+        $html = view('user.task_messages', compact('messages'))->render();
+
+        return response()->json(['html' => $html]);
     }
 
     public function updateTask(Request $request, $id)
