@@ -22,6 +22,13 @@
             </div>
             <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 pt-lg-4 pt-xl-4">
                 <ul>
+                    <li>
+                        @auth
+                            <a href="{{ route('dashboard') }}">Dashboard</a>
+                        @else
+                            <a href="{{ route('client.login') }}">Login</a>
+                        @endauth
+                    </li>
                     <li><a href="{{ route('homepage') }}#contact">Contact</a></li>
                     <li><a href="{{ route('quotation') }}">Get Quotation</a></li>
                     <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
