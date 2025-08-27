@@ -54,8 +54,8 @@ class ProjectRecentUpdateController extends Controller
     public function store(ClientProject $project, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
             'attachment' => 'nullable|file|max:10240', // 10MB max
         ]);
 
@@ -85,7 +85,7 @@ class ProjectRecentUpdateController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Update created successfully.',
+            'message' => 'Attachment created successfully.',
             'data' => $update
         ], 201);
     }

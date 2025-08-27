@@ -197,7 +197,7 @@ $(document).ready(function(){
 });
 
 $(document).ready(function(){
-    $('.ajaxForm').on('submit', function(e){
+    $(document).on('submit', '.ajaxForm', function(e){
         e.preventDefault();
 
         var $form = $(this);

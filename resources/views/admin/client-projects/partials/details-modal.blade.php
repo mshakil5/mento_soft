@@ -17,7 +17,14 @@
               <h3>Additional Information</h3>
               <p>{!! $row->additional_info !!}</p>
               
-              <h3>Attachments</h3>
+              <h3 class="d-flex justify-content-between align-items-center">
+                  Attachments
+                  <button type="button" class="btn btn-sm btn-success" 
+                          data-toggle="modal" 
+                          data-target="#quickAddUpdateModal-{{ $row->id }}">
+                      <i class="fas fa-plus"></i> Add attachment
+                  </button>
+              </h3>
               @if($row->recentUpdates->count())
                   <div class="d-flex flex-wrap gap-2">
                       @foreach($row->recentUpdates as $update)
@@ -25,17 +32,13 @@
                               <a href="{{ asset('images/recent-updates/'.$update->attachment) }}" 
                                 download 
                                 class="badge bg-light text-dark border">
-                                <i class="fas fa-paperclip text-info"></i> {{ $update->title ?? 'Untitled' }}
+                                <i class="fas fa-paperclip text-info"></i> {{ basename($update->attachment) }}
                               </a>
-                          @else
-                              <span class="badge bg-secondary">
-                                  <i class="fas fa-paperclip"></i> {{ $update->title ?? 'Untitled' }}
-                              </span>
                           @endif
                       @endforeach
                   </div>
               @else
-                  <p class="text-muted">No updates yet.</p>
+                  <p class="text-muted">No attachments yet.</p>
               @endif
             </div>
 
@@ -94,6 +97,32 @@
 
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="quickAddUpdateModal-{{ $row->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content card-outline card-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Attachment for "{{ $row->title }}"</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="ajaxForm" action="{{ route('client-projects.updates.store', $row->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="project_id" value="{{ $row->id }}">
+
+            <div class="mb-3">
+                <label class="form-label">Attachment <span class="text-danger">*</span></label>
+                <input type="file" class="form-control" name="attachment" required>
+            </div>
+
+            <button type="submit" class="btn btn-success float-end">Add Attachment</button>
+        </form>
       </div>
     </div>
   </div>

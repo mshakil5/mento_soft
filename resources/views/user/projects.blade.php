@@ -82,12 +82,8 @@
                                                                           @foreach($project->recentUpdates as $update)
                                                                               @if($update->attachment)
                                                                                   <a href="{{ asset('images/recent-updates/'.$update->attachment) }}" download class="badge bg-light text-dark border">
-                                                                                      <i class="fas fa-paperclip text-info"></i> {{ $update->title ?? 'Untitled' }}
+                                                                                      <i class="fas fa-paperclip text-info"></i> {{ basename($update->attachment) }}
                                                                                   </a>
-                                                                              @else
-                                                                                  <span class="badge bg-secondary">
-                                                                                      <i class="fas fa-paperclip"></i> {{ $update->title ?? 'Untitled' }}
-                                                                                  </span>
                                                                               @endif
                                                                           @endforeach
                                                                       </div>
