@@ -7,13 +7,14 @@
         <div class="row">
 
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar vh-100 p-3">
+            <nav class="col-md-3 col-lg-3 d-none d-md-block sidebar vh-100 p-3">
                 <div class="position-sticky">
-                    <h4 class="text-light mb-4">{{ auth()->user()->name }}</h4>
-                    <ul class="nav flex-column">
-                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Projects</a></li>
-                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Profile</a></li>
-                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Change Password</a></li>
+                    <ul class="nav flex-column mt-3">
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.dashboard') ? 'active' : '' }}" href="{{ route('user.dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.projects') ? 'active' : '' }}" href="{{ route('user.projects') }}">Projects</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.tasks') ? 'active' : '' }}" href="{{ route('user.tasks') }}">Tasks</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.profile') ? 'active' : '' }}" href="{{ route('user.profile') }}">Profile</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.password') ? 'active' : '' }}" href="{{ route('user.password') }}">Change Password</a></li>
                         <li class="nav-item mb-2">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -32,9 +33,11 @@
                 </button>
                 <div class="collapse mt-2" id="mobileSidebarCollapse">
                     <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Dashboard</a></li>
                         <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Projects</a></li>
-                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Profile</a></li>
-                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Change Password</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light" href="#">Tasks</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.profile') ? 'active' : '' }}" href="{{ route('user.profile') }}">Profile</a></li>
+                        <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.password') ? 'active' : '' }}" href="{{ route('user.password') }}">Change Password</a></li>
                         <li class="nav-item mb-2">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -45,11 +48,18 @@
                 </div>
             </div>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 text-light">
+            <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4 py-4 text-light">
                 @yield('user-content')
             </main>
 
         </div>
     </div>
 </section>
+<style>
+  .nav-link.active {
+      font-weight: bold;
+      color: #FF6D33 !important;
+  }
+</style>
+
 @endsection
