@@ -9,6 +9,7 @@ Route::prefix('user')->middleware(['auth', 'is_user'])->group(function () {
 
     Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
     Route::get('/tasks', [UserController::class, 'tasks'])->name('user.tasks');
+    Route::put('/tasks/{task}', [UserController::class, 'updateTask'])->name('tasks.update');
 
     Route::get('/profile', [UserController::class, 'userProfile'])->name('user.profile');
     Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('user.profile.update');

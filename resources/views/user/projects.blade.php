@@ -3,10 +3,7 @@
 @section('user-content')
 <div class="row px-2">
     <div class="col-12">
-        <div class="card bg-dark text-light shadow-sm mb-4">
-            <div class="card-header border-0">
-                <h5 class="mb-0">My Projects</h5>
-            </div>
+        <div class="card text-light shadow-sm mb-4 form-style fadeInUp">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table text-light mb-0 align-middle table-hover table-striped">
@@ -45,17 +42,17 @@
 
                                         <div class="modal fade" id="projectModal-{{ $project->id }}" tabindex="-1" aria-labelledby="projectModalLabel-{{ $project->id }}" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content bg-dark text-light">
+                                                <div class="modal-content card-outline card-secondary">
                                                     <div class="modal-header border-0">
                                                         <h5 class="modal-title" id="projectModalLabel-{{ $project->id }}">{{ $project->title }}</h5>
-                                                        <button type="button" class="btn-close btn-sm btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <p><strong>Description:</strong></p>
-                                                        <p>{{ $project->description ?? 'No description available.' }}</p>
+                                                        <p>{!! $project->description ?? 'No description available.' !!}</p>
                                                         <hr class="border-light">
                                                         <p><strong>Additional Info:</strong></p>
-                                                        <p>{{ $project->additional_info ?? '-' }}</p>
+                                                        <p>{!! $project->additional_info ?? '-' !!}</p>
                                                     </div>
                                                     <div class="modal-footer border-0">
                                                         <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Close</button>

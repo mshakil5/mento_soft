@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\ClientProject;
+use App\Models\ProjectTask;
 
 class UserController extends Controller
 {
@@ -70,14 +71,43 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        $projects = ClientProject::with(['tasks' => function($q) {
-                $q->latest()->take(5)->with('employee');
-            }])
-            ->where('client_id', $user->client->id)
+        $projects = ClientProject::where('client_id', $user->client->id)
             ->latest()
-            ->paginate(1);
+            ->paginate(10);
 
         return view('user.projects', compact('projects'));
+    }
+
+    public function tasks()
+    {
+        $user = auth()->user();
+
+        $tasks = ProjectTask::with('employee', 'clientProject')
+            ->where('client_id', $user->client->id)
+            ->latest()
+            ->paginate(10);
+
+        return view('user.tasks', compact('tasks'));
+    }
+
+    public function updateTask(Request $request, $id)
+    {
+        $request->validate([
+            'priority' => 'required|in:high,medium,low',
+            'due_date' => 'nullable|date',
+            'status' => 'required|in:1,2,3',
+            'description' => 'required|string',
+        ]);
+
+        $task = ProjectTask::findOrFail($id);
+
+        $task->priority = $request->priority;
+        $task->due_date = $request->due_date;
+        $task->status = $request->status;
+        $task->task = $request->description;
+        $task->save();
+
+        return redirect()->back()->with('success', 'Task updated successfully!');
     }
 
 }

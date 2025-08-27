@@ -51,7 +51,8 @@
 
     <script src="{{ asset('resources/frontend/js/bootstrap-5.bundle.min.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/iconify.min.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/jquery-3.0.min.js') }}"></script>
+    <script src="{{ asset('resources/frontend/js/jquery-3.7.1.min.js') }}"></script>
+    {{-- <script src="{{ asset('resources/frontend/js/jquery-3.0.min.js') }}"></script> --}}
     <script src="{{ asset('resources/frontend/js/jquery.ripples.min.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/typed.min.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/slick.min.js') }}"></script>
