@@ -4,16 +4,16 @@
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" id="newBtn">
           <div class="d-flex gap-2 my-3 col-4">
               <a href="{{ route('project-services.index') }}" class="btn btn-secondary mr-2">Back to Services</a>
-              <button type="button" class="btn btn-secondary" id="newBtn">Add new Service Type</button>
+              <button type="button" class="btn btn-secondary">Add new Service Type</button>
             </div>
         </div>
     </div>
 </section>
 
-<section class="content mt-3" id="addThisFormContainer">
+<section class="content pt-3" id="addThisFormContainer">
     <div class="container-fluid">
         <div class="row justify-content-md-center">
             <div class="col-md-10">

@@ -30,8 +30,11 @@ class HomeController extends Controller
     }
 
     public function userHome()
-    {
-        return view('user.dashboard');
+    {   
+        $user = auth()->user();
+        $projectsCount = ClientProject::where('client_id', $user->client->id)->count();
+        
+        return view('user.dashboard', compact('projectsCount'));
     }
 
     public function toggleSidebar(Request $request)

@@ -72,9 +72,17 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        $projects = ClientProject::where('client_id', $user->client->id)
-            ->latest()
-            ->paginate(10);
+        $projects = ClientProject::with([
+            'tasks' => function($q) {
+                $q->latest()->with('employee');
+            },
+            'recentUpdates' => function($q) {
+                $q->latest();
+            }
+        ])
+        ->where('client_id', $user->client->id)
+        ->latest()
+        ->paginate(10);
 
         return view('user.projects', compact('projects'));
     }
@@ -82,13 +90,18 @@ class UserController extends Controller
     public function tasks()
     {
         $user = auth()->user();
+        $userId = $user->id;
 
-        $tasks = ProjectTask::with('employee', 'clientProject')
+        $tasks = ProjectTask::with(['employee', 'clientProject'])
+            ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                $query->where('user_id', '!=', $userId)
+                      ->whereDoesntHave('views', fn($q) => $q->where('user_id', $userId));
+            }])
             ->where('client_id', $user->client->id)
             ->latest()
             ->paginate(10);
-        $clientProjects = ClientProject::where('client_id', $user->client->id)->select('id', 'title')->get();
-        return view('user.tasks', compact('tasks', 'clientProjects'));
+
+        return view('user.tasks', compact('tasks'));
     }
 
     public function storeTask(Request $request)

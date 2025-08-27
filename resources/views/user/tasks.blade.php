@@ -3,55 +3,6 @@
 @section('user-content')
 <div class="row px-2">
     <div class="col-12">
-        <div class="modal fade" id="createTaskModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content card-outline card-secondary">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Create New Task</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('tasks.store') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label class="form-label">Project <span class="text-danger">*</span></label>
-                                <select class="form-select bg-light text-dark" name="project_id" required>
-                                    <option value="">-- Select Project --</option>
-                                    @foreach($clientProjects as $project)
-                                        <option value="{{ $project->id }}">{{ $project->title }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Task <span class="text-danger">*</span></label>
-                                <textarea id="new-task-description" name="task" class="form-control bg-light text-dark"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Priority <span class="text-danger">*</span></label>
-                                <select class="form-select bg-light text-dark" name="priority" required>
-                                    <option value="high">High</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="low">Low</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Due Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control bg-light text-dark" name="due_date" required min="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Status <span class="text-danger">*</span></label>
-                                <select class="form-select bg-light text-dark" name="status">
-                                    <option value="1">To Do</option>
-                                    <option value="2">In Progress</option>
-                                    <option value="3">Done</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-success float-end">Create Task</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -114,8 +65,13 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal-{{ $task->id }}">
+                                        <button type="button" class="btn btn-sm btn-primary position-relative" data-bs-toggle="modal" data-bs-target="#taskModal-{{ $task->id }}">
                                             View
+                                            @if($task->unread_messages_count > 0)
+                                                <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle p-1">
+                                                    {{ $task->unread_messages_count }}
+                                                </span>
+                                            @endif
                                         </button>
                                         <div class="modal fade task-modal" id="taskModal-{{ $task->id }}" tabindex="-1" aria-hidden="true">
                                           <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -172,7 +128,7 @@
                                             </div>
                                           </div>
                                         </div>
-                                        <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#taskEditModal-{{ $task->id }}">
+                                        <button type="button" class="btn btn-sm btn-warning position-relative" data-bs-toggle="modal" data-bs-target="#taskEditModal-{{ $task->id }}">
                                             Edit
                                         </button>
                                         <div class="modal fade" id="taskEditModal-{{ $task->id }}" tabindex="-1" aria-hidden="true">
@@ -194,6 +150,10 @@
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
+                                                                <label class="form-label">Task <span class="text-danger">*</span></label>
+                                                                <textarea id="description-{{ $task->id }}" name="description">{{ $task->task }}</textarea>
+                                                            </div>
+                                                            <div class="mb-3">
                                                                 <label class="form-label">Due Date <span class="text-danger">*</span></label>
                                                                 <input type="date" class="form-control bg-light text-dark" name="due_date" value="{{ $task->due_date ?? '' }}" required>
                                                             </div>
@@ -204,10 +164,6 @@
                                                                     <option value="2" {{ $task->status==2 ? 'selected' : '' }}>In Progress</option>
                                                                     <option value="3" {{ $task->status==3 ? 'selected' : '' }}>Done</option>
                                                                 </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Task <span class="text-danger">*</span></label>
-                                                                <textarea id="description-{{ $task->id }}" name="description">{{ $task->task }}</textarea>
                                                             </div>
                                                             <button type="submit" class="btn btn-success float-end">Update Task</button>
                                                         </form>
@@ -236,15 +192,7 @@
 
 @endsection
 @section('script')
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
-<script>
-  ClassicEditor.create(document.querySelector('#new-task-description'))
-    .catch(error => console.error(error));
 
-  document.querySelectorAll('[id^="description-"]').forEach((el) => {
-      ClassicEditor.create(el).catch(error => console.error(error));
-  });
-</script>
 
 <script>
     $(document).on('click', '[data-bs-target^="#taskModal-"]', function() {

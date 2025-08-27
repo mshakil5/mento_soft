@@ -8,7 +8,6 @@
       <div class="modal-body">
         <form class="ajaxForm" id="quickClientForm" action="{{ route('admin.clients.store') }}" method="POST">
           @csrf
-          <input type="hidden" id="codeid" name="codeid">
           
           <div class="row">
             <div class="col-md-6">
@@ -33,6 +32,12 @@
               <div class="form-group">
                 <label>Phone <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="phone1" name="phone1" placeholder="Enter primary phone" required>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Password <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="password" name="password" required>
               </div>
             </div>
           </div>

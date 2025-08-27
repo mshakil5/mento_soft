@@ -105,14 +105,14 @@ class ClientProjectController extends Controller
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu p-2" style="min-width: 160px;">
-                                <a class="btn btn-success btn-sm btn-block mb-1" href="' . route('client-projects.tasks', $row->id) . '">
+                                <a class="btn btn-success btn-sm btn-block mb-1 d-none" href="' . route('client-projects.tasks', $row->id) . '">
                                     Tasks
                                     <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
                                 </a>
-                                <a class="btn btn-warning btn-sm btn-block mb-1" href="' . route('client-projects.updates', $row->id) . '">
+                                <a class="btn btn-warning btn-sm btn-block mb-1 d-none" href="' . route('client-projects.updates', $row->id) . '">
                                     Updates ' . ($row->recent_updates_count > 0 ? '<span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '') . '
                                 </a>
-                                <hr class="dropdown-divider">
+                                <hr class="dropdown-divider d-none">
                                 <button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>
                                 <button class="btn btn-outline-danger btn-sm btn-block delete" data-id="'.$row->id.'">Delete</button>
                             </div>
