@@ -38,5 +38,5 @@ Route::get('/privacy-policy', [FrontendController::class, 'privacyPolicy'])->nam
 Route::get('/terms-and-conditions', [FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
 Route::get('/frequently-asked-questions', [FrontendController::class, 'frequentlyAskedQuestions'])->name('frequently-asked-questions');
 
-Route::get('/client-login', [ClientController::class, 'showLoginForm'])->name('client.login');
+Route::get('/client-login', [ClientController::class, 'loginForm'])->name('client.login');
 Route::post('/client-login', [ClientController::class, 'login']);

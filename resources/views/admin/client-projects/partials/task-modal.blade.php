@@ -1,5 +1,5 @@
 @php
-  $employees = \App\Models\User::where('status', 1)->select('id', 'name')->latest()->get();
+  $employees = \App\Models\User::where('status', 1)->where('user_type', 1)->select('id', 'name')->latest()->get();
   $projects = \App\Models\ClientProject::select('id', 'title')->latest()->get();
 @endphp
 <div class="modal fade" id="tasksModal" tabindex="-1" role="dialog">

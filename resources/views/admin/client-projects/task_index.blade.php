@@ -172,7 +172,7 @@ table.dataTable {
         });
 
         $(document).on('hidden.bs.modal', '.task-modal', reloadAllTables);
-        setInterval(reloadAllTables, 60000);
+        // setInterval(reloadAllTables, 60000);
 
     });
 </script>

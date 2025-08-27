@@ -337,7 +337,7 @@ class ClientController extends Controller
         return response()->json(['status' => 200, 'message' => 'Status updated successfully']);
     }
 
-    public function showLoginForm()
+    public function loginForm()
     {
         return view('auth.client-login');
     }

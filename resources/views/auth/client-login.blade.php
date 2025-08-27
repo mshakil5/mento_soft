@@ -7,7 +7,7 @@
     <div class="container">
         <div class="row px-2 justify-content-center">
             <div class="col-lg-6 text-light">
-                <div class="text-center mb-4">
+                <div class="text-center my-5">
                     <h2 class="text-light text-uppercase fw-bold title-font wow bounce mb-0 secTtile">
                        Login
                     </h2>

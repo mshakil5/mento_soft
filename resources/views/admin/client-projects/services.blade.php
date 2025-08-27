@@ -144,6 +144,8 @@
 @section('script')
 <script>
   $(document).ready(function () {
+
+      $("#client_id").select2();
       $("#addThisFormContainer").hide();
 
       $("#newBtn").click(function(){
