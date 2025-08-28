@@ -147,7 +147,7 @@ class FrontendController extends Controller
             $products = $products->slice(0, $count - 1);
         }
 
-        $company = CompanyDetails::first();
+        $company = CompanyDetails::select('meta_title', 'meta_description', 'meta_keywords', 'meta_image')->first();
 
         $this->seo(
             $company?->meta_title ?? '',
@@ -198,8 +198,6 @@ class FrontendController extends Controller
         $functionalFeatures = $project->functional_features
             ? array_filter(array_map('trim', explode(',', $project->functional_features)))
             : [];
-
-        $company = CompanyDetails::first();
 
         $this->seo(
             $project->meta_title,

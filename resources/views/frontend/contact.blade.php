@@ -1,6 +1,6 @@
 @php
   $contact = App\Models\Master::where('name', 'contact')->first();
-  $company = \App\Models\CompanyDetails::first();
+  $company = \App\Models\CompanyDetails::select('email1', 'phone1')->first();
 @endphp
 
 <section class="default contact-section wow fadeIn"

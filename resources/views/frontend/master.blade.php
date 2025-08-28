@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale())}}">
 
 @php
-    $company = \App\Models\CompanyDetails::first();
+    $company = \App\Models\CompanyDetails::select('fav_icon', 'company_logo', 'footer_content', 'email1', 'phone1', 'address1', 'facebook', 'instagram', 'linkedin', 'business_name', 'company_reg_number', 'vat_number', 'whatsapp')->first();
     $services = \App\Models\Service::where('status', 1)->orderByRaw('sl = 0, sl ASC')->orderBy('id', 'desc')->limit(6)->pluck('title');
 @endphp 
 
