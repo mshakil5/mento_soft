@@ -22,7 +22,8 @@ class ClientProjectController extends Controller
                       $query->latest();
                   },
                   'tasks' => function($query) {
-                      $query->latest()->take(5)->with('employee');
+                      $query->latest()->take(5)
+                      ->with(['employee', 'creator']);
                   }
               ])
               ->withCount(['recentUpdates', 'tasks'])
@@ -105,7 +106,7 @@ class ClientProjectController extends Controller
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu p-2" style="min-width: 160px;">
-                                <a class="btn btn-success btn-sm btn-block mb-1 d-none" href="' . route('client-projects.tasks', $row->id) . '">
+                                <a class="btn btn-success btn-sm btn-block mb-1" href="' . route('client-projects.tasks', $row->id) . '">
                                     Tasks
                                     <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
                                 </a>

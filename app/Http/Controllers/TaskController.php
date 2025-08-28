@@ -20,6 +20,7 @@ class TaskController extends Controller
             $query = ProjectTask::with([
                 'clientProject:id,title',
                 'employee:id,name',
+                'creator:id,name',
             ])->withCount(['messages as unread_messages_count' => function ($q) use ($userId) {
                 $q->where('user_id', '!=', $userId)
                   ->whereDoesntHave('views', fn($q) => $q->where('user_id', $userId));
@@ -86,16 +87,22 @@ class TaskController extends Controller
         $userId = auth()->id();
 
         $messages = $task->messages()->with('sender:id,name')->orderBy('created_at','asc')->get();
-
         foreach ($messages as $message) {
             if (!$message->views()->where('user_id', $userId)->exists()) {
                 $message->views()->create(['user_id' => $userId]);
             }
         }
+        
+        $messagesHtml = view('admin.client-projects.partials.task_messages', compact('messages'))->render();
 
-        $html = view('admin.client-projects.partials.task_messages', compact('messages'))->render();
+        $task->load(['activities.causer']);
+        
+        $timelineHtml = view('admin.client-projects.partials.task_timeline', compact('task'))->render();
 
-        return response()->json(['html' => $html]);
+        return response()->json([
+            'messagesHtml' => $messagesHtml,
+            'timelineHtml' => $timelineHtml,
+        ]);
     }
 
     public function store(Request $request, ProjectTask $task)

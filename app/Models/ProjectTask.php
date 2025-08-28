@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Activity;
 
 class ProjectTask extends Model
 {
@@ -47,6 +48,16 @@ class ProjectTask extends Model
     public function messages()
     {
         return $this->hasMany(TaskMessage::class, 'task_id')->with('sender');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function activities()
+    {
+        return $this->morphMany(Activity::class, 'subject');
     }
     
 }

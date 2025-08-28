@@ -7,6 +7,7 @@ use App\Models\ClientProject;
 use App\Models\Invoice;
 use App\Models\ProjectServiceDetail;
 use Illuminate\Http\Request;
+use App\Models\ProjectTask;
 
 class HomeController extends Controller
 {
@@ -21,7 +22,9 @@ class HomeController extends Controller
         $activeProjects = ClientProject::where('status', 2)->count();
         $onGoingServices = ProjectServiceDetail::where('status', 1)->count();
         $totalPending = Invoice::where('status', 2)->sum('net_amount');
-        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'totalPending'));
+        $todoTasks = ProjectTask::where('status', 1)->count();
+        $inProgressTasks = ProjectTask::where('status', 2)->count();
+        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'totalPending', 'todoTasks', 'inProgressTasks'));
     }
 
     public function managerHome()
@@ -32,9 +35,11 @@ class HomeController extends Controller
     public function userHome()
     {   
         $user = auth()->user();
-        $projectsCount = ClientProject::where('client_id', $user->client->id)->count();
-        
-        return view('user.dashboard', compact('projectsCount'));
+        $plannedprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 1)->count();
+        $ongoingprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 2)->count();
+        $doneProjectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 4)->count();
+        $onGoingTasksCount = ProjectTask::where('client_id', $user->client->id)->whereIn('status', [1, 2])->count();
+        return view('user.dashboard', compact('ongoingprojectsCount', 'doneProjectsCount', 'plannedprojectsCount', 'onGoingTasksCount'));
     }
 
     public function toggleSidebar(Request $request)

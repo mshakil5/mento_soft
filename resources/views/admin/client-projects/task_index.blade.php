@@ -127,7 +127,9 @@ table.dataTable {
                 url: '/admin/tasks/' + taskId + '/messages',
                 type: 'GET',
                 success: function(res) {
-                    $('#taskModalMessages-' + taskId).html(res.html);
+                    $('#taskModalMessages-' + taskId).html(res.messagesHtml);
+                    $('#taskModalTimeline-' + taskId).html(res.timelineHtml);
+
                     var chat = $('#taskModalMessages-' + taskId);
                     chat.scrollTop(chat[0].scrollHeight);
                 },

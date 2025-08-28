@@ -19,6 +19,9 @@ class ProjectController extends Controller
     {
         if ($request->ajax()) {
             $data = Project::with('service')->latest();
+            if ($request->project_type_id) {
+                $data = $data->where('project_type_id', $request->project_type_id);
+            }
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('thumbnail', function($row) {

@@ -43,6 +43,24 @@
           </div>
         </div>
       </div>
+      <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box shadow-lg">
+          <span class="info-box-icon bg-warning"><i class="far fa-clock"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">To Do Tasks</span>
+            <span class="info-box-number">{{ number_format($todoTasks, 0) }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box shadow-lg">
+          <span class="info-box-icon bg-secondary"><i class="far fa-clock"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">In Progress Tasks</span>
+            <span class="info-box-number">{{ number_format($inProgressTasks, 0) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="row mt-4 d-none">

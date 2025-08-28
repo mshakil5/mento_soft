@@ -4,10 +4,10 @@
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row" id="newBtn">
+        <div class="row" id="">
           <div class="d-flex gap-2 my-3 col-4">
               <a href="{{ route('project-services.index') }}" class="btn btn-secondary mr-2">Back to Services</a>
-              <button type="button" class="btn btn-secondary">Add new Service Type</button>
+              <button type="button" class="btn btn-secondary" id="newBtn">Add new Service Type</button>
             </div>
         </div>
     </div>
@@ -82,13 +82,13 @@ $(document).ready(function () {
 
     $("#newBtn").click(function(){
         clearform();
-        $("#newBtn").hide(100);
+        $("#newBtnSection").hide(100);
         $("#addThisFormContainer").show(300);
     });
 
     $("#FormCloseBtn").click(function(){
         $("#addThisFormContainer").hide(200);
-        $("#newBtn").show(100);
+        $("#newBtnSection").show(100);
         clearform();
     });
 
@@ -172,7 +172,7 @@ $(document).ready(function () {
         $("#addBtn").val('Update');
         $("#addBtn").html('Update');
         $("#addThisFormContainer").show(300);
-        $("#newBtn").hide(100);
+        $("#newBtnSection").hide(100);
     }
 
     function clearform(){
@@ -180,7 +180,7 @@ $(document).ready(function () {
         $("#addBtn").val('Create');
         $("#addBtn").html('Create');
         $("#addThisFormContainer").slideUp(200);
-        $("#newBtn").slideDown(200);
+        $("#newBtnSection").slideDown(200);
         $("#cardTitle").text('Add new Service Type');
     }
 

@@ -82,7 +82,8 @@
                                             {{ ucfirst($task->priority ?? '') }}
                                         </span>
                                     </span> &middot; 
-                                    <span><strong>Assigned to:</strong> {{ $task->employee->name ?? '' }}</span>
+                                    <span><strong>Assigned to:</strong> {{ $task->employee->name ?? '-' }}</span>
+                                    <span><strong>Created by:</strong> {{ $task->creator->name ?? '-' }}</span>
                                 </div>
                             </div>
                         @endforeach

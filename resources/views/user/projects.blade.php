@@ -73,8 +73,8 @@
                                                                   <h6>Project Concept / Idea</h6>
                                                                   <p>{!! $project->description ?? 'No description available.' !!}</p>
 
-                                                                  <h6>Additional Information</h6>
-                                                                  <p>{!! $project->additional_info ?? '-' !!}</p>
+                                                                  {{-- <h6>Additional Information</h6>
+                                                                  <p>{!! $project->additional_info ?? '-' !!}</p> --}}
 
                                                                   <h6>Attachments / Updates</h6>
                                                                   @if($project->recentUpdates->count())
@@ -108,15 +108,6 @@
                                                                           @foreach($project->tasks as $task)
                                                                               <div class="list-group-item mb-2">
                                                                                   <strong>{!! $task->task !!}</strong>
-                                                                                  <div class="small text-muted mt-1">
-                                                                                      <span><strong>Due:</strong> {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d-m-Y') : '-' }}</span> &middot;
-                                                                                      <span><strong>Status:</strong> {{ [1=>'To Do',2=>'In Progress',3=>'Done'][$task->status] ?? '-' }}</span> &middot;
-                                                                                      <span><strong>Priority:</strong>
-                                                                                          <span class="badge {{ ['high'=>'bg-danger','medium'=>'bg-warning','low'=>'bg-info'][$task->priority] ?? 'bg-secondary' }}">
-                                                                                              {{ ucfirst($task->priority) }}
-                                                                                          </span>
-                                                                                      </span> &middot;
-                                                                                  </div>
                                                                               </div>
                                                                           @endforeach
                                                                       </div>

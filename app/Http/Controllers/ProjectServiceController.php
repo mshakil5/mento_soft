@@ -10,6 +10,7 @@ use App\Models\ProjectServiceDetail;
 use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Transaction;
+use App\Models\ClientProject;
 
 class ProjectServiceController extends Controller
 {
@@ -17,6 +18,18 @@ class ProjectServiceController extends Controller
     {
         if ($request->ajax()) {
             $data = ProjectServiceDetail::with(['serviceType', 'client', 'project'])->latest();
+
+            if ($request->client_id) {
+                $data = $data->where('client_id', $request->client_id);
+            }
+
+            if ($request->project_id) {
+                $data = $data->where('client_project_id', $request->project_id);
+            }
+
+            if ($request->service_type_id) {
+                $data = $data->where('project_service_id', $request->service_type_id);
+            }
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -96,8 +109,8 @@ class ProjectServiceController extends Controller
 
         $serviceTypes = ProjectService::where('status', 1)->latest()->get();
         $clients = Client::where('status', 1)->select('id', 'business_name')->latest()->get();
-
-        return view('admin.client-projects.services', compact('serviceTypes', 'clients'));
+        $projects = ClientProject::where('status', 1)->select('id', 'title')->latest()->get();
+        return view('admin.client-projects.services', compact('serviceTypes', 'clients', 'projects'));
     }
 
     public function store(Request $request)

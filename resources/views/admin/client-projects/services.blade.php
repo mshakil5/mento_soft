@@ -3,11 +3,35 @@
 @section('content')
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row" id="newBtn">
-           <div class="d-flex gap-2 my-3 col-4">
-              <button type="button" class="btn btn-secondary mr-2">Add Service</button>
+        <div class="row py-3">
+            <div class="col-3">
+              <button type="button" class="btn btn-secondary mr-2" id="newBtn">Add Service</button>
               <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service Types</a>
-           </div>
+            </div>
+            <div class="col-3 d-flex">
+                <select id="clientFilter" class="form-control ml-2 select2">
+                    <option value="">Select Client</option>
+                    @foreach ($clients as $client)
+                      <option value="{{ $client->id }}">{{ $client->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-3 d-flex">
+                <select id="projectFilter" class="form-control ml-2 select2">
+                    <option value="">Select Project</option>
+                    @foreach ($projects as $project)
+                      <option value="{{ $project->id }}">{{ $project->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-3 d-flex">
+                <select id="serviceTypeFilter" class="form-control ml-2 select2">
+                    <option value="">Select Service Type</option>
+                    @foreach ($serviceTypes as $serviceType)
+                      <option value="{{ $serviceType->id }}">{{ $serviceType->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
     </div>
 </section>
@@ -150,13 +174,13 @@
 
       $("#newBtn").click(function(){
           clearform();
-          $("#newBtn").hide(100);
+          $("#newBtnSection").hide(100);
           $("#addThisFormContainer").show(300);
       });
 
       $("#FormCloseBtn").click(function(){
           $("#addThisFormContainer").hide(200);
-          $("#newBtn").show(100);
+          $("#newBtnSection").show(100);
           clearform();
       });
 
@@ -302,7 +326,7 @@
           $("#addBtn").val('Update');
           $("#addBtn").html('Update');
           $("#addThisFormContainer").show(300);
-          $("#newBtn").hide(100);
+          $("#newBtnSection").hide(100);
         }
 
       function clearform(){
@@ -311,7 +335,7 @@
           $("#addBtn").val('Create');
           $("#addBtn").html('Create');
           $("#addThisFormContainer").slideUp(200);
-          $("#newBtn").slideDown(200);
+          $("#newBtnSection").slideDown(200);
       }
 
       // Status toggle
@@ -372,6 +396,11 @@
           ajax: {
               url: "{{ route('project-services.index') }}" + window.location.search,
               type: "GET",
+              data: function (d) {
+                  d.client_id = $('#clientFilter').val();
+                  d.project_id = $('#projectFilter').val();
+                  d.service_type_id = $('#serviceTypeFilter').val();
+              },
               error: function (xhr, status, error) {
                   console.error(xhr.responseText);
               }
@@ -397,6 +426,10 @@
       function reloadTable() {
         table.ajax.reload(null, false);
       }
+
+      $('#clientFilter, #projectFilter, #serviceTypeFilter').on('change', function() {
+          reloadTable();
+      });
 
       $(document).on('submit', '.receive-form', function(e) {
           e.preventDefault();

@@ -108,10 +108,7 @@ class UserController extends Controller
     {
         $request->validate([
             'project_id'  => 'required|exists:client_projects,id',
-            'task'        => 'required|string',
-            'priority'    => 'required|in:high,medium,low',
-            'due_date'    => 'nullable|date',
-            'status'      => 'required|in:1,2,3',
+            'task'        => 'required|string'
         ]);
 
         $project = ClientProject::findOrFail($request->project_id);
@@ -120,9 +117,6 @@ class UserController extends Controller
             'client_project_id' => $project->id,
             'client_id'         => $project->client_id,
             'task'              => $request->task,
-            'priority'          => $request->priority,
-            'due_date'          => $request->due_date,
-            'status'            => $request->status,
             'created_by'        => auth()->id(),
         ]);
 
@@ -166,21 +160,22 @@ class UserController extends Controller
     public function updateTask(Request $request, $id)
     {
         $request->validate([
-            'priority' => 'required|in:high,medium,low',
-            'due_date' => 'nullable|date',
-            'status' => 'required|in:1,2,3',
             'description' => 'required|string',
         ]);
 
         $task = ProjectTask::findOrFail($id);
-
-        $task->priority = $request->priority;
-        $task->due_date = $request->due_date;
-        $task->status = $request->status;
         $task->task = $request->description;
         $task->save();
 
         return redirect()->back()->with('success', 'Task updated successfully!');
+    }
+
+    public function confirmTask(ProjectTask $task)
+    {
+        $task->is_confirmed = $task->is_confirmed ? 0 : 1;
+        $task->save();
+          
+        return back()->with('success', 'Task status updated.');
     }
 
 }

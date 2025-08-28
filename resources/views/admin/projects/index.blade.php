@@ -8,6 +8,14 @@
             <div class="col-2">
                 <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
             </div>
+            <div class="col-3 my-3 d-flex">
+              <select id="projectFilter" class="form-control ml-2 select2">
+                  <option value="">All</option>
+                  @foreach ($projectTypes as $projectType)
+                    <option value="{{ $projectType->id }}">{{ $projectType->name }}</option>
+                  @endforeach
+              </select>
+            </div>
         </div>
     </div>
 </section>
@@ -575,6 +583,9 @@
           serverSide: true,
           ajax: {
               url: "{{ route('projects.index') }}",
+              data: function (d) {
+                  d.project_type_id = $('#projectFilter').val();
+              },
               type: "GET",
               error: function (xhr, status, error) {
                   console.error(xhr.responseText);
@@ -595,6 +606,9 @@
           autoWidth: false,
       });
 
+        $('#projectFilter').on('change', function() {
+            reloadTable();
+        });
       function reloadTable() {
         table.ajax.reload(null, false);
       }

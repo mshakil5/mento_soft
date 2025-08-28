@@ -1,5 +1,5 @@
 <div class="modal fade task-modal" id="taskModal-{{ $row->id }}" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ $row->clientProject->title ?? '' }}</h5>
@@ -18,7 +18,8 @@
                 {{ ucfirst($row->priority ?? '') }}
               </span>
             </span> &middot;
-            <span><strong>Assigned to:</strong> {{ $row->employee->name ?? '' }}</span> &middot;
+            <span><strong>Assigned to:</strong> {{ $row->employee->name ?? '-' }}</span> &middot;
+            <span><strong>Created by:</strong> {{ $row->creator->name ?? '-' }}</span> &middot;
             <span><strong>Project:</strong> {{ $row->clientProject->title ?? '' }}</span>
           </div>
         </div>
@@ -49,6 +50,23 @@
             </form>
           </div>
         </div>
+
+        <div class="card direct-chat direct-chat-secondary w-100 mt-3">
+          <div class="card-header">
+            <h3 class="card-title">Task Edit History</h3>
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body p-3" style="max-height:300px; overflow-y:auto;">
+            <div id="taskModalTimeline-{{ $row->id }}">
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

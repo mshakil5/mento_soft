@@ -34,10 +34,8 @@
                             <tr>
                                 <th>Project</th>
                                 <th>Task</th>
-                                <th>Priority</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Task</th>
+                                <th>Approved</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -45,24 +43,22 @@
                                 <tr class="bg-dark border-top">
                                     <td>{{ $task->clientProject->title ?? '' }}</td>
                                     <td>{!! $task->task ?? '' !!}</td>
-                                    <td>{{ ucfirst($task->priority) }}</td>
-                                    <td>{{ $task->employee->name ?? '' }}</td>
                                     <td>
-                                        @php
-                                            $statusLabels = [
-                                                1 => 'To Do',
-                                                2 => 'In Progress',
-                                                3 => 'Done',
-                                            ];
-                                            $statusClasses = [
-                                                1 => 'bg-warning text-dark',
-                                                2 => 'bg-primary',
-                                                3 => 'bg-success',
-                                            ];
-                                        @endphp
-                                        <span class="badge {{ $statusClasses[$task->status] ?? '' }}">
-                                            {{ $statusLabels[$task->status] ?? '' }}
-                                        </span>
+                                        @if($task->status == 3)
+                                            <form action="{{ route('tasks.confirm', $task->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" name="is_confirmed" value="1" id="confirm-{{ $task->id }}"
+                                                        {{ $task->is_confirmed ? 'checked' : '' }} onchange="this.form.submit()">
+                                                    <label class="form-check-label" for="confirm-{{ $task->id }}">
+                                                        {{ $task->is_confirmed ? 'Approved' : 'No' }}
+                                                    </label>
+                                                </div>
+                                            </form>
+                                        @else
+                                            <span class="text-muted">Not Completed Yet</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary position-relative" data-bs-toggle="modal" data-bs-target="#taskModal-{{ $task->id }}">
@@ -84,26 +80,6 @@
                                               <div class="modal-body">
                                                 <div class="list-group-item mb-3">
                                                     <strong>{!! $task->task ?? 'N/A' !!}</strong>
-                                                    <div class="small text-muted mt-1">
-                                                        <span><strong>Due:</strong> {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d-m-Y') : 'N/A' }}</span> &middot;
-                                                        <span><strong>Status:</strong>
-                                                            <span class="badge 
-                                                                {{ $task->status == 1 ? 'bg-secondary' : '' }}
-                                                                {{ $task->status == 2 ? 'bg-primary' : '' }}
-                                                                {{ $task->status == 3 ? 'bg-success' : '' }}">
-                                                                {{ [1=>'To Do',2=>'In Progress',3=>'Done'][$task->status] ?? 'N/A' }}
-                                                            </span>
-                                                        </span> &middot;
-                                                        <span><strong>Priority:</strong> 
-                                                            <span class="badge 
-                                                                {{ $task->priority == 'high' ? 'bg-danger' : '' }}
-                                                                {{ $task->priority == 'medium' ? 'bg-warning text-dark' : '' }}
-                                                                {{ $task->priority == 'low' ? 'bg-info text-dark' : '' }}">
-                                                                {{ ucfirst($task->priority ?? 'N/A') }}
-                                                            </span>
-                                                        </span> &middot;
-                                                        <span><strong>Project:</strong> {{ $task->clientProject->title ?? 'N/A' }}</span>
-                                                    </div>
                                                 </div>
 
                                                 <!-- Chat -->
@@ -132,9 +108,10 @@
                                             Edit
                                         </button>
                                         <div class="modal fade" id="taskEditModal-{{ $task->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-dialog modal-dialog-centered  modal-lg">
                                                 <div class="modal-content card-outline card-secondary">
                                                     <div class="modal-header text-center w-100">
+                                                        <h5 class="modal-title w-100" id="projectModalLabel-{{ $task->id }}">Edit Task</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -142,28 +119,7 @@
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="mb-3">
-                                                                <label class="form-label">Priority <span class="text-danger">*</span></label>
-                                                                <select class="form-select bg-light text-dark" name="priority">
-                                                                    <option value="high" {{ $task->priority=='high' ? 'selected' : '' }}>High</option>
-                                                                    <option value="medium" {{ $task->priority=='medium' ? 'selected' : '' }}>Medium</option>
-                                                                    <option value="low" {{ $task->priority=='low' ? 'selected' : '' }}>Low</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Task <span class="text-danger">*</span></label>
                                                                 <textarea id="description-{{ $task->id }}" name="description">{{ $task->task }}</textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Due Date <span class="text-danger">*</span></label>
-                                                                <input type="date" class="form-control bg-light text-dark" name="due_date" value="{{ $task->due_date ?? '' }}" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Status <span class="text-danger">*</span></label>
-                                                                <select class="form-select bg-light text-dark" name="status">
-                                                                    <option value="1" {{ $task->status==1 ? 'selected' : '' }}>To Do</option>
-                                                                    <option value="2" {{ $task->status==2 ? 'selected' : '' }}>In Progress</option>
-                                                                    <option value="3" {{ $task->status==3 ? 'selected' : '' }}>Done</option>
-                                                                </select>
                                                             </div>
                                                             <button type="submit" class="btn btn-success float-end">Update Task</button>
                                                         </form>
