@@ -72,8 +72,8 @@
         </ul>
     </li>
 
-    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
             <p>
                 Settings <i class="fas fa-angle-left right"></i>
@@ -120,6 +120,12 @@
                 <a href="{{ route('allcontactemail') }}" class="nav-link {{ Route::is('allcontactemail') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-envelope"></i>
                     <p>Contact Email</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.mail-footer') }}" class="nav-link {{ Route::is('admin.mail-footer') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-mail-bulk"></i>
+                    <p>Mail Footer</p>
                 </a>
             </li>
             <li class="nav-item">

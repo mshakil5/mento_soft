@@ -12,6 +12,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\LoginRecord;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ClientEmail;
+use App\Models\CompanyDetails;
 
 class ClientController extends Controller
 {
@@ -41,8 +44,18 @@ class ClientController extends Controller
                 ->addColumn('date', function($row) {
                     return Carbon::parse($row->created_at)->format('d-m-Y');
                 })
+                // ->addColumn('projects_count', function($row) {
+                //     return $row->projects_count ?? 0;
+                // })
                 ->addColumn('projects_count', function($row) {
-                    return $row->projects_count ?? 0;
+                    if ($row->projects_count > 0) {
+                        return '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" 
+                                  class="badge badge-success" 
+                                  title="View Projects">
+                                  '.$row->projects_count.'
+                                </a>';
+                    }
+                    return '<span class="badge badge-secondary">0</span>';
                 })
                 ->addColumn('outstanding_amount', function($row) {
                     return '£' . $row->invoices->where('status', 1)->sum('net_amount');
@@ -78,6 +91,9 @@ class ClientController extends Controller
                     $details = view('admin.clients.partials.details-modal', ['row' => $row])->render();
 
                     $buttons = '
+                        <a href="'.route('client.email', $row->id).'" class="btn btn-sm btn-warning">
+                            <i class="fas fa-envelope"></i>
+                        </a>
                         <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
                             View Details
                         </a>
@@ -90,13 +106,13 @@ class ClientController extends Controller
                                 <button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
 
                     if ($row->projects->count()) {
-                        $buttons .= '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" class="btn btn-success btn-sm btn-block mb-1">
+                        $buttons .= '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" class="btn btn-success btn-sm btn-block mb-1 d-none">
                                         Projects ('.$row->projects->count().')
                                     </a>';
                     }
 
                     if ($row->invoices->count()) {
-                        $buttons .= '<a href="'.route('invoices.index', ['client_id' => $row->id]).'" class="btn btn-primary btn-sm btn-block">
+                        $buttons .= '<a href="'.route('invoices.index', ['client_id' => $row->id]).'" class="btn btn-primary btn-sm btn-block d-none">
                                         Invoices ('.$row->invoices->count().')
                                     </a>';
                     }
@@ -108,7 +124,7 @@ class ClientController extends Controller
 
                     return $buttons;
                 })
-                ->rawColumns(['image', 'status', 'action'])
+                ->rawColumns(['image', 'status', 'action', 'projects_count'])
                 ->make(true);
         }
 
@@ -375,6 +391,38 @@ class ClientController extends Controller
 
         return back()->withInput($request->only('email'))
                     ->withErrors(['email' => 'Credential error.']);
+    }
+
+    public function clientEmail($id)
+    {
+        $client = client::find($id)->select('id', 'name','email')->first();
+        $mailFooter = CompanyDetails::select('mail_footer')->first();
+        return view('admin.clients.email', compact('client', 'mailFooter'));
+    }
+
+    public function sendClientEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id'      => 'required|exists:clients,id',
+            'subject' => 'required|string|max:255',
+            'body'    => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $client = Client::findOrFail($request->id);
+
+        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body));
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Email sent successfully.'
+        ]);
     }
 
 }

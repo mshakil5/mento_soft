@@ -171,6 +171,25 @@ class CompanyDetailsController extends Controller
         return redirect()->back()->with('success', 'Terms and conditions updated successfully.');
     }
 
+    public function mailFooter()
+    {
+        $companyDetails = CompanyDetails::select('mail_footer')->first();
+        return view('admin.mail_footer.terms', compact('companyDetails'));
+    }
+
+    public function mailFooterUpdate(Request $request)
+    {
+        $request->validate([
+            'mail_footer' => 'required',
+        ]);
+
+        $companyDetails = CompanyDetails::first();
+        $companyDetails->mail_footer = $request->mail_footer;
+        $companyDetails->save();
+
+        return redirect()->back()->with('success', 'Updated successfully.');
+    }
+
     public function seoMeta()
     {
         $companyDetails = CompanyDetails::first();

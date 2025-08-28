@@ -62,6 +62,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/terms-and-conditions', [CompanyDetailsController::class, 'termsAndConditions'])->name('admin.terms-and-conditions');
     Route::post('/terms-and-conditions', [CompanyDetailsController::class, 'termsAndConditionsUpdate'])->name('admin.terms-and-conditions');
 
+    Route::get('/mail-footer', [CompanyDetailsController::class, 'mailFooter'])->name('admin.mail-footer');
+    Route::post('/mail-footer', [CompanyDetailsController::class, 'mailFooterUpdate'])->name('admin.mail-footer');
+
     Route::get('/company/seo-meta', [CompanyDetailsController::class, 'seoMeta'])->name('admin.company.seo-meta');
     Route::post('/company/seo-meta/update', [CompanyDetailsController::class, 'seoMetaUpdate'])->name('admin.company.seo-meta.update');
 
@@ -205,6 +208,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/clients/update', [ClientController::class, 'update']);
     Route::get('/clients/{id}', [ClientController::class, 'destroy']);
     Route::post('/clients/status', [ClientController::class, 'toggleStatus'])->name('clients.status');
+
+    Route::get('/client-mail/{id}', [ClientController::class, 'clientEmail'])->name('client.email');
+    Route::post('/client-mail', [ClientController::class, 'sendClientEmail'])->name('client.email.send');
 
     // Client Projects
     Route::get('/client-projects', [ClientProjectController::class, 'index'])->name('client-projects.index');
