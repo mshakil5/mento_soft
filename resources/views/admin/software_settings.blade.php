@@ -41,7 +41,7 @@
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.index') || request()->routeIs('invoices.due') || request()->routeIs('invoices.received') ? 'active' : '' }}">
+        <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
             <i class="fas fa-file-alt nav-icon"></i>
             <p>Invoices</p>
         </a>

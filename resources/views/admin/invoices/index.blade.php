@@ -4,10 +4,10 @@
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row" id="newBtn">
+        <div class="row">
             <div class="col-2">
                   @if(request()->client_type_id)
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary my-3" id="newBtn">Back</a>
                   @endif
                 <button type="button" class="btn btn-secondary my-3">Add new</button>
             </div>
@@ -221,11 +221,11 @@
     $(document).ready(function () {
 
       $("#addThisFormContainer").hide();
-          $("#newBtn").show();
+          $("#newBtnSection").show();
 
           function openNewForm() {
               clearform();
-              $("#newBtn").hide(100);
+              $("#newBtnSection").hide(100);
               $("#addThisFormContainer").show(300);
 
               $("#invoice_number").val('Loading...');
@@ -246,7 +246,7 @@
 
           $("#FormCloseBtn").click(function() {
               $("#addThisFormContainer").hide(200);
-              $("#newBtn").show(100);
+              $("#newBtnSection").show(100);
               clearform();
           });
 
@@ -679,7 +679,7 @@
             $("#addBtn").val('Update');
             $("#addBtn").html('Save as pdf');
             $("#addThisFormContainer").show(300);
-            $("#newBtn").hide(100);
+            $("#newBtnSection").hide(100);
         }
         
         function clearform(){
@@ -693,7 +693,7 @@
             $("#addBtn").val('Create');
             $("#addBtn").html('Save as pdf');
             $("#addThisFormContainer").slideUp(200);
-            $("#newBtn").slideDown(200);
+            $("#newBtnSection").slideDown(200);
             $("#cardTitle").text('Create New Invoice');
             
             // Reset totals
@@ -729,12 +729,6 @@
         });
 
         let ajaxUrl = "{{ route('invoices.index') }}";
-
-        if (window.location.pathname.includes('/invoices/due')) {
-            ajaxUrl = "{{ route('invoices.due') }}";
-        } else if (window.location.pathname.includes('/invoices/received')) {
-            ajaxUrl = "{{ route('invoices.received') }}";
-        }
 
         var table = $('#example1').DataTable({
             processing: true,

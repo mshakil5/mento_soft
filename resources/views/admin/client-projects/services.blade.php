@@ -12,7 +12,7 @@
                 <select id="clientFilter" class="form-control ml-2 select2">
                     <option value="">Select Client</option>
                     @foreach ($clients as $client)
-                      <option value="{{ $client->id }}">{{ $client->name }}</option>
+                      <option value="{{ $client->id }}">{{ $client->business_name }}</option>
                     @endforeach
                 </select>
             </div>

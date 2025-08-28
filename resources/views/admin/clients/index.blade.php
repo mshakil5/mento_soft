@@ -4,12 +4,12 @@
 <!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
-        <div class="row" id="newBtn">
+        <div class="row">
             <div class="col-2">
                   @if(request()->client_type_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
-                <button type="button" class="btn btn-secondary my-3">Add new</button>
+                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
             </div>
             <div class="col-4 my-3 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
@@ -142,12 +142,12 @@
         $("#addThisFormContainer").hide();
         $("#newBtn").click(function(){
             clearform();
-            $("#newBtn").hide(100);
+            $("#newBtnSection").hide(100);
             $("#addThisFormContainer").show(300);
         });
         $("#FormCloseBtn").click(function(){
             $("#addThisFormContainer").hide(200);
-            $("#newBtn").show(100);
+            $("#newBtnSection").show(100);
             clearform();
         });
 
@@ -261,7 +261,7 @@
             $("#addBtn").val('Update');
             $("#addBtn").html('Update');
             $("#addThisFormContainer").show(300);
-            $("#newBtn").hide(100);
+            $("#newBtnSection").hide(100);
         }
         
         function clearform(){
@@ -269,7 +269,7 @@
             $("#addBtn").val('Create');
             $("#addBtn").html('Create');
             $("#addThisFormContainer").slideUp(200);
-            $("#newBtn").slideDown(200);
+            $("#newBtnSection").slideDown(200);
             $('.summernote').summernote('reset');
             $('#preview-image').attr('src', '#');
             $("#cardTitle").text('Add new client');

@@ -278,8 +278,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/invoices/due', [InvoiceController::class, 'due'])->name('invoices.due');
-    Route::get('/invoices/received', [InvoiceController::class, 'received'])->name('invoices.received');
     Route::post('/invoices', [InvoiceController::class, 'store']);
     Route::get('/invoices/create', [InvoiceController::class, 'create']);
     Route::get('/invoices/{id}/edit', [InvoiceController::class, 'edit']);

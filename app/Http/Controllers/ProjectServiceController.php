@@ -109,7 +109,7 @@ class ProjectServiceController extends Controller
 
         $serviceTypes = ProjectService::where('status', 1)->latest()->get();
         $clients = Client::where('status', 1)->select('id', 'business_name')->latest()->get();
-        $projects = ClientProject::where('status', 1)->select('id', 'title')->latest()->get();
+        $projects = ClientProject::select('id', 'title')->latest()->get();
         return view('admin.client-projects.services', compact('serviceTypes', 'clients', 'projects'));
     }
 
