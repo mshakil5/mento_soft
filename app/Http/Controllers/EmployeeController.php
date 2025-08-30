@@ -13,8 +13,8 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('user_type', 1)->latest();
-            return DataTables::of($data)
+            $employee = User::where('user_type', 1)->latest();
+            return DataTables::of($employee)
                 ->addIndexColumn()
                 ->addColumn('date', function($row) {
                     return date('d-m-Y', strtotime($row->created_at));
@@ -31,7 +31,12 @@ class EmployeeController extends Controller
                     $deleteBtn = auth()->id() !== $row->id
                         ? ' <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>'
                         : '';
-                    return $editBtn . $deleteBtn;
+
+                    $details = view('admin.employees.details-modal', ['row' => $row])->render();
+
+                    $detailsBtn = ' <button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">Details</button>';
+
+                    return $editBtn . $deleteBtn . $detailsBtn . $details;
                 })
                 ->rawColumns(['status', 'action'])
                 ->make(true);
@@ -45,6 +50,7 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'contact_no' => 'required',
             'password' => 'required|string|min:6|confirmed'
         ]);
 
@@ -55,15 +61,23 @@ class EmployeeController extends Controller
             ], 422);
         }
 
-        $data = new User;
-        $data->name = $request->name;
-        $data->email = $request->email;
-        $data->password = Hash::make($request->password);
-        $data->user_type = 1;
-        $data->status = 1;
-        $data->created_by = auth()->id();
+        $employee = new User;
+        $employee->name = $request->name;
+        $employee->email = $request->email;
+        $employee->contact_no = $request->contact_no;
+        $employee->joining_date = $request->joining_date;
+        $employee->em_contact_person = $request->em_contact_person;
+        $employee->em_contact_no = $request->em_contact_no;
+        $employee->nid = $request->nid;
+        $employee->address = $request->address;
+        $employee->salary = $request->salary;
+        $employee->bank_details = $request->bank_details;
+        $employee->password = Hash::make($request->password);
+        $employee->user_type = 1;
+        $employee->status = 1;
+        $employee->created_by = auth()->id();
 
-        if ($data->save()) {
+        if ($employee->save()) {
             return response()->json([
                 'status' => 200,
                 'message' => 'Employee created successfully.'
@@ -113,6 +127,14 @@ class EmployeeController extends Controller
 
         $employee->name = $request->name;
         $employee->email = $request->email;
+        $employee->contact_no = $request->contact_no;
+        $employee->joining_date = $request->joining_date;
+        $employee->em_contact_person = $request->em_contact_person;
+        $employee->em_contact_no = $request->em_contact_no;
+        $employee->nid = $request->nid;
+        $employee->address = $request->address;
+        $employee->salary = $request->salary;
+        $employee->bank_details = $request->bank_details;
         $employee->updated_by = auth()->id();
 
         if ($request->password) {

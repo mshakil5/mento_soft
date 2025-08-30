@@ -15,7 +15,7 @@
 <section class="content mt-3" id="addThisFormContainer">
     <div class="container-fluid">
         <div class="row justify-content-md-center">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title" id="cardTitle">Add new Employee</h3>
@@ -26,21 +26,78 @@
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
                             
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-12">
+                                    <h5>Basic Information</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" required>
+                                        <input type="text" class="form-control" id="name" name="name" placeholder="" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="" required>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Contact No. <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="contact_no" name="contact_no" placeholder="" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Joining Date </label>
+                                        <input type="date" class="form-control" id="joining_date" name="joining_date" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Em. Contact Person</label>
+                                        <input type="text" class="form-control" id="em_contact_person" name="em_contact_person" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Em. Contact No. </label>
+                                        <input type="text" class="form-control" id="em_contact_no" name="em_contact_no" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>NID </label>
+                                        <input type="text" class="form-control" id="nid" name="nid" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label>Address </label>
+                                    <textarea class="form-control" id="address" name="address" placeholder="" rows="3"></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-12">
+                                    <h5>Payment Information</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Salary </label>
+                                        <input type="number" class="form-control" id="salary" name="salary" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                  <div class="form-group">
+                                    <label>Bank Details </label>
+                                    <textarea class="form-control" id="bank_details" name="bank_details" placeholder="" rows="1"></textarea>
+                                  </div>
+                                </div>
+                                    <div class="col-12">
+                                    <h5>Login Information</h5>
+                                    <hr>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Password <span class="text-danger" id="passwordRequired">*</span></label>
@@ -79,9 +136,10 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Date</th>
+                                    {{-- <th>Date</th> --}}
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>Contact No.</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -121,6 +179,14 @@
                 var form_data = {
                     name: $("#name").val(),
                     email: $("#email").val(),
+                    contact_no: $("#contact_no").val(),
+                    joining_date: $("#joining_date").val(),
+                    em_contact_person: $("#em_contact_person").val(),
+                    em_contact_no: $("#em_contact_no").val(),
+                    nid: $("#nid").val(),
+                    address: $("#address").val(),
+                    salary: $("#salary").val(),
+                    bank_details: $("#bank_details").val(),
                     password: $("#password").val(),
                     password_confirmation: $("#password_confirmation").val()
                 };
@@ -150,6 +216,14 @@
                 var form_data = {
                     name: $("#name").val(),
                     email: $("#email").val(),
+                    contact_no: $("#contact_no").val(),
+                    joining_date: $("#joining_date").val(),
+                    em_contact_person: $("#em_contact_person").val(),
+                    em_contact_no: $("#em_contact_no").val(),
+                    nid: $("#nid").val(),
+                    address: $("#address").val(),
+                    salary: $("#salary").val(),
+                    bank_details: $("#bank_details").val(),
                     password: $("#password").val(),
                     password_confirmation: $("#password_confirmation").val(),
                     codeid: $("#codeid").val()
@@ -194,6 +268,14 @@
             pageTop();
             $("#name").val(data.name);
             $("#email").val(data.email);
+            $("#contact_no").val(data.contact_no);
+            $("#joining_date").val(data.joining_date);
+            $("#em_contact_person").val(data.em_contact_person);
+            $("#em_contact_no").val(data.em_contact_no);
+            $("#nid").val(data.nid);
+            $("#address").val(data.address);
+            $("#salary").val(data.salary);
+            $("#bank_details").val(data.bank_details);
             $("#codeid").val(data.id);
             
             $("#addBtn").val('Update');
@@ -274,9 +356,10 @@
             },
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                {data: 'date', name: 'date'},
+                // {data: 'date', name: 'date'},
                 {data: 'name', name: 'name'},
                 {data: 'email', name: 'email'},
+                {data: 'contact_no', name: 'contact_no'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],
