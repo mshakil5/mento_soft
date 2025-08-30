@@ -32,6 +32,11 @@
             </span> 
             &middot;
             <span><strong>Created by:</strong> {{ $row->creator->name ?? '-' }}</span> &middot;
+            @if($row->is_confirmed == 1)
+            <span class="badge bg-success ml-2">
+                <i class="fas fa-check-circle"></i> Confirmed by Client
+            </span>
+            @endif
             <span><strong>Project:</strong> {{ $row->clientProject->title ?? '' }}</span>
           </div>
         </div>

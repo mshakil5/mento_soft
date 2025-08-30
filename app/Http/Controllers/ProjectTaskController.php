@@ -49,6 +49,10 @@ class ProjectTaskController extends Controller
                     return '<span class="badge '.$badgeClass.'">'.ucfirst($row->priority).'</span>';
                 })
                 ->addColumn('status', function($row) {
+                    if ($row->is_confirmed == 1) {
+                        return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Confirmed by Client</span>';
+                    }
+
                     $statuses = [
                         1 => 'To Do',
                         2 => 'In Progress',
@@ -64,7 +68,7 @@ class ProjectTaskController extends Controller
                             '.$currentStatus.'
                         </button>
                         <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">';
-                        
+
                         foreach ($statuses as $value => $label) {
                             $html .= '<a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="'.$value.'">'.$label.'</a>';
                         }
@@ -136,7 +140,7 @@ class ProjectTaskController extends Controller
 
     public function editPage(ProjectTask $task)
     {
-        $employees = User::where('status', 1)->get();
+        $employees = User::where('status', 1)->where('user_type', 1)->select('id', 'name')->get();
         return view('admin.client-projects.edit-task', compact('task', 'employees'));
     }
 

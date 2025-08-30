@@ -92,6 +92,12 @@
                                             @endif
                                         </span>
                                         <span><strong>Created by:</strong> {{ $task->creator->name ?? '-' }}</span>
+                                        
+                                        @if($task->is_confirmed == 1)
+                                        <span class="badge bg-success ml-2">
+                                            <i class="fas fa-check-circle"></i> Confirmed by Client
+                                        </span>
+                                        @endif
                                     </div>
                                 </div>
 
