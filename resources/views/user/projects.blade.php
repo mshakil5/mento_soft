@@ -20,18 +20,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-        <div class="card text-light shadow-sm mb-4 form-style fadeInUp">
+        <div class="card text-light shadow-sm mb-4 form-style fadeInUp border-light">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table text-light mb-0 align-middle table-hover table-striped">
-                        <thead class="bg-secondary text-dark">
+                    <table class="table mb-0 align-middle custom-table-bg">
+                        <thead>
                             <tr>
-                                <th>Project</th>
-                                <th>Start Date</th>
-                                <th>Due Date</th>
-                                <th>Status</th>
-                                <th>Amount (£)</th>
-                                <th>Action</th>
+                                <th class="text-light">Project</th>
+                                <th class="text-light">Start Date</th>
+                                <th class="text-light">Due Date</th>
+                                <th class="text-light">Status</th>
+                                <th class="text-light">Amount (£)</th>
+                                <th class="text-light">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -42,41 +42,41 @@
                                     $startDate = $project->start_date ? \Carbon\Carbon::parse($project->start_date)->format('d-m-Y') : '-';
                                     $dueDate = $project->due_date ? \Carbon\Carbon::parse($project->due_date)->format('d-m-Y') : '-';
                                 @endphp
-                                <tr class="bg-dark border-top">
-                                    <td>{{ $project->title }}</td>
-                                    <td>{{ $startDate }}</td>
-                                    <td>{{ $dueDate }}</td>
-                                    <td>
+                                <tr class="border-top">
+                                    <td class="text-light">{{ $project->title }}</td>
+                                    <td class="text-light">{{ $startDate }}</td>
+                                    <td class="text-light">{{ $dueDate }}</td>
+                                    <td class="text-light">
                                         <span class="badge {{ $statusClasses[$project->status] ?? 'bg-secondary' }}">
                                             {{ $statuses[$project->status] ?? 'Unknown' }}
                                         </span>
                                     </td>
-                                    <td>£{{ number_format($project->amount, 0) }}</td>
-                                    <td>
-                                      <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal-{{ $project->id }}">
+                                    <td class="text-light">£{{ number_format($project->amount, 0) }}</td>
+                                    <td class="text-light">
+                                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#projectModal-{{ $project->id }}">
                                           View
                                       </button>
 
                                       <div class="modal fade" id="projectModal-{{ $project->id }}" tabindex="-1" aria-labelledby="projectModalLabel-{{ $project->id }}" aria-hidden="true">
-                                          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                          <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                               <div class="modal-content">
                                                   <div class="modal-header">
                                                       <h5 class="modal-title" id="projectModalLabel-{{ $project->id }}">{{ $project->title }}</h5>
-                                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                      <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
                                                   </div>
 
                                                   <div class="modal-body">
                                                       <div class="p-3 border rounded bg-light">
 
                                                           <div class="row">
-                                                              <div class="col-6">
-                                                                  <h6>Project Concept / Idea</h6>
-                                                                  <p>{!! $project->description ?? 'No description available.' !!}</p>
+                                                              <div class="col-12">
+                                                                  <h3>Project Concept / Idea</h3>
+                                                                  <p>{!! $project->description ?? '-' !!}</p>
 
-                                                                  {{-- <h6>Additional Information</h6>
-                                                                  <p>{!! $project->additional_info ?? '-' !!}</p> --}}
+                                                                  <h3>Additional Information</h3>
+                                                                  <p>{!! $project->additional_info ?? '-' !!}</p>
 
-                                                                  <h6>Attachments / Updates</h6>
+                                                                  <h3>Attachments</h3>
                                                                   @if($project->recentUpdates->count())
                                                                       <div class="d-flex flex-wrap gap-2">
                                                                           @foreach($project->recentUpdates as $update)
@@ -88,11 +88,11 @@
                                                                           @endforeach
                                                                       </div>
                                                                   @else
-                                                                      <p class="text-muted">No updates yet.</p>
+                                                                      <p class="text-muted">No attachments yet.</p>
                                                                   @endif
                                                               </div>
 
-                                                              <div class="col-6">
+                                                              <div class="col-6 d-none">
                                                                   <div class="d-flex justify-content-between align-items-center mb-2">
                                                                       <h6 class="mb-0">Linked Tasks</h6>
                                                                       <button type="button" class="btn btn-sm btn-success" 
@@ -119,11 +119,6 @@
 
                                                       </div>
                                                   </div>
-
-                                                  <div class="modal-footer">
-                                                      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                                                  </div>
-
                                               </div>
                                           </div>
                                       </div>
@@ -131,7 +126,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-3">No projects found.</td>
+                                    <td colspan="7" class="text-center text-muted py-3 text-light">No projects found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

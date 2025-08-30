@@ -24,6 +24,10 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Task <span class="text-danger">*</span></label>
+                        <input class="form-control bg-light text-dark" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description <span class="text-danger">*</span></label>
                         <textarea id="new-task-description" name="task" class="form-control bg-light text-dark"></textarea>
                     </div>
                     <button type="submit" class="btn btn-success float-end">Create Task</button>

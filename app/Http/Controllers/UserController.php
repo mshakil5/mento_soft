@@ -108,6 +108,7 @@ class UserController extends Controller
     {
         $request->validate([
             'project_id'  => 'required|exists:client_projects,id',
+            'title'        => 'required|string',
             'task'        => 'required|string'
         ]);
 
@@ -116,6 +117,7 @@ class UserController extends Controller
         ProjectTask::create([
             'client_project_id' => $project->id,
             'client_id'         => $project->client_id,
+            'title'              => $request->title,
             'task'              => $request->task,
             'created_by'        => auth()->id(),
         ]);
@@ -161,9 +163,11 @@ class UserController extends Controller
     {
         $request->validate([
             'description' => 'required|string',
+            'title'       => 'required|string'
         ]);
 
         $task = ProjectTask::findOrFail($id);
+        $task->title = $request->title;
         $task->task = $request->description;
         $task->save();
 
