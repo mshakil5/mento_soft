@@ -24,7 +24,8 @@ class HomeController extends Controller
         $totalPending = Invoice::where('status', 2)->sum('net_amount');
         $todoTasks = ProjectTask::where('status', 1)->count();
         $inProgressTasks = ProjectTask::where('status', 2)->count();
-        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'totalPending', 'todoTasks', 'inProgressTasks'));
+        $needToBeAssigned = ProjectTask::whereNull('employee_id')->count();
+        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'totalPending', 'todoTasks', 'inProgressTasks', 'needToBeAssigned'));
     }
 
     public function managerHome()

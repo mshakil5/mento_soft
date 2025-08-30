@@ -7,6 +7,7 @@
 
     <div class="row pt-3">
       <div class="col-md-3 col-sm-6 col-12">
+        <a href="{{ route('clients.index') }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-info"><i class="far fa-user"></i></span>
           <div class="info-box-content">
@@ -14,8 +15,10 @@
             <span class="info-box-number">{{ $totalClients }}</span>
           </div>
         </div>
+        </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
+        <a href="{{ route('projects.index') }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
 
@@ -24,8 +27,10 @@
             <span class="info-box-number">{{ $activeProjects }}</span>
           </div>
         </div>
+        </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
+        <a href="{{ route('project-services.index') }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
           <div class="info-box-content">
@@ -33,6 +38,7 @@
             <span class="info-box-number">{{ $onGoingServices }}</span>
           </div>
         </div>
+        </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
         <div class="info-box shadow-lg">
@@ -44,6 +50,7 @@
         </div>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
+        <a href="{{ route('tasks.index') }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-warning"><i class="far fa-clock"></i></span>
           <div class="info-box-content">
@@ -51,8 +58,10 @@
             <span class="info-box-number">{{ number_format($todoTasks, 0) }}</span>
           </div>
         </div>
+        </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
+        <a href="{{ route('tasks.index') }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-secondary"><i class="far fa-clock"></i></span>
           <div class="info-box-content">
@@ -60,6 +69,18 @@
             <span class="info-box-number">{{ number_format($inProgressTasks, 0) }}</span>
           </div>
         </div>
+        </a>
+      </div>
+      <div class="col-md-3 col-sm-6 col-12">
+        <a href="{{ route('tasks.index') }}" class="text-dark">
+        <div class="info-box shadow-lg">
+          <span class="info-box-icon bg-danger"><i class="far fa-clock"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Task Need to be Assigned</span>
+            <span class="info-box-number">{{ number_format($needToBeAssigned, 0) }}</span>
+          </div>
+        </div>
+        </a>
       </div>
     </div>
 

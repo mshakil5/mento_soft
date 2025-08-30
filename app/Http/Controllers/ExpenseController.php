@@ -60,7 +60,7 @@ class ExpenseController extends Controller
                 ->make(true);
         }
 
-        $employees = User::where('status', 1)->get();
+        $employees = User::where('status', 1)->where('user_type', 1)->get();
         $accounts = ChartOfAccount::where('account_head', 'Expenses')->get();
         return view('admin.transactions.expense', compact('accounts', 'employees'));
     }
