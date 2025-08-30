@@ -77,7 +77,7 @@ class ProjectTaskController extends Controller
                 })
                 ->addColumn('action', function($row) {
                     return '
-                      <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
+                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-info">Edit</a>
                       <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
                     ';
                 })
@@ -132,6 +132,12 @@ class ProjectTaskController extends Controller
             ], 404);
         }
         return response()->json($task);
+    }
+
+    public function editPage(ProjectTask $task)
+    {
+        $employees = User::where('status', 1)->get();
+        return view('admin.client-projects.edit-task', compact('task', 'employees'));
     }
 
     public function update(Request $request, ProjectTask $task)

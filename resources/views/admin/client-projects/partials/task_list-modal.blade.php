@@ -3,6 +3,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ $row->clientProject->title ?? '' }}</h5>
+        <a href="{{ route('client-projects-task.edit-page', $row->id) }}" class="ml-2 text-info" title="Edit Task">
+            <i class="fas fa-edit"></i>
+        </a>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -18,7 +21,16 @@
                 {{ ucfirst($row->priority ?? '') }}
               </span>
             </span> &middot;
-            <span><strong>Assigned to:</strong> {{ $row->employee->name ?? '-' }}</span> &middot;
+            <span><strong>Assigned to:</strong> 
+                @if($row->employee)
+                    {{ $row->employee->name }}
+                @else
+                    <span class="text-danger font-weight-bold">
+                        <i class="fas fa-exclamation-circle"></i> Needs Assignment
+                    </span>
+                @endif
+            </span> 
+            &middot;
             <span><strong>Created by:</strong> {{ $row->creator->name ?? '-' }}</span> &middot;
             <span><strong>Project:</strong> {{ $row->clientProject->title ?? '' }}</span>
           </div>

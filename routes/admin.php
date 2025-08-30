@@ -224,6 +224,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/client-projects/{project}/tasks', [ProjectTaskController::class, 'index'])->name('client-projects.tasks');
     Route::post('/client-projects/{project}/tasks', [ProjectTaskController::class, 'store']);
     Route::get('/client-projects-task/{task}/edit', [ProjectTaskController::class, 'edit']);
+    Route::get('/client-projects-task/{task}/edit-page', [ProjectTaskController::class, 'editPage'])->name('client-projects-task.edit-page');
     Route::post('/client-projects-task/{task}', [ProjectTaskController::class, 'update']);
     Route::delete('/client-projects-task/{task}', [ProjectTaskController::class, 'destroy']);
     Route::post('/client-projects-task/{task}/toggle-status', [ProjectTaskController::class, 'toggleStatus']);

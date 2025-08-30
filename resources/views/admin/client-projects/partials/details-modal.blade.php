@@ -55,35 +55,50 @@
                 @if($row->tasks->count())
                     <div class="list-group">
                         @foreach($row->tasks as $task)
-                            <div class="list-group-item mb-2">
-                                <strong>{!! $task->task ?? '' !!}</strong>
-
-                                <div class="small text-muted mt-1">
-                                    <span><strong>Due:</strong> {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d-m-Y') : '' }}</span> &middot; 
-                                    <span><strong>Status:</strong> 
-                                        @php
-                                            $statuses = [
-                                                1 => ['label' => 'To Do'],
-                                                2 => ['label' => 'In Progress'],
-                                                3 => ['label' => 'Done']
-                                            ];
-                                        @endphp
-                                        {{ $statuses[$task->status]['label'] ?? '' }}
-                                    </span> &middot; 
-                                    <span><strong>Priority:</strong> 
-                                        @php
-                                            $priorityColors = [
-                                                'high' => 'bg-danger',
-                                                'medium' => 'bg-warning',
-                                                'low' => 'bg-info'
-                                            ];
-                                        @endphp
-                                        <span class="badge {{ $priorityColors[$task->priority] ?? 'bg-secondary' }}">
-                                            {{ ucfirst($task->priority ?? '') }}
+                            <div class="list-group-item mb-2 d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{!! $task->task ?? '' !!}</strong>
+                                    <div class="small text-muted mt-1">
+                                        <span><strong>Due:</strong> {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d-m-Y') : '' }}</span> &middot; 
+                                        <span><strong>Status:</strong> 
+                                            @php
+                                                $statuses = [
+                                                    1 => ['label' => 'To Do'],
+                                                    2 => ['label' => 'In Progress'],
+                                                    3 => ['label' => 'Done']
+                                                ];
+                                            @endphp
+                                            {{ $statuses[$task->status]['label'] ?? '' }}
+                                        </span> &middot; 
+                                        <span><strong>Priority:</strong> 
+                                            @php
+                                                $priorityColors = [
+                                                    'high' => 'bg-danger',
+                                                    'medium' => 'bg-warning',
+                                                    'low' => 'bg-info'
+                                                ];
+                                            @endphp
+                                            <span class="badge {{ $priorityColors[$task->priority] ?? 'bg-secondary' }}">
+                                                {{ ucfirst($task->priority ?? '') }}
+                                            </span>
+                                        </span> &middot; 
+                                        <span><strong>Assigned to:</strong> 
+                                            @if($task->employee)
+                                                {{ $task->employee->name }}
+                                            @else
+                                                <span class="text-danger font-weight-bold">
+                                                    <i class="fas fa-exclamation-circle"></i> Needs Assignment
+                                                </span>
+                                            @endif
                                         </span>
-                                    </span> &middot; 
-                                    <span><strong>Assigned to:</strong> {{ $task->employee->name ?? '-' }}</span>
-                                    <span><strong>Created by:</strong> {{ $task->creator->name ?? '-' }}</span>
+                                        <span><strong>Created by:</strong> {{ $task->creator->name ?? '-' }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <a href="{{ route('client-projects-task.edit-page', $task->id) }}" class="text-info" title="Edit Task">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </div>
                             </div>
                         @endforeach

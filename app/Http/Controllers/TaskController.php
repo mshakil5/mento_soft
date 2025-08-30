@@ -52,21 +52,28 @@ class TaskController extends Controller
                     };
 
                     $projectTitle = $row->clientProject->title ?? 'N/A';
-
                     $unreadCount = $row->unread_messages_count;
 
                     $html = '<div data-toggle="modal" data-target="#taskModal-'.$row->id.'" style="cursor:pointer;">';
                     $html .= '<div class="d-flex flex-column">';
-                    $html .= '  <div class="d-flex justify-content-between align-items-start mb-2">';
-                    $html .= '    <span class="flex-grow-1">' . $taskText . '</span>';
-                    $html .= '    <div class="d-flex align-items-center">';
+
+                    $html .= '<div class="d-flex justify-content-between align-items-start mb-2">';
+                    $html .= '  <span class="flex-grow-1">' . $taskText . '</span>';
+                    $html .= '  <div class="d-flex align-items-center">';
+
                     if ($unreadCount > 0) {
                         $html .= '<span class="badge badge-warning mr-2">' . $unreadCount . '</span>';
                     }
-                    $html .= '      <span class="' . $priorityClass . '">' . ucfirst($row->priority) . '</span>';
-                    $html .= '    </div>';
+
+                    if (is_null($row->employee_id)) {
+                        $html .= '<i class="fas fa-user-slash text-danger mr-2" title="Unassigned"></i>';
+                    }
+
+                    $html .= '    <span class="' . $priorityClass . '">' . ucfirst($row->priority) . '</span>';
                     $html .= '  </div>';
-                    $html .= '  <div class="align-self-end text-muted small">' . $projectTitle . '</div>';
+                    $html .= '</div>';
+
+                    $html .= '<div class="align-self-end text-muted small">' . $projectTitle . '</div>';
                     $html .= '</div>';
                     $html .= '</div>';
 
