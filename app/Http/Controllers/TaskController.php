@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -51,7 +52,7 @@ class TaskController extends Controller
                         default => '',
                     };
 
-                    $projectTitle = $row->clientProject->title ?? 'N/A';
+                    $projectTitle = $row->clientProject->title ?? '';
                     $unreadCount = $row->unread_messages_count;
 
                     $html = '<div data-toggle="modal" data-target="#taskModal-'.$row->id.'" style="cursor:pointer;">';
@@ -87,6 +88,87 @@ class TaskController extends Controller
 
         $clientProjects = ClientProject::select('id', 'title')->latest()->get();
         return view('admin.client-projects.task_index', compact('clientProjects'));
+    }
+
+    public function allTasks(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = ProjectTask::with(['employee', 'clientProject'])->latest();
+
+            if ($request->status) {
+                $data->where('status', $request->status);
+            }
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('date', function($row) {
+                    return Carbon::parse($row->created_at)->format('d-m-Y');
+                })
+                ->addColumn('employee_name', function($row) {
+                    return $row->employee->name ?? '';
+                })
+                ->addColumn('project_title', function($row) {
+                    return $row->clientProject->title ?? '';
+                })
+                ->addColumn('task', function($row) {
+                    return Str::limit(strip_tags($row->task), 200);
+                })
+                ->addColumn('due_date', function($row) {
+                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
+                })
+                ->addColumn('priority', function($row) {
+                    $badgeClass = [
+                        'high' => 'bg-danger',
+                        'medium' => 'bg-warning',
+                        'low' => 'bg-info'
+                    ][$row->priority] ?? 'bg-secondary';
+                    
+                    return '<span class="badge '.$badgeClass.'">'.ucfirst($row->priority).'</span>';
+                })
+                ->addColumn('status', function($row) {
+                    if ($row->is_confirmed == 1) {
+                        return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Confirmed by Client</span>';
+                    }
+
+                    $statuses = [
+                        1 => 'To Do',
+                        2 => 'In Progress',
+                        3 => 'Done'
+                    ];
+
+                    $currentStatus = $statuses[$row->status] ?? 'Unknown';
+
+                    $html = '
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+                            id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            '.$currentStatus.'
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">';
+
+                        foreach ($statuses as $value => $label) {
+                            $html .= '<a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="'.$value.'">'.$label.'</a>';
+                        }
+
+                    $html .= '
+                        </div>
+                    </div>';
+
+                    return $html;
+                })
+                ->addColumn('action', function($row) {
+                    return '
+                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-info">Edit</a>
+                      <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                    ';
+                })
+                ->rawColumns(['priority', 'status', 'action'])
+                ->make(true);
+        }
+
+        $employees = User::where('status', 1)->latest()->get();
+        return view('admin.client-projects.all_tasks', compact('employees'));
     }
 
     public function messages(ProjectTask $task)

@@ -231,6 +231,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 
+    Route::get('/all-tasks', [TaskController::class, 'allTasks'])->name('tasks.all');
+
     Route::get('/tasks/{task}/messages', [TaskController::class, 'messages'])->name('tasks.messages');
 
     Route::post('/tasks/{task}/messages', [TaskController::class, 'store'])->name('tasks.messages.store');

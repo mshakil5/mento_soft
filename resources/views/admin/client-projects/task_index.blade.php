@@ -5,7 +5,7 @@
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-2">
+            <div class="col-3">
                   @if(request()->client_type_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
@@ -14,6 +14,7 @@
                           onclick="openTaskModal()">
                           Add Task
                 </button>
+                <a href="{{ route('tasks.all') }}" class="btn btn-secondary my-3">ALL Tasks</a>
             </div>
             <div class="col-3 my-3 d-flex">
                 <select id="projectFilter" class="form-control ml-2 select2">
