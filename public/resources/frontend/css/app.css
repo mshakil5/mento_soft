@@ -1952,9 +1952,3 @@ section.default.contact-section .secTtile {
         height: 300px;
     }
 }
-
-  .custom-table-bg th,
-  .custom-table-bg td,
-  .custom-table-bg tbody {
-      background-color: transparent !important;
-  }

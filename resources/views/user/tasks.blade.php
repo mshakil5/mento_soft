@@ -1,6 +1,15 @@
 @extends('user.master')
 
 @section('user-content')
+
+<style>
+  .custom-table-bg th,
+  .custom-table-bg td,
+  .custom-table-bg tbody {
+      background-color: transparent !important;
+  }
+</style>
+
 <div class="row px-2">
     <div class="col-12">
         @if(session('success'))

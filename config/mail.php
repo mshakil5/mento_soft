@@ -52,6 +52,18 @@ return [
         'ses' => [
             'transport' => 'ses',
         ],
+        'mailgun' => [
+            'transport' => 'mailgun',
+        ],
+        'gmail' => [
+          'transport' => 'smtp',
+          'host' => 'smtp.gmail.com',
+          'port' => 587,
+          'encryption' => 'tls',
+          'username' => env('GMAIL_USERNAME'),
+          'password' => env('GMAIL_PASSWORD'),
+          'timeout' => null,
+        ],
 
         'postmark' => [
             'transport' => 'postmark',

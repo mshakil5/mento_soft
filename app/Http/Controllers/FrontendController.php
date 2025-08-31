@@ -87,7 +87,10 @@ class FrontendController extends Controller
         $contactEmails = ContactEmail::where('status', 1)->pluck('email');
 
         foreach ($contactEmails as $contactEmail) {
-            Mail::to($contactEmail)->send(new ContactMail($contact));
+            Mail::mailer('gmail')->to($contactEmail)
+              ->cc('info@mentosoftware.co.uk')
+              ->send(new ContactMail($contact)
+            );
         }
 
         return back()->with('success', 'Your message has been sent successfully!')->withFragment('contact');
