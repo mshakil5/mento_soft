@@ -117,6 +117,7 @@ class UserController extends Controller
         ProjectTask::create([
             'client_project_id' => $project->id,
             'client_id'         => $project->client_id,
+            'employee_id'         => $project->employee_id,
             'title'              => $request->title,
             'task'              => $request->task,
             'created_by'        => auth()->id(),

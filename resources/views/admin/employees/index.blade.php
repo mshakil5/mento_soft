@@ -68,8 +68,8 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>NID </label>
-                                        <input type="text" class="form-control" id="nid" name="nid" placeholder="">
+                                        <label>NID</label>
+                                        <input type="file" class="form-control" id="nid" name="nid">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -176,24 +176,28 @@
 
         $("#addBtn").click(function(){
             if($(this).val() == 'Create') {
-                var form_data = {
-                    name: $("#name").val(),
-                    email: $("#email").val(),
-                    contact_no: $("#contact_no").val(),
-                    joining_date: $("#joining_date").val(),
-                    em_contact_person: $("#em_contact_person").val(),
-                    em_contact_no: $("#em_contact_no").val(),
-                    nid: $("#nid").val(),
-                    address: $("#address").val(),
-                    salary: $("#salary").val(),
-                    bank_details: $("#bank_details").val(),
-                    password: $("#password").val(),
-                    password_confirmation: $("#password_confirmation").val()
-                };
+                var form_data = new FormData();
+                form_data.append('name', $("#name").val());
+                form_data.append('email', $("#email").val());
+                form_data.append('contact_no', $("#contact_no").val());
+                form_data.append('joining_date', $("#joining_date").val());
+                form_data.append('em_contact_person', $("#em_contact_person").val());
+                form_data.append('em_contact_no', $("#em_contact_no").val());
+                form_data.append('address', $("#address").val());
+                form_data.append('salary', $("#salary").val());
+                form_data.append('bank_details', $("#bank_details").val());
+                form_data.append('password', $("#password").val());
+                form_data.append('password_confirmation', $("#password_confirmation").val());
+
+                if($("#nid")[0].files.length > 0){
+                    form_data.append('nid', $("#nid")[0].files[0]);
+                }
                 
                 $.ajax({
                     url: url,
                     method: "POST",
+                    contentType: false,
+                    processData: false,
                     data: form_data,
                     success: function(res) {
                       clearform();
@@ -213,26 +217,30 @@
             }
             
             if($(this).val() == 'Update') {
-                var form_data = {
-                    name: $("#name").val(),
-                    email: $("#email").val(),
-                    contact_no: $("#contact_no").val(),
-                    joining_date: $("#joining_date").val(),
-                    em_contact_person: $("#em_contact_person").val(),
-                    em_contact_no: $("#em_contact_no").val(),
-                    nid: $("#nid").val(),
-                    address: $("#address").val(),
-                    salary: $("#salary").val(),
-                    bank_details: $("#bank_details").val(),
-                    password: $("#password").val(),
-                    password_confirmation: $("#password_confirmation").val(),
-                    codeid: $("#codeid").val()
-                };
-                
+                var form_data = new FormData();
+                form_data.append('name', $("#name").val());
+                form_data.append('email', $("#email").val());
+                form_data.append('contact_no', $("#contact_no").val());
+                form_data.append('joining_date', $("#joining_date").val());
+                form_data.append('em_contact_person', $("#em_contact_person").val());
+                form_data.append('em_contact_no', $("#em_contact_no").val());
+                form_data.append('address', $("#address").val());
+                form_data.append('salary', $("#salary").val());
+                form_data.append('bank_details', $("#bank_details").val());
+                form_data.append('password', $("#password").val());
+                form_data.append('password_confirmation', $("#password_confirmation").val());
+                form_data.append('codeid', $("#codeid").val());
+
+                if($("#nid")[0].files.length > 0){
+                    form_data.append('nid', $("#nid")[0].files[0]);
+                }
+
                 $.ajax({
                     url: upurl,
                     method: "POST",
                     data: form_data,
+                    processData: false,
+                    contentType: false,
                     success: function(res) {
                       clearform();
                       success(res.message);
@@ -272,7 +280,17 @@
             $("#joining_date").val(data.joining_date);
             $("#em_contact_person").val(data.em_contact_person);
             $("#em_contact_no").val(data.em_contact_no);
-            $("#nid").val(data.nid);
+            if(data.nid) {
+                let fileUrl = '/images/employees/' + data.nid;
+                $("#nidFileLink").remove();
+                $("#nid").after(`
+                    <a href="${fileUrl}" target="_blank" id="nidFileLink" class="d-block mt-2 text-decoration-none">
+                        <i class="fas fa-file-download me-1"></i> Download current NID
+                    </a>
+                `);
+            } else {
+                $("#nidFileLink").remove();
+            }
             $("#address").val(data.address);
             $("#salary").val(data.salary);
             $("#bank_details").val(data.bank_details);
@@ -293,6 +311,7 @@
             $("#passwordRequired").show();
             $("#passwordConfirmationRequired").show();
             $("#cardTitle").text('Add new employee');
+            $("#nidFileLink").remove();
         }
 
         // Status toggle

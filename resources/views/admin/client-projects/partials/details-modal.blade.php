@@ -57,7 +57,7 @@
                         @foreach($row->tasks as $task)
                             <div class="list-group-item mb-2 d-flex justify-content-between align-items-start">
                                 <div>
-                                    <strong>{!! $task->task ?? '' !!}</strong>
+                                    <strong>{{ $task->title ?? '' }}</strong> - {!! $task->task ?? '' !!}
                                     <div class="small text-muted mt-1">
                                         <span><strong>Due:</strong> {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d-m-Y') : '' }}</span> &middot; 
                                         <span><strong>Status:</strong> 

@@ -24,8 +24,19 @@
                   </div>
                   <div class="row">
                     <h2 class="card-title mt-3">Tasks</h2>
-                      @if ($onGoingTasksCount > 0)
-                      <p class="card-text">You have total {{ $onGoingTasksCount }} ongoing tasks</p>
+                      @if ($onGoingTasksCount > 0 || $notConfirmedTasksCount > 0)
+                          <p class="card-text">
+                              @if ($onGoingTasksCount > 0)
+                                  You have total {{ $onGoingTasksCount }} ongoing tasks
+                              @endif
+
+                              @if ($notConfirmedTasksCount > 0)
+                                  @if ($onGoingTasksCount > 0)
+                                      , 
+                                  @endif
+                                  {{ $notConfirmedTasksCount }} done & waiting for your approval
+                              @endif
+                          </p>
                       @endif
                   </div>
                 </div>

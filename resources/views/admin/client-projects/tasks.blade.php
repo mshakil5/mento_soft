@@ -302,7 +302,7 @@
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'date', name: 'date'},
-                {data: 'task', name: 'task'},
+                {data: 'title', name: 'title'},
                 {data: 'employee_name', name: 'employee_name'},
                 {data: 'priority', name: 'priority', orderable: false, searchable: false},
                 {data: 'due_date', name: 'due_date'},

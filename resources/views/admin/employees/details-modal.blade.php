@@ -20,8 +20,18 @@
           <div class="col-md-3"><p><strong>Joining Date:</strong> {{ $row->joining_date ?? '-' }}</p></div>
           <div class="col-md-3"><p><strong>Em. Contact Person:</strong> {{ $row->em_contact_person ?? '-' }}</p></div>
           <div class="col-md-3"><p><strong>Em. Contact No:</strong> {{ $row->em_contact_no ?? '-' }}</p></div>
-          <div class="col-md-3"><p><strong>NID:</strong> {{ $row->nid ?? '-' }}</p></div>
           <div class="col-md-12"><p><strong>Address:</strong> {{ $row->address ?? '-' }}</p></div>
+          <div class="col-md-3">
+              <p><strong>NID:</strong>
+                  @if($row->nid)
+                      <a href="{{ asset('images/employees/' . $row->nid) }}" target="_blank" class="btn btn-sm">
+                          <i class="fas fa-file-download me-1"></i> Download
+                      </a>
+                  @else
+                      <span class="text-muted">-</span>
+                  @endif
+              </p>
+          </div>
 
           <div class="col-12 mt-3">
             <h5>Payment Information</h5><hr>

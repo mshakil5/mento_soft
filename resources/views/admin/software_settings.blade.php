@@ -13,7 +13,7 @@
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('tasks.index') }}" class="nav-link {{ Route::is('tasks.index') ? 'active' : '' }}">
+        <a href="{{ route('tasks.index') }}" class="nav-link {{ Route::is('tasks.index') || Route::is('tasks.all') ? 'active' : '' }}">
             <i class="fas fa-tasks nav-icon"></i>
             <p>Tasks</p>
         </a>
@@ -94,45 +94,46 @@
 
     <li class="nav-item">
         <a href="{{ route('admin.income') }}" class="nav-link {{ Route::is('admin.income') ? 'active' : '' }}">
-            <i class="fas fa-chart-line nav-icon"></i>
+            <i class="fas fa-dollar-sign nav-icon"></i>
             <p>Income</p>
         </a>
     </li>
 
     <li class="nav-item">
         <a href="{{ route('admin.expense') }}" class="nav-link {{ Route::is('admin.expense') ? 'active' : '' }}">
-            <i class="fas fa-chart-line nav-icon"></i>
+            <i class="fas fa-money-bill-wave nav-icon"></i>
             <p>Expense</p>
         </a>
     </li>
 
     <li class="nav-item">
         <a href="{{ route('admin.asset') }}" class="nav-link {{ Route::is('admin.asset') ? 'active' : '' }}">
-            <i class="fas fa-chart-line nav-icon"></i>
+            <i class="fas fa-warehouse nav-icon"></i>
             <p>Assets</p>
         </a>
     </li>
 
     <li class="nav-item">
         <a href="{{ route('admin.liabilities') }}" class="nav-link {{ Route::is('admin.liabilities') ? 'active' : '' }}">
-            <i class="fas fa-chart-line nav-icon"></i>
+            <i class="fas fa-hand-holding-usd nav-icon"></i>
             <p>Liabilities</p>
         </a>
     </li>
 
     <li class="nav-item">
         <a href="{{ route('admin.equity') }}" class="nav-link {{ Route::is('admin.equity') ? 'active' : '' }}">
-            <i class="fas fa-chart-line nav-icon"></i>
+            <i class="fas fa-balance-scale nav-icon"></i>
             <p>Equity</p>
         </a>
     </li>
 
     <li class="nav-item">
         <a href="{{ route('admin.equityholders') }}" class="nav-link {{ Route::is('admin.equityholders') ? 'active' : '' }}">
-            <i class="fas fa-chart-line nav-icon"></i>
+            <i class="fas fa-users nav-icon"></i>
             <p>Equity Holders</p>
         </a>
     </li>
+
 
     <li class="nav-item dropdown {{ request()->routeIs('cashbook') || request()->routeIs('bankbook') ? 'menu-open' : '' }}">
         <a href="#" class="nav-link {{ request()->routeIs('cashbook') || request()->routeIs('bankbook') ? 'active' : '' }}">

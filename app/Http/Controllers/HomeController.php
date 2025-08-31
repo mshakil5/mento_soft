@@ -39,7 +39,8 @@ class HomeController extends Controller
         $ongoingprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 2)->count();
         $doneProjectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 4)->count();
         $onGoingTasksCount = ProjectTask::where('client_id', $user->client->id)->whereIn('status', [1, 2])->count();
-        return view('user.dashboard', compact('ongoingprojectsCount', 'doneProjectsCount', 'plannedprojectsCount', 'onGoingTasksCount'));
+        $notConfirmedTasksCount = ProjectTask::where('client_id', $user->client->id)->where('status', 3)->where('is_confirmed', 0)->count();
+        return view('user.dashboard', compact('ongoingprojectsCount', 'doneProjectsCount', 'plannedprojectsCount', 'onGoingTasksCount', 'notConfirmedTasksCount'));
     }
 
     public function toggleSidebar(Request $request)

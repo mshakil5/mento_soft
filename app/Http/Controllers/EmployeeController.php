@@ -51,7 +51,8 @@ class EmployeeController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'contact_no' => 'required',
-            'password' => 'required|string|min:6|confirmed'
+            'password' => 'required|string|min:6|confirmed',
+            'nid' => 'nullable|file'
         ]);
 
         if ($validator->fails()) {
@@ -68,7 +69,6 @@ class EmployeeController extends Controller
         $employee->joining_date = $request->joining_date;
         $employee->em_contact_person = $request->em_contact_person;
         $employee->em_contact_no = $request->em_contact_no;
-        $employee->nid = $request->nid;
         $employee->address = $request->address;
         $employee->salary = $request->salary;
         $employee->bank_details = $request->bank_details;
@@ -76,6 +76,15 @@ class EmployeeController extends Controller
         $employee->user_type = 1;
         $employee->status = 1;
         $employee->created_by = auth()->id();
+
+        if ($request->hasFile('nid')) {
+            $nidFile = $request->file('nid');
+            $nidName = time() . '_' . $nidFile->getClientOriginalName();
+            $path = public_path('images/employees/');
+            if (!file_exists($path)) mkdir($path, 0755, true);
+            $nidFile->move($path, $nidName);
+            $employee->nid = $nidName;
+        }
 
         if ($employee->save()) {
             return response()->json([
@@ -131,7 +140,6 @@ class EmployeeController extends Controller
         $employee->joining_date = $request->joining_date;
         $employee->em_contact_person = $request->em_contact_person;
         $employee->em_contact_no = $request->em_contact_no;
-        $employee->nid = $request->nid;
         $employee->address = $request->address;
         $employee->salary = $request->salary;
         $employee->bank_details = $request->bank_details;
@@ -139,6 +147,20 @@ class EmployeeController extends Controller
 
         if ($request->password) {
             $employee->password = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('nid')) {
+            $nidFile = $request->file('nid');
+            $nidName = time() . '_' . $nidFile->getClientOriginalName();
+            $path = public_path('images/employees/');
+            if (!file_exists($path)) mkdir($path, 0755, true);
+
+            if ($employee->nid && file_exists($path . $employee->nid)) {
+                unlink($path . $employee->nid);
+            }
+
+            $nidFile->move($path, $nidName);
+            $employee->nid = $nidName;
         }
 
         if ($employee->save()) {
