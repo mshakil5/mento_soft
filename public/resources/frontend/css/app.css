@@ -1926,8 +1926,8 @@ section.default.contact-section .secTtile {
     transition: all 0.3s ease-in-out;
     cursor: pointer;
     z-index: 1000;
-    bottom: 140px;
-    right: 27px;
+    bottom: 50px;
+    right: 30px;
     background-color: #FF6D33;
     color: white;
 }
