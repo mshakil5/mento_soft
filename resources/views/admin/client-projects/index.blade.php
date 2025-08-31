@@ -64,10 +64,21 @@
                                         <input type="text" class="form-control" id="domain" name="domain" placeholder="Enter domain">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Project URL</label>
                                         <input type="url" class="form-control" id="project_url" name="project_url" placeholder="Enter project URL">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Project Manager <span class="text-danger">*</span></label>
+                                        <select name="project_manager" id="project_manager" class="form-control select2">
+                                            <option value="">Select Project Manager</option>
+                                            @foreach($employees as $employee)
+                                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             
@@ -77,7 +88,7 @@
                                         <input type="text" class="form-control" id="tech_stack" name="tech_stack" placeholder="e.g. PHP,Laravel,MySQL">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Status <span class="text-danger">*</span></label>
                                         <select class="form-control" id="status" name="status" required>
@@ -212,6 +223,7 @@
             form_data.append("due_date", $("#due_date").val());
             form_data.append("amount", $("#amount").val());
             form_data.append("status", $("#status").val());
+            form_data.append("project_manager", $("#project_manager").val());
 
             // Handle image upload
             var imageInput = document.getElementById('image');
@@ -294,6 +306,7 @@
             $("#due_date").val(data.due_date);
             $("#amount").val(data.amount);
             $("#status").val(data.status);
+            $("#project_manager").val(data.employee_id).trigger('change');
             $("#codeid").val(data.id);
             
             // Set preview image

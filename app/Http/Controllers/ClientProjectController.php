@@ -126,7 +126,7 @@ class ClientProjectController extends Controller
         }
 
         $clients = Client::latest()->get();
-        $employees = User::where('status', 1)->get();
+        $employees = User::where('status', 1)->where('user_type', 1)->select('id', 'name')->get();
         return view('admin.client-projects.index', compact('clients', 'employees'));
     }
 
@@ -135,6 +135,7 @@ class ClientProjectController extends Controller
         $validator = Validator::make($request->all(), [
             'client_id' => 'required|exists:clients,id',
             'title' => 'required|string|max:255',
+            'project_manager' => 'required',
             'domain' => 'nullable|string|max:255',
             'project_url' => 'nullable|url|max:255',
             'tech_stack' => 'nullable|string|max:255',
@@ -156,6 +157,7 @@ class ClientProjectController extends Controller
         $data->title = $request->title;
         $data->domain = $request->domain;
         $data->project_url = $request->project_url;
+        $data->employee_id = $request->project_manager;
         $data->tech_stack = $request->tech_stack;
         $data->description = $request->description;
         $data->additional_info = $request->additional_info;
@@ -216,6 +218,7 @@ class ClientProjectController extends Controller
         $validator = Validator::make($request->all(), [
             'client_id' => 'required|exists:clients,id',
             'title' => 'required|string|max:255',
+            'project_manager' => 'required',
             'domain' => 'nullable|string|max:255',
             'project_url' => 'nullable|url|max:255',
             'tech_stack' => 'nullable|string|max:255',
@@ -242,6 +245,7 @@ class ClientProjectController extends Controller
 
         $project->client_id = $request->client_id;
         $project->title = $request->title;
+        $project->employee_id = $request->project_manager;
         $project->domain = $request->domain;
         $project->project_url = $request->project_url;
         $project->tech_stack = $request->tech_stack;
