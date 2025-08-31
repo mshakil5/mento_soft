@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\ContactEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactMail;
+use App\Mail\QuotationMail;
 use App\Models\Contact;
 use App\Models\Master;
 use App\Models\Service;
@@ -107,18 +108,27 @@ class FrontendController extends Controller
             'dream_description' => 'required',
         ]);
 
-        Quotation::create([
-            'first_name'        => $request->first_name,
-            'last_name'         => $request->last_name,
-            'email'             => $request->email,
-            'phone'             => $request->phone,
-            'company'           => $request->company,
-            'website'           => $request->website,
-            'dream_description' => $request->dream_description,
-            'timeline'          => $request->timeline,
-            'features'          => $request->features ? json_encode($request->features) : null,
-            'additional_info'   => $request->additional_info,
-        ]);
+        $quotation = new Quotation();
+        $quotation->first_name = $request->first_name;
+        $quotation->last_name = $request->last_name;
+        $quotation->email = $request->email;
+        $quotation->phone = $request->phone;
+        $quotation->company = $request->company;
+        $quotation->website = $request->website;
+        $quotation->dream_description = $request->dream_description;
+        $quotation->timeline = $request->timeline;
+        $quotation->features = $request->features ? json_encode($request->features) : null;
+        $quotation->additional_info = $request->additional_info;
+        $quotation->save();
+
+        $contactEmails = ContactEmail::where('status', 1)->pluck('email');
+
+        foreach ($contactEmails as $contactEmail) {
+            Mail::mailer('gmail')->to($contactEmail)
+              ->cc('info@mentosoftware.co.uk')
+              ->send(new QuotationMail($quotation)
+            );
+        }
 
         return back()->with('success', 'Your quotation request has been submitted successfully!');
     }
