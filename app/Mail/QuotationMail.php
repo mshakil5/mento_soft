@@ -30,7 +30,7 @@ class QuotationMail extends Mailable
                         'last_name'  => $this->quotation->last_name,
                         'email'      => $this->quotation->email,
                         'phone'      => $this->quotation->phone,
-                        'subject'    => $this->quotation->subject ?? 'No Subject',
+                        'subject'    => $this->quotation->subject ?? 'New Quotation Message',
                         'message'    => $this->quotation->message,
                         'company'    => $this->quotation->company,
                         'website'    => $this->quotation->website,

@@ -5,10 +5,11 @@ New Quotation Request
 **Email:** {{ $email }}  
 **Phone:** {{ $phone }}  
 **Subject:** {{ $subject }}  
+**Additional Info:** {{ $additional_info }}  
 
 
 **Message:**  
-{{ $message }}
+{{ $dream_description }}
 
 Thanks,  
 {{ config('app.name') }}
