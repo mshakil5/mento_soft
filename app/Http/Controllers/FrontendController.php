@@ -302,4 +302,34 @@ class FrontendController extends Controller
         return view('frontend.faq', compact('faqQuestions'));
     }
 
+    public function sitemap()
+    {
+        $urls = [
+            ['loc' => url('/'), 'lastmod' => now()->toDateString(), 'changefreq' => 'daily', 'priority' => '1.0'],
+            ['loc' => url('/about-us'), 'lastmod' => now()->toDateString(), 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ];
+
+        $products = Product::where('status', '1')->latest()->get();
+        foreach ($products as $product) {
+            $urls[] = [
+                'loc' => url('/product/' . $product->slug),
+                'lastmod' => $product->updated_at->toDateString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.9',
+            ];
+        }
+
+        $services = Service::where('status', '1')->latest()->get();
+        foreach ($services as $service) {
+            $urls[] = [
+                'loc' => url('/service/' . $service->slug),
+                'lastmod' => $service->updated_at->toDateString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.9',
+            ];
+        }
+
+        $content = view('frontend.sitemap', compact('urls'))->render();
+        return response($content, 200)->header('Content-Type', 'application/xml');
+    }
 }

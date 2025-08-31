@@ -25,15 +25,21 @@ Route::fallback(fn () => redirect('/'));
 
 Auth::routes();
 
+Route::get('/sitemap.xml', [FrontendController::class, 'sitemap']);
+
 Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+
 Route::get('/', [FrontendController::class, 'index'])->name('homepage');
+
 Route::get('/contact-us', [FrontendController::class, 'contact'])->name('contact');
 Route::post('/contact-us', [FrontendController::class, 'storeContact'])->name('contact.store');
 Route::get('/get-quotation', [FrontendController::class, 'getQuotation'])->name('quotation');
 Route::post('/quotation/store', [FrontendController::class, 'storeQuotation'])->name('quotation.store');
+
 Route::get('/portfolio', [FrontendController::class, 'portfolio'])->name('portfolio');
 Route::get('/portfolio/{slug}', [FrontendController::class, 'portfolioDetails'])->name('portfolioDetails');
 Route::get('/product/{slug}', [FrontendController::class, 'productDetails'])->name('productDetails');
+
 Route::get('/privacy-policy', [FrontendController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/terms-and-conditions', [FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
 Route::get('/frequently-asked-questions', [FrontendController::class, 'frequentlyAskedQuestions'])->name('frequently-asked-questions');
