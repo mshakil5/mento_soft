@@ -11,20 +11,20 @@
         <div class="p-3 border rounded bg-light">
           <div class="row">
             <div class="col-6">
-              <h3>Project Concept / Idea</h3>
+              <h5>Project Concept / Idea</h5>
               <p>{!! $row->description !!}</p>
 
-              <h3>Additional Information</h3>
+              <h5>Additional Information</h5>
               <p>{!! $row->additional_info !!}</p>
               
-              <h3 class="d-flex justify-content-between align-items-center">
+              <h5 class="d-flex justify-content-between align-items-center">
                   Attachments
                   <button type="button" class="btn btn-sm btn-success" 
                           data-toggle="modal" 
                           data-target="#quickAddUpdateModal-{{ $row->id }}">
                       <i class="fas fa-plus"></i> Add attachment
                   </button>
-              </h3>
+              </h5>
               @if($row->recentUpdates->count())
                   <div class="d-flex flex-wrap gap-2">
                       @foreach($row->recentUpdates as $update)
@@ -43,7 +43,7 @@
             </div>
 
             <div class="col-6">
-                <h3>Linked Tasks
+                <h5>Linked Tasks
                   <button type="button" class="btn btn-sm btn-success float-right" 
                           data-toggle="modal" 
                           data-target="#tasksModal" 
@@ -51,7 +51,7 @@
                           onclick="openTaskModal({{ $row->id }})">
                       <i class="fas fa-plus"></i> Add New Task
                   </button>
-                </h3>
+                </h5>
                 @if($row->tasks->count())
                     <div class="list-group">
                         @foreach($row->tasks as $task)

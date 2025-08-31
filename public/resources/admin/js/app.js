@@ -59,6 +59,11 @@ $(document).ready(function () {
   $('.select2').select2({
       width: '100%'
   });
+  $('.modal-backdrop').remove();
+});
+
+$('.modal').on('hidden.bs.modal', function () {
+    $('.modal-backdrop').remove();
 });
 
 // Global remove button handler

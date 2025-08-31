@@ -41,6 +41,7 @@
                     <table class="table mb-0 align-middle custom-table-bg">
                         <thead>
                             <tr>
+                                <th class="text-light">Date</th>
                                 <th class="text-light">Project</th>
                                 <th class="text-light">Task</th>
                                 <th class="text-light">Approved</th>
@@ -50,6 +51,9 @@
                         <tbody>
                             @forelse($tasks as $index => $task)
                                 <tr class="border-top">
+                                    <td class="text-light">
+                                        {{ $task->created_at ? date('d F Y', strtotime($task->created_at)) : ''; }}
+                                    </td>
                                     <td class="text-light">{{ $task->clientProject->title ?? '' }}</td>
                                     <td class="text-light">{{ $task->title ?? '' }}</td>
                                     <td class="text-light">
@@ -61,12 +65,14 @@
                                                     <input class="form-check-input" type="checkbox" name="is_confirmed" value="1" id="confirm-{{ $task->id }}"
                                                         {{ $task->is_confirmed ? 'checked' : '' }} onchange="this.form.submit()">
                                                     <label class="form-check-label" for="confirm-{{ $task->id }}">
-                                                        {{ $task->is_confirmed ? 'Approved' : 'No' }}
+                                                        {{ $task->is_confirmed ? 'Yes' : 'No' }}
                                                     </label>
                                                 </div>
                                             </form>
-                                        @else
-                                            <span class="text-light">Not Completed Yet</span>
+                                        @elseif($task->status == 2)
+                                            <span class="text-light">In Progress</span>
+                                        @elseif($task->status == 1)
+                                            <span class="text-light">To Do</span>
                                         @endif
                                     </td>
                                     <td class="text-light">
@@ -89,6 +95,11 @@
                                               <div class="modal-body">
                                                 
                                                 <div class="list-group-item mb-3">
+                                                    <strong>Task Created:</strong> 
+                                                    {{ $task->created_at ? date('d F Y', strtotime($task->created_at)) : '' }}
+                                                </div>
+
+                                                <div class="list-group-item mb-3">
                                                     <strong>Task:</strong> {{ $task->title ?? '' }}
                                                 </div>
 
@@ -96,31 +107,38 @@
                                                     <strong>{!! $task->task ?? '' !!}</strong>
                                                 </div>
 
-                                                <!-- Chat -->
-                                                <div class="card direct-chat direct-chat-primary w-100" style="max-height:400px; overflow-y:auto;">
-                                                  <div class="card-header">
-                                                    <h3 class="card-title">Conversation</h3>
+                                              <div class="card shadow-lg border-0 rounded-3">
+                                                  <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                                                      <h5 class="mb-0">Conversation</h5>
+                                                      <span class="badge bg-light text-dark">Active</span>
                                                   </div>
 
-                                                  <div class="card-body">
+                                                  <div class="card-body bg-light overflow-auto" style="max-height: 350px;">
                                                       <div class="direct-chat-messages" id="taskModalMessages-{{ $task->id }}"></div>
                                                   </div>
 
-                                                  <div class="card-footer p-2">
+                                                  <div class="card-footer">
                                                       <form class="taskMessageForm d-flex" data-task-id="{{ $task->id }}">
-                                                          <input type="text" name="message" class="form-control me-2" placeholder="Type a message..." required>
-                                                          <button type="submit" class="btn btn-success">Send</button>
+                                                          <div class="input-group">
+                                                              <input type="text" name="message" class="form-control" placeholder="Type a message..." required>
+                                                              <div class="input-group-append">
+                                                                  <button class="btn btn-primary" type="submit">
+                                                                      <i class="fas fa-paper-plane"></i> Send
+                                                                  </button>
+                                                              </div>
+                                                          </div>
                                                       </form>
                                                   </div>
-
-                                                </div>
+                                              </div>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
+                                        @if ($task->status == 1)
                                         <button type="button" class="btn btn-sm btn-warning position-relative" data-bs-toggle="modal" data-bs-target="#taskEditModal-{{ $task->id }}">
                                             Edit
                                         </button>
+                                        @endif
                                         <div class="modal fade" id="taskEditModal-{{ $task->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered  modal-lg">
                                                 <div class="modal-content card-outline card-secondary">

@@ -14,7 +14,7 @@
                           onclick="openTaskModal()">
                           Add Task
                 </button>
-                <a href="{{ route('tasks.all') }}" class="btn btn-secondary my-3">ALL Tasks</a>
+                <a href="{{ route('tasks.all') }}" class="btn btn-secondary my-3">All Tasks</a>
             </div>
             <div class="col-3 my-3 d-flex">
                 <select id="projectFilter" class="form-control ml-2 select2">

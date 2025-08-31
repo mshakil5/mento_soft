@@ -79,13 +79,13 @@
 
                                                           <div class="row">
                                                               <div class="col-12">
-                                                                  <h3>Project Concept / Idea</h3>
+                                                                  <h5>Project Concept / Idea</h5>
                                                                   <p>{!! $project->description ?? '-' !!}</p>
 
-                                                                  <h3>Additional Information</h3>
+                                                                  <h5>Additional Information</h5>
                                                                   <p>{!! $project->additional_info ?? '-' !!}</p>
 
-                                                                  <h3>Attachments</h3>
+                                                                  <h5>Attachments</h5>
                                                                   @if($project->recentUpdates->count())
                                                                       <div class="d-flex flex-wrap gap-2">
                                                                           @foreach($project->recentUpdates as $update)

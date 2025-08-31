@@ -29,6 +29,11 @@
                     </div>
                 </div>
             </div>
+            <div class="col-3">
+              @if(request()->status)
+                <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
+              @endif
+            </div>
         </div>
     </div>
 </section>
@@ -76,7 +81,6 @@
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(res) {
-                  clearform();
                   success(res.message);
                   pageTop();
                   reloadTable();

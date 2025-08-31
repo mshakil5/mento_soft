@@ -19,6 +19,7 @@
       </div>
       <div class="col-md-3 col-sm-6 col-12">
         <a href="{{ route('projects.index') }}" class="text-dark">
+        {{-- <a href="{{ route('client-projects.index', ['project_status' => '2']) }}" class="text-dark"> --}}
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
 
@@ -50,7 +51,7 @@
         </div>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-        <a href="{{ route('tasks.index') }}" class="text-dark">
+        <a href="{{ route('tasks.all', ['status' => 1]) }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-warning"><i class="far fa-clock"></i></span>
           <div class="info-box-content">
@@ -61,7 +62,7 @@
         </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-        <a href="{{ route('tasks.index') }}" class="text-dark">
+        <a href="{{ route('tasks.all', ['status' => 2]) }}" class="text-dark">
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-secondary"><i class="far fa-clock"></i></span>
           <div class="info-box-content">
@@ -72,12 +73,12 @@
         </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-        <a href="{{ route('tasks.index') }}" class="text-dark">
+        <a href="{{ route('tasks.all', ['status' => 3]) }}" class="text-dark">
         <div class="info-box shadow-lg">
-          <span class="info-box-icon bg-danger"><i class="far fa-clock"></i></span>
+          <span class="info-box-icon bg-success"><i class="far fa-clock"></i></span>
           <div class="info-box-content">
-            <span class="info-box-text">Task Need to be Assigned</span>
-            <span class="info-box-number">{{ number_format($needToBeAssigned, 0) }}</span>
+            <span class="info-box-text">Completed & Confirmed Tasks</span>
+            <span class="info-box-number">{{ number_format($inProgressTasks, 0) }}</span>
           </div>
         </div>
         </a>

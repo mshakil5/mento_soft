@@ -37,6 +37,10 @@ class ClientProjectController extends Controller
                 $data->where('status', $request->status);
             }
 
+            // if ($request->project_status) {
+            //     $data->where('status', $request->project_status);
+            // }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('image', function($row) {
