@@ -6,7 +6,7 @@
                 <th class="text-light">Project</th>
                 <th class="text-light">Task</th>
                 <th class="text-light">Approved</th>
-                <th class="text-light">Action</th>
+                <th class="text-light text-center">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -17,14 +17,24 @@
                 <td class="text-light">{{ $task->title ?? '' }}</td>
                 <td class="text-light">
                     @if($task->status == 3)
-                        <span>{{ $task->is_confirmed ? 'Yes' : 'No' }}</span>
-                    @elseif($task->status == 2)
-                        <span>In Progress</span>
-                    @elseif($task->status == 1)
-                        <span>To Do</span>
+                      <form action="{{ route('tasks.confirm', $task->id) }}" method="POST">
+                          @csrf
+                          @method('PUT')
+                          <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" name="is_confirmed" value="1" id="confirm-{{ $task->id }}"
+                                  {{ $task->is_confirmed ? 'checked' : '' }} onchange="this.form.submit()">
+                              <label class="form-check-label" for="confirm-{{ $task->id }}">
+                                  {{ $task->is_confirmed ? 'Yes' : 'No' }}
+                              </label>
+                          </div>
+                      </form>
+                      @elseif($task->status == 2)
+                          <span>In Progress</span>
+                      @elseif($task->status == 1)
+                          <span>To Do</span>
                     @endif
                 </td>
-                <td class="text-light">
+                <td class="text-light text-center">
                     <button type="button" class="btn btn-sm btn-primary position-relative" data-bs-toggle="modal" data-bs-target="#taskModal-{{ $task->id }}">
                         View
                         @if($task->unread_messages_count > 0)
@@ -43,7 +53,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="5" class="text-center text-muted py-3 text-light">No tasks found.</td>
+                <td colspan="5" class="text-center py-3 text-light">No tasks found.</td>
             </tr>
             @endforelse
         </tbody>

@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<nav class="col-md-3 col-lg-3 d-none d-md-block sidebar vh-100 p-3">
+<nav class="col-md-2 col-lg-2 d-none d-md-block sidebar vh-100 p-3">
     <div class="position-sticky">
         <ul class="nav flex-column mt-3">
             <li class="nav-item mb-2"><a class="nav-link text-light {{ request()->routeIs('user.dashboard') ? 'active' : '' }}" href="{{ route('user.dashboard') }}">Dashboard</a></li>

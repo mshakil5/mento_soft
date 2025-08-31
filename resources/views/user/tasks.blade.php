@@ -31,11 +31,25 @@
         @endif
 
         <div class="card text-light shadow-sm mb-4 form-style fadeInUp border-light">
-            <div class="d-flex justify-content-end my-2">
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTaskModal">
-                    + New Task
-                </button>
-            </div>
+
+          <form method="GET" action="{{ route('user.tasks') }}" class="row mb-3">
+              <div class="col-3">
+                  <select name="project" class="form-select" onchange="this.form.submit()">
+                      <option value="">-- Select Project --</option>
+                      @foreach($projects as $project)
+                          <option value="{{ $project->id }}" {{ request('project') == $project->id ? 'selected' : '' }}>
+                              {{ $project->title }}
+                          </option>
+                      @endforeach
+                  </select>
+              </div>
+              <div class="col-6"></div>
+              <div class="col-3">
+                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                      + New Task
+                  </button>
+              </div>
+          </form>
 
             <ul class="nav nav-tabs" id="taskTabs" role="tablist">
                 <li class="nav-item" role="presentation">

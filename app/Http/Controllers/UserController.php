@@ -87,7 +87,7 @@ class UserController extends Controller
         return view('user.projects', compact('projects'));
     }
 
-    public function tasks()
+    public function tasks(Request $request)
     {
         $user = auth()->user();
         $userId = $user->id;
@@ -98,10 +98,14 @@ class UserController extends Controller
                       ->whereDoesntHave('views', fn($q) => $q->where('user_id', $userId));
             }])
             ->where('client_id', $user->client->id)
+            ->when($request->project, fn($q, $projectId) => $q->where('client_project_id', $projectId))
             ->latest()
             ->paginate(10);
 
-        return view('user.tasks', compact('tasks'));
+        $projects = ClientProject::where('client_id', $user->client->id)
+          ->whereHas('tasks')
+          ->get();
+        return view('user.tasks', compact('tasks', 'projects'));
     }
 
     public function storeTask(Request $request)
