@@ -17,7 +17,7 @@
             </div>
         @endif
 
-        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="fadeInUp">
+        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="form-style fadeInUp border-light">
             @csrf
             <div class="row">
 

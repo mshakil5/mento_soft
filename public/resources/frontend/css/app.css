@@ -1661,12 +1661,33 @@ section.default.contact-section .secTtile {
   padding-left: 0;
   color: #FFffff;
 }
+
+.contact-section .card-footer .form-control {
+  background: transparent;
+  border-bottom: 3px solid #fff;
+  color: rgb(143, 143, 143);
+  border: 0;
+  border-bottom: 1px solid #fff;
+  border-radius: 0;
+  padding-left: 0;
+  color: #000;
+}
+
 .contact-section .form-control::-moz-placeholder {
   color: rgb(204, 204, 204);
 }
 .contact-section .form-control::placeholder {
   color: rgb(204, 204, 204);
 }
+
+.contact-section .card-footer .form-control::placeholder {
+  color: rgb(81, 80, 80);
+}
+
+.contact-section .card-footer .form-control:focus::placeholder {
+  color: #5b5a5a;
+}
+
 .contact-section .form-control:focus {
   outline: 0;
   box-shadow: none;

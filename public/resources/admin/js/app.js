@@ -62,10 +62,6 @@ $(document).ready(function () {
   $('.modal-backdrop').remove();
 });
 
-$('.modal').on('hidden.bs.modal', function () {
-    $('.modal-backdrop').remove();
-});
-
 // Global remove button handler
 $(document).on('click', '.remove-file', function() {
     const btn = $(this);

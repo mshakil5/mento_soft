@@ -3,8 +3,8 @@
 @section('content')
 <section class="content pt-3">
     <div class="container-fluid">
-        <div class="row justify-content-md-center">
-            <div class="col-md-10">
+        <div class="row">
+            <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title" id="cardTitle">Edit Task for {{ $task->clientProject->title ?? '' }}</h3>
@@ -71,6 +71,9 @@
                         <a href="{{ url()->previous() }}" class="btn btn-default">Cancel</a>
                     </div>
                 </div>
+            </div>
+            <div class="col-3">
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
             </div>
         </div>
     </div>

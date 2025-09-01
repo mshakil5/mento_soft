@@ -53,5 +53,10 @@ class Client extends Model
     {
         return $this->emailLogs()->whereNotNull('invoice_id');
     }
+
+    public function services()
+    {
+        return $this->hasMany(ProjectServiceDetail::class);
+    }
     
 }

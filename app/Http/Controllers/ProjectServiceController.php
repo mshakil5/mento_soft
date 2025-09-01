@@ -19,17 +19,29 @@ class ProjectServiceController extends Controller
         if ($request->ajax()) {
             $data = ProjectServiceDetail::with(['serviceType', 'client', 'project'])->latest();
 
+            if ($request->client_filter_id) {
+                $data = $data->where('client_id', $request->client_filter_id);
+            }
+
             if ($request->client_id) {
                 $data = $data->where('client_id', $request->client_id);
             }
 
-            if ($request->project_id) {
-                $data = $data->where('client_project_id', $request->project_id);
+            if ($request->project_filter_id) {
+                $data = $data->where('client_project_id', $request->project_filter_id);
             }
 
-            if ($request->service_type_id) {
-                $data = $data->where('project_service_id', $request->service_type_id);
+            if ($request->service_filter_type_id) {
+                $data = $data->where('project_service_id', $request->service_filter_type_id);
             }
+
+            if ($request->project_service_id) {
+                $data = $data->where('project_service_id', $request->project_service_id);
+            }
+
+          if ($request->has('bill_paid')) {
+              $data = $data->where('bill_paid', $request->bill_paid);
+          }
 
             return DataTables::of($data)
                 ->addIndexColumn()

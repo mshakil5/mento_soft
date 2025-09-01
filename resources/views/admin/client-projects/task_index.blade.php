@@ -174,8 +174,12 @@ table.dataTable {
             });
         });
 
-        $(document).on('hidden.bs.modal', '.task-modal', reloadAllTables);
-        // setInterval(reloadAllTables, 60000);
+        $(document).on('hidden.bs.modal', '.task-modal', function () {
+            reloadAllTables();
+            $('.modal-backdrop').remove();
+        });
+
+        setInterval(reloadAllTables, 60000);
 
     });
 </script>

@@ -20,8 +20,9 @@ class ClientController extends Controller
 {
     public function index(Request $request)
     {
+      // dd($data = Client::with(['clientType', 'projects', 'invoices', 'services.serviceType'])->withCount('projects')->latest()->get());
         if ($request->ajax()) {
-            $data = Client::with(['clientType', 'projects', 'invoices'])->withCount('projects')->latest();
+            $data = Client::with(['clientType', 'projects', 'invoices', 'services.serviceType'])->withCount('projects')->latest();
 
             if ($request->client_type_id) {
                 $data->where('client_type_id', $request->client_type_id);
@@ -44,9 +45,6 @@ class ClientController extends Controller
                 ->addColumn('date', function($row) {
                     return Carbon::parse($row->created_at)->format('d-m-Y');
                 })
-                // ->addColumn('projects_count', function($row) {
-                //     return $row->projects_count ?? 0;
-                // })
                 ->addColumn('projects_count', function($row) {
                     if ($row->projects_count > 0) {
                         return '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" 
@@ -58,11 +56,18 @@ class ClientController extends Controller
                     return '<span class="badge badge-secondary">0</span>';
                 })
                 ->addColumn('outstanding_amount', function($row) {
-                    return '£' . $row->invoices->where('status', 1)->sum('net_amount');
+                    $amount = $row->services->where('bill_paid', 0)->sum('amount');
+
+                    if ($amount > 0) {
+                        $url = route('project-services.index', [
+                            'client_id' => $row->id,
+                            'bill_paid' => 0
+                        ]);
+                        return '<a href="'.$url.'" class="badge badge-success" title="View Outstanding Amount">£' . number_format($amount, 2) . '</a>';
+                    }
+
+                    return '<span class="badge badge-secondary">£0.00</span>';
                 })
-                // ->addColumn('client_type', function($row) {
-                //     return $row->clientType->name ?? 'N/A';
-                // })
                 ->addColumn('status', function($row) {
                     $statuses = [
                         1 => 'Active',
@@ -111,20 +116,29 @@ class ClientController extends Controller
                                     </a>';
                     }
 
-                    if ($row->invoices->count()) {
-                        $buttons .= '<a href="'.route('invoices.index', ['client_id' => $row->id]).'" class="btn btn-primary btn-sm btn-block d-none">
-                                        Invoices ('.$row->invoices->count().')
-                                    </a>';
+                    $buttons .= '</div></div>';
+
+                    $buttons .= '<div class="btn-group ml-1">
+                        <button type="button" class="btn btn-sm btn-dark dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div class="dropdown-menu p-2" style="min-width: 200px;">';
+
+                    $groupedServices = $row->services->filter(fn($s) => $s->serviceType)->unique('project_service_id');
+
+                    foreach ($groupedServices as $service) {
+                        $buttons .= '<a href="'.route('project-services.index', [
+                                                'client_id' => $row->id,
+                                                'project_service_id' => $service->serviceType->id
+                                            ]).'" class="btn btn-outline-primary btn-sm btn-block mb-1">'
+                                    . $service->serviceType->name .
+                                    '</a>';
                     }
 
-                    $buttons .= '
-                            </div>
-                        </div>
-                        '.$details;
+                    $buttons .= '</div></div>';
 
                     return $buttons;
                 })
-                ->rawColumns(['image', 'status', 'action', 'projects_count'])
+                ->rawColumns(['image', 'status', 'action', 'projects_count', 'outstanding_amount'])
                 ->make(true);
         }
 

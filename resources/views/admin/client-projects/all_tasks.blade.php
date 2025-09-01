@@ -31,7 +31,7 @@
             </div>
             <div class="col-3">
               @if(request()->status)
-                <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
               @endif
             </div>
         </div>

@@ -113,7 +113,6 @@
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Conversation</h5>
-                    <span class="badge bg-light text-dark">Active</span>
                 </div>
 
                 <div class="card-body bg-light overflow-auto" style="max-height: 350px;">
@@ -125,8 +124,9 @@
                         <div class="input-group">
                             <input type="text" name="message" class="form-control" placeholder="Type a message..." required>
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="fas fa-paper-plane"></i> Send
+                                <button class="btn btn-info d-flex align-items-center gap-1" type="submit">
+                                    <iconify-icon icon="mdi:send" class="text-white" width="20" height="20"></iconify-icon>
+                                    Send
                                 </button>
                             </div>
                         </div>
