@@ -15,6 +15,7 @@ use App\Models\LoginRecord;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ClientEmail;
 use App\Models\CompanyDetails;
+use App\Models\ProjectServiceDetail;
 
 class ClientController extends Controller
 {
@@ -410,8 +411,14 @@ class ClientController extends Controller
     public function clientEmail($id)
     {
         $client = client::find($id)->select('id', 'name','email')->first();
+        
+        $services = ProjectServiceDetail::with(['serviceType:id,name', 'project:id,title'])
+          ->where('client_id', $id)
+          ->where('bill_paid', 0)
+          ->get(['id','client_id','project_service_id','client_project_id','amount','bill_paid','start_date','end_date']);
+
         $mailFooter = CompanyDetails::select('mail_footer')->first();
-        return view('admin.clients.email', compact('client', 'mailFooter'));
+        return view('admin.clients.email', compact('client', 'mailFooter', 'services'));
     }
 
     public function sendClientEmail(Request $request)
