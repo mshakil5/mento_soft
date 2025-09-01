@@ -128,14 +128,15 @@ class ClientController extends Controller
 
                     foreach ($groupedServices as $service) {
                         $buttons .= '<a href="'.route('project-services.index', [
-                                                'client_id' => $row->id,
-                                                'project_service_id' => $service->serviceType->id
-                                            ]).'" class="btn btn-outline-primary btn-sm btn-block mb-1">'
+                                                    'client_id' => $row->id,
+                                                    'project_service_id' => $service->serviceType->id
+                                                ]).'" class="btn btn-outline-primary btn-sm btn-block mb-1">'
                                     . $service->serviceType->name .
                                     '</a>';
                     }
 
                     $buttons .= '</div></div>';
+                    $buttons .= $details;
 
                     return $buttons;
                 })

@@ -8,7 +8,7 @@
               <button type="button" class="btn btn-secondary mr-2" id="newBtn">Add Service</button>
               <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service Types</a>
             </div>
-            @if (!(request()->client_id || request()->project_service_id))
+            @if (!(request()->client_id || request()->project_service_id || request()->status || request()->due))
             <div class="col-3 d-flex">
                 <select id="clientFilter" class="form-control ml-2 select2">
                     <option value="">Select Client</option>
@@ -162,8 +162,8 @@
                     </div>
                 </div>
             </div>
-            @if (request()->client_id || request()->project_service_id)
-            <div class="col-3">
+            @if (request()->client_id || request()->project_service_id || request()->status|| request()->due )
+            <div class="col-3 mb-3">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
             </div>
             @endif
@@ -452,7 +452,7 @@
                   form.closest('.modal').modal('hide');
                   reloadTable();
               },
-                            error: function (xhr, status, error) {
+              error: function (xhr, status, error) {
                   console.error(xhr.responseText);
               }
           });

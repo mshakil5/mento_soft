@@ -43,6 +43,41 @@ class ProjectServiceController extends Controller
               $data = $data->where('bill_paid', $request->bill_paid);
           }
 
+          if ($request->has('status')) {
+              $data = $data->where('status', $request->status);
+          }
+
+          $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
+          $yearlyLimit  = Carbon::now()->addMonths(3)->format('Y-m-d');
+
+          if ($request->has('expiring') && $request->expiring == 1) {
+              $data = $data->where(function($query) use ($monthlyLimit, $yearlyLimit) {
+                  $query->where(function($q) use ($monthlyLimit) {
+                      $q->where('cycle_type', 1)
+                        ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$monthlyLimit]);
+                  })
+                  ->orWhere(function($q) use ($yearlyLimit) {
+                      $q->where('cycle_type', 2)
+                        ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$yearlyLimit]);
+                  });
+              });
+          }
+
+          if ($request->has('due')) {
+              $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
+              $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
+              $nextMonthStart    = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
+              $nextMonthEnd      = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
+
+              if ($request->due === 'current') {
+                  $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$currentMonthStart, $currentMonthEnd]);
+              } elseif ($request->due === 'next') {
+                  $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$nextMonthStart, $nextMonthEnd]);
+              } elseif ($request->due === 'previous') {
+                  $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') < ?", [Carbon::now()->format('Y-m-d')]);
+              }
+          }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('start_date', fn($row) => $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : 'N/A')

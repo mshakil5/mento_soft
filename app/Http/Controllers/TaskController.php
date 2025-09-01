@@ -102,6 +102,22 @@ class TaskController extends Controller
                 $data->where('status', $request->status);
             }
 
+            if ($request->status_filter) {
+                $data->where('status', $request->status_filter);
+            }
+
+            if ($request->project_id) {
+                $data->where('client_project_id', $request->project_id);
+            }
+
+            if ($request->priority) {
+                $data->where('priority', $request->priority);
+            }
+
+            if ($request->has('is_confirmed')) {
+                $data->where('is_confirmed', $request->is_confirmed);
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('date', function($row) {
@@ -197,7 +213,8 @@ class TaskController extends Controller
         }
 
         $employees = User::where('status', 1)->latest()->get();
-        return view('admin.client-projects.all_tasks', compact('employees'));
+        $projects = ClientProject::select('id', 'title')->latest()->get();
+        return view('admin.client-projects.all_tasks', compact('employees', 'projects'));
     }
 
     public function messages(ProjectTask $task)

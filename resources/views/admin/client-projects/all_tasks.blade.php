@@ -4,6 +4,41 @@
 
 <section class="content pt-3" id="contentContainer">
     <div class="container-fluid">
+        <div class="row mb-3">
+            @if (!(request()->status))
+            <div class="col-2 d-flex">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" 
+                    data-target="#tasksModal"
+                    onclick="openTaskModal()">
+                    Add Task
+                </button>
+            </div>
+            <div class="col-3 d-flex">
+                <select id="projectFilter" class="form-control ml-2 select2">
+                    <option value="">Select Project</option>
+                    @foreach ($projects as $project)
+                      <option value="{{ $project->id }}">{{ $project->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-3 d-flex">
+                <select id="statusFilter" class="form-control ml-2 select2">
+                    <option value="">Select Status</option>
+                    <option value="1">To Do </option>
+                    <option value="2">In Progress</option>
+                    <option value="3">Done</option>
+                </select>
+            </div>
+            <div class="col-3 d-flex">
+                <select id="priorityFilter" class="form-control ml-2 select2">
+                    <option value="">Select Priority</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+            @endif
+        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
@@ -102,6 +137,11 @@
             ajax: {
                 url: "{{ route('tasks.all') }}" + window.location.search,
                 type: "GET",
+                data: function (d) {
+                    d.project_id = $('#projectFilter').val();
+                    d.status_filter = $('#statusFilter').val();
+                    d.priority = $('#priorityFilter').val();
+                },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
                 }
@@ -125,6 +165,10 @@
         function reloadTable() {
           table.ajax.reload(null, false);
         }
+
+        $('#projectFilter, #statusFilter, #priorityFilter').on('change', function() {
+            reloadTable();
+        });
     });
 </script>
 @endsection

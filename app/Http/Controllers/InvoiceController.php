@@ -30,7 +30,11 @@ class InvoiceController extends Controller
                 $query->where('client_id', $request->client_id);
             }
 
-            $filter = $request->status;
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $filter = $request->status_filter;
 
             $invoices = $query->get();
 

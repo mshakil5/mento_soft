@@ -11,6 +11,7 @@
                   @endif
                 <button type="button" class="btn btn-secondary my-3">Add new</button>
             </div>
+            @if (!(request()->status))
             <div class="col-4 my-3 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
                     <option value="">All</option>
@@ -18,6 +19,7 @@
                     <option value="received">Received</option>
                 </select>
             </div>
+            @endif
         </div>
     </div>
 </section>
@@ -737,8 +739,7 @@
                 url: ajaxUrl + window.location.search,
                 type: "GET",
                 data: function (d) {
-                    d.status = $('#statusFilter').val();
-                    console.log(d.status);
+                    d.status_filter = $('#statusFilter').val();
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);

@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\ProjectServiceDetail;
 use Illuminate\Http\Request;
 use App\Models\ProjectTask;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -21,10 +22,49 @@ class HomeController extends Controller
         $totalClients = Client::count();
         $activeProjects = ClientProject::where('status', 2)->count();
         $onGoingServices = ProjectServiceDetail::where('status', 1)->count();
-        $totalPending = Invoice::where('status', 2)->sum('net_amount');
+        $pendingInvoices = Invoice::where('status', 1)->sum('net_amount');
         $todoTasks = ProjectTask::where('status', 1)->count();
         $inProgressTasks = ProjectTask::where('status', 2)->count();
-        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'totalPending', 'todoTasks', 'inProgressTasks'));
+        $doneNotConfirmedTasks = ProjectTask::where('status', 3)->where('is_confirmed', 0)->count();
+        $doneTasks = ProjectTask::where('status', 3)->where('is_confirmed', 1)->count();
+        $now = Carbon::now()->format('Y-m-d');
+        $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
+        $yearlyLimit = Carbon::now()->addMonths(3)->format('Y-m-d');
+        $servicesExpiringSoon = ProjectServiceDetail::where('status', 1)
+            ->where(function($query) use ($monthlyLimit, $yearlyLimit) {
+                $query->where(function($q) use ($monthlyLimit) {
+                    $q->where('cycle_type', 1)
+                      ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$monthlyLimit]);
+                })
+                ->orWhere(function($q) use ($yearlyLimit) {
+                    $q->where('cycle_type', 2)
+                      ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$yearlyLimit]);
+                });
+            })
+        ->count();
+        $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
+
+        $currentMonthDue = ProjectServiceDetail::where('bill_paid', 0)
+            ->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') >= ?", [$currentMonthStart])
+            ->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') <= ?", [$currentMonthEnd])
+            ->sum('amount');
+
+            
+        $nextMonthStart = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
+        $nextMonthEnd   = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
+
+        $nextMonthDue = ProjectServiceDetail::where('bill_paid', 0)
+            ->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') >= ?", [$nextMonthStart])
+            ->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') <= ?", [$nextMonthEnd])
+            ->sum('amount');
+        $today = Carbon::now()->format('Y-m-d');
+
+        $allPreviousDue = ProjectServiceDetail::where('bill_paid', 0)
+            ->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') < ?", [$today])
+            ->sum('amount');
+
+        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'pendingInvoices', 'todoTasks', 'inProgressTasks', 'doneTasks', 'doneNotConfirmedTasks', 'servicesExpiringSoon', 'currentMonthDue', 'nextMonthDue', 'allPreviousDue'));
     }
 
     public function managerHome()
