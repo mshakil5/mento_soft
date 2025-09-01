@@ -61,6 +61,14 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('quotation') ? 'active' : '' }}" href="{{ route('quotation') }}">Get Quotation</a>
                         </li>
+                        @auth
+                        <li class="nav-item">
+                            <a class="nav-link" 
+                              href="{{ route('dashboard') }}">
+                                Dashboard
+                            </a>
+                        </li>
+                        @endauth
                     </ul>
                 </div>
 

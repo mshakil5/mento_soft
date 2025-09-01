@@ -65,7 +65,7 @@ class HomeController extends Controller
                 return redirect()->route('user.dashboard');
             }
         } else {
-            return redirect()->route('login');
+            return redirect()->route('homepage');
         }
     }
 }
