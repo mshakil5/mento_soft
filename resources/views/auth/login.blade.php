@@ -1,60 +1,53 @@
-@extends('layouts.auth')
+@extends('frontend.master')
 
 @section('content')
-<div class="card card-outline card-secondary">
-    <div class="card-header text-center">
-        <h1><b>Login</b></h1>
-    </div>
-    <div class="card-body">
-        <p class="login-box-msg">Sign in to start your session</p>
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <div class="input-group mb-3">
-                <input id="email" type="email"
-                       class="form-control @error('email') is-invalid @enderror"
-                       name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
-                       placeholder="Email">
-
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-envelope"></span>
-                    </div>
+<section class="default contact-section wow fadeIn"
+    style="background-image: url(&quot;../images/pattern-1.svg&quot;),linear-gradient(61deg, rgb(12, 29, 77) 46%, rgb(255, 163, 15) 94%); background-attachment: fixed;">
+    <div class="container">
+        <div class="row px-2 justify-content-center">
+            <div class="col-lg-6 text-light">
+                <div class="text-center my-5">
+                    <h2 class="text-light text-uppercase fw-bold title-font wow bounce mb-0 secTtile">
+                       Login
+                    </h2>
                 </div>
-            </div>
-            @error('email')
-                <span class="invalid-feedback d-block" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
 
-            <div class="input-group mb-3">
-                <input id="password" type="password"
-                       class="form-control @error('password') is-invalid @enderror"
-                       name="password" required autocomplete="current-password"
-                       placeholder="Password">
-
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-lock"></span>
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                </div>
-            </div>
-            @error('password')
-                <span class="invalid-feedback d-block" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
+                @endif
 
-            <div class="social-auth-links text-center mt-2 mb-3">
-                <button type="submit" class="btn btn-secondary btn-block">Sign In</button>
-            </div>
+                <form action="{{ route('login') }}" method="POST" class="form-style fadeInUp">
+                    @csrf
+                    <div class="row">
 
-            <div class="text-center">
-                <a href="{{ route('password.request') }}">Forgot Your Password?</a>
+                        <div class="col-12 form-group mb-3">
+                            <input type="email" name="email" class="form-control"
+                                   placeholder="Email *" value="{{ old('email') }}" required autofocus>
+                            @error('email') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="col-12 form-group mb-3">
+                            <input type="password" name="password" class="form-control"
+                                   placeholder="Password *" required>
+                            @error('password') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="col-12 form-group">
+                            <button type="submit" id="submit-btn"
+                                    class="mt-4 border-0 d-block rounded-3 w-100 fs-5 text-uppercase btn-theme">
+                                Log In
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</section>
+
 @endsection

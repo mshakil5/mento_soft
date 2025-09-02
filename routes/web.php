@@ -23,7 +23,11 @@ Route::get('/clear', function () {
 
 Route::fallback(fn () => redirect('/'));
 
-Auth::routes();
+Auth::routes([
+    'register' => false,
+    'reset' => false,
+    'verify' => false,
+]);
 
 Route::get('/sitemap.xml', [FrontendController::class, 'sitemap']);
 

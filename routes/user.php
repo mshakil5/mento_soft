@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 
-Route::prefix('user')->middleware(['auth', 'is_user'])->group(function () {
+Route::prefix('user')->middleware(['is_user'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'userHome'])->name('user.dashboard');
 
     Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');

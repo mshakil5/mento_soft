@@ -26,7 +26,7 @@
 
                         <div class="col-12 form-group mb-3">
                             <input type="email" name="email" class="form-control"
-                                   placeholder="Email *" value="{{ old('email') }}" required>
+                                   placeholder="Email *" value="{{ old('email') }}" required autofocus>
                             @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
@@ -34,14 +34,6 @@
                             <input type="password" name="password" class="form-control"
                                    placeholder="Password *" required>
                             @error('password') <small class="text-danger">{{ $message }}</small> @enderror
-                        </div>
-
-                        <div class="col-12 form-group mb-3 d-flex justify-content-between align-items-center d-none">
-                            <div>
-                                <input type="checkbox" name="remember" id="remember">
-                                <label for="remember" class="text-white">Remember Me</label>
-                            </div>
-                            <a href="{{ route('password.request') }}" class="text-light text-decoration-underline">Forgot Password?</a>
                         </div>
 
                         <div class="col-12 form-group">

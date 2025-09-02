@@ -1,6 +1,10 @@
 <nav class="mt-2">
   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
+    @role('admin')
+     {{-- Admin Only --}}
+    @endrole
+
     <a href="{{ route('toggle.sidebar') }}" class="btn btn-info my-2">
         Switch to Frontend Settings <i class="fas fa-arrow-right"></i>
     </a>
