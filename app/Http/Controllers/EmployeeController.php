@@ -7,17 +7,21 @@ use App\Models\User;
 use Yajra\DataTables\Facades\DataTables;
 use Validator;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $employee = User::where('user_type', 1)->latest();
+            $employee = User::with('roles')->where('user_type', 1)->latest();
             return DataTables::of($employee)
                 ->addIndexColumn()
                 ->addColumn('date', function($row) {
                     return date('d-m-Y', strtotime($row->created_at));
+                })
+                ->addColumn('role', function($row) {
+                    return $row->roles->first() ? $row->roles->first()->name : '';
                 })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
@@ -41,8 +45,9 @@ class EmployeeController extends Controller
                 ->rawColumns(['status', 'action'])
                 ->make(true);
         }
-
-        return view('admin.employees.index');
+        
+        $roles = Role::all();
+        return view('admin.employees.index', compact('roles'));
     }
 
     public function store(Request $request)
@@ -51,6 +56,7 @@ class EmployeeController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'contact_no' => 'required',
+            'role_id' => 'required',
             'password' => 'required|string|min:6|confirmed',
             'nid' => 'nullable|file'
         ]);
@@ -87,6 +93,8 @@ class EmployeeController extends Controller
         }
 
         if ($employee->save()) {
+            $role = Role::findOrFail($request->role_id);
+            $employee->syncRoles([$role->name]); 
             return response()->json([
                 'status' => 200,
                 'message' => 'Employee created successfully.'
@@ -101,7 +109,7 @@ class EmployeeController extends Controller
 
     public function edit($id)
     {
-        $employee = User::find($id);
+        $employee = User::with('roles')->find($id);
         if (!$employee) {
             return response()->json([
                 'status' => 404,
@@ -164,6 +172,8 @@ class EmployeeController extends Controller
         }
 
         if ($employee->save()) {
+            $role = Role::findOrFail($request->role_id);
+            $employee->syncRoles([$role->name]); 
             return response()->json([
                 'status' => 200,
                 'message' => 'Employee updated successfully.'

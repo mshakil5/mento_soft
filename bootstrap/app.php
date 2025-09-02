@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_admin' => App\Http\Middleware\IsAdmin::class,
             'is_manager' => App\Http\Middleware\IsManager::class,
             'is_user' => App\Http\Middleware\IsUser::class,
+
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {

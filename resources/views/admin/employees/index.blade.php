@@ -95,16 +95,27 @@
                                   </div>
                                 </div>
                                     <div class="col-12">
-                                    <h5>Login Information</h5>
+                                    <h5>Other Information</h5>
                                     <hr>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Role <span class="text-danger">*</span></label>
+                                        <select name="role_id" id="role_id" class="form-control select2" required>
+                                            <option value="">-- Select Role --</option>
+                                            @foreach($roles as $role)
+                                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Password <span class="text-danger" id="passwordRequired">*</span></label>
                                         <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Confirm Password <span class="text-danger" id="passwordConfirmationRequired">*</span></label>
                                         <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirm password">
@@ -140,6 +151,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Contact No.</th>
+                                    <th>Role</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -186,6 +198,7 @@
                 form_data.append('address', $("#address").val());
                 form_data.append('salary', $("#salary").val());
                 form_data.append('bank_details', $("#bank_details").val());
+                form_data.append('role_id', $("#role_id").val());
                 form_data.append('password', $("#password").val());
                 form_data.append('password_confirmation', $("#password_confirmation").val());
 
@@ -227,6 +240,7 @@
                 form_data.append('address', $("#address").val());
                 form_data.append('salary', $("#salary").val());
                 form_data.append('bank_details', $("#bank_details").val());
+                form_data.append('role_id', $("#role_id").val());
                 form_data.append('password', $("#password").val());
                 form_data.append('password_confirmation', $("#password_confirmation").val());
                 form_data.append('codeid', $("#codeid").val());
@@ -280,6 +294,11 @@
             $("#joining_date").val(data.joining_date);
             $("#em_contact_person").val(data.em_contact_person);
             $("#em_contact_no").val(data.em_contact_no);
+            if(data.roles.length > 0) {
+                $("#role_id").val(data.roles[0].id).trigger('change');
+            } else {
+                $("#role_id").val(null).trigger('change');
+            }
             if(data.nid) {
                 let fileUrl = '/images/employees/' + data.nid;
                 $("#nidFileLink").remove();
@@ -304,6 +323,7 @@
         
         function clearform(){
             $('#createThisForm')[0].reset();
+            $("#role_id").val(null).trigger('change');
             $("#addBtn").val('Create');
             $("#addBtn").html('Create');
             $("#addThisFormContainer").slideUp(200);
@@ -379,6 +399,7 @@
                 {data: 'name', name: 'name'},
                 {data: 'email', name: 'email'},
                 {data: 'contact_no', name: 'contact_no'},
+                {data: 'role', name: 'role'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],

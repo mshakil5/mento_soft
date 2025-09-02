@@ -41,8 +41,10 @@ use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ServiceTypeController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin', 'role:admin']], function () {
 
     Route::get('/toggle-sidebar', [HomeController::class, 'toggleSidebar'])->name('toggle.sidebar');
 
@@ -292,6 +294,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/invoices/project-info/{id}', [InvoiceController::class, 'getProjectInfo']);
     Route::post('/invoices/send-email/{id}', [InvoiceController::class, 'sendEmail'])->name('invoices.send.email');
     Route::post('/invoices/{invoice}/receive', [InvoiceController::class, 'receive'])->name('invoices.receive');
+
+    // Permissions
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+    Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
+    Route::get('/permissions/{id}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
+    Route::post('/permissions/update', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::get('/permissions/{id}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
+
+    // Roles
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::post('/roles/update', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
 
     //Chart of account
     Route::get('chart-of-account', [ChartOfAccountController::class, 'index'])->name('admin.addchartofaccount');
