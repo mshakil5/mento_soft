@@ -33,12 +33,29 @@
 
                             <div class="form-group">
                                 <label>Permissions</label>
-                                <select id="permissions" name="permissions[]" class="form-control select2" multiple="multiple">
+
+                                <div class="mb-2">
+                                    <div class="icheck-primary">
+                                        <input type="checkbox" id="checkAll">
+                                        <label for="checkAll"><strong>Check All Permissions</strong></label>
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     @foreach($permissions as $permission)
-                                        <option value="{{ $permission->id }}">{{ $permission->name }}</option>
+                                        <div class="col-md-4">
+                                            <div class="icheck-primary">
+                                                <input type="checkbox" 
+                                                      name="permissions[]" 
+                                                      value="{{ $permission->id }}" 
+                                                      id="perm_{{ $permission->id }}">
+                                                <label for="perm_{{ $permission->id }}">
+                                                    {{ $permission->name }}
+                                                </label>
+                                            </div>
+                                        </div>
                                     @endforeach
-                                </select>
-                                <small class="text-muted">Select multiple permissions</small>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -78,11 +95,25 @@
         </div>
     </div>
 </section>
+
+<style>
+  #checkAll + label {
+      background: #6c757d;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+  }
+</style>
 @endsection
 
 @section('script')
 <script>
 $(document).ready(function () {
+
+  $("#checkAll").on("change", function() {
+      $("input[name='permissions[]']").prop('checked', this.checked);
+  });
+
     // Initialize Select2
     $('#permissions').select2({
         placeholder: "Select permissions",
@@ -116,7 +147,9 @@ $(document).ready(function () {
             data: {
                 codeid: $("#codeid").val(),
                 name: $("#name").val(),
-                permissions: $("#permissions").val() // Select2 selected values
+                permissions: $("input[name='permissions[]']:checked").map(function(){ 
+                    return this.value; 
+                }).get()
             },
             success: function(res) {
                 clearform();
@@ -145,11 +178,13 @@ $(document).ready(function () {
     function populateForm(data){
         $("#name").val(data.name);
         $("#codeid").val(data.id);
-        let permIds = data.permissions.map(p => p.id);
-        $("#permissions").val(permIds).trigger('change'); // update Select2
 
-        $("#addBtn").val('Update');
-        $("#addBtn").html('Update');
+        $("input[name='permissions[]']").prop('checked', false);
+        data.permissions.forEach(p => {
+            $("#perm_" + p.id).prop('checked', true);
+        });
+
+        $("#addBtn").val('Update').html('Update');
         $("#addThisFormContainer").show(300);
         $("#newBtn").hide(100);
     }

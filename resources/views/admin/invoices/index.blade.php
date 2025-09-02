@@ -9,7 +9,9 @@
                   @if(request()->client_type_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3" id="newBtn">Back</a>
                   @endif
+                 @can('add invoice')
                 <button type="button" class="btn btn-secondary my-3">Add new</button>
+                @endcan
             </div>
             @if (!(request()->status))
             <div class="col-4 my-3 d-flex">

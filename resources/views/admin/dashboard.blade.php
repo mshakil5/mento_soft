@@ -2,6 +2,7 @@
 
 @section('content')
 
+@can('dashboard-content')
 <section class="content">
   <div class="container-fluid">
 
@@ -167,6 +168,7 @@
 
   </div>
 </section>
+@endcan
 
 @endsection
 

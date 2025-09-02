@@ -9,12 +9,16 @@
                   @if(request()->client_type_id)
                     <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
-                <button type="button" class="btn btn-secondary my-3" data-toggle="modal" 
-                          data-target="#tasksModal"
-                          onclick="openTaskModal()">
-                          Add Task
-                </button>
-                <a href="{{ route('tasks.all') }}" class="btn btn-secondary my-3">All Tasks</a>
+                  @can('add task')
+                  <button type="button" class="btn btn-secondary my-3" data-toggle="modal" 
+                            data-target="#tasksModal"
+                            onclick="openTaskModal()">
+                            Add Task
+                  </button>
+                  @endcan
+                  @can('all tasks')
+                  <a href="{{ route('tasks.all') }}" class="btn btn-secondary my-3">All Tasks</a>
+                  @endcan
             </div>
             <div class="col-3 my-3 d-flex">
                 <select id="projectFilter" class="form-control ml-2 select2">

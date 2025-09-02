@@ -92,21 +92,16 @@ class ClientProjectController extends Controller
                 })
                 ->addColumn('action', function($row) {
                     $percent = $row->completed_percentage;
-                    $badgeClass = 'bg-warning';
-                    if ($percent >= 100) {
-                        $badgeClass = 'bg-success';
-                    } elseif ($percent < 20) {
-                        $badgeClass = 'bg-danger';
-                    }
-
+                    $badgeClass = $percent >= 100 ? 'bg-success' : ($percent < 20 ? 'bg-danger' : 'bg-warning');
                     $details = view('admin.client-projects.partials.details-modal', ['row' => $row])->render();
 
-                    return '
+                    $buttons = '
                         <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
                             View Details
                         </a>
                         <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu p-2" style="min-width: 160px;">
@@ -118,12 +113,18 @@ class ClientProjectController extends Controller
                                     Updates ' . ($row->recent_updates_count > 0 ? '<span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '') . '
                                 </a>
                                 <hr class="dropdown-divider d-none">
-                                <button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>
-                                <button class="btn btn-outline-danger btn-sm btn-block delete" data-id="'.$row->id.'">Delete</button>
+                    ';
+
+                    if (auth()->user()->can('edit project')) {
+                        $buttons .= '<button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>';
+                    }
+
+                    $buttons .= '<button class="btn btn-outline-danger btn-sm btn-block delete" data-id="'.$row->id.'">Delete</button>
                             </div>
                         </div>
-                        '.$details.'
-                    ';
+                        '.$details;
+
+                    return $buttons;
                 })
                 ->rawColumns(['image', 'status', 'action'])
                 ->make(true);

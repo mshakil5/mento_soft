@@ -21,7 +21,6 @@ class ClientController extends Controller
 {
     public function index(Request $request)
     {
-      // dd($data = Client::with(['clientType', 'projects', 'invoices', 'services.serviceType'])->withCount('projects')->latest()->get());
         if ($request->ajax()) {
             $data = Client::with(['clientType', 'projects', 'invoices', 'services.serviceType'])->withCount('projects')->latest();
 
@@ -96,20 +95,30 @@ class ClientController extends Controller
                 ->addColumn('action', function($row) {
                     $details = view('admin.clients.partials.details-modal', ['row' => $row])->render();
 
-                    $buttons = '
-                        <a href="'.route('client.email', $row->id).'" class="btn btn-sm btn-warning">
-                            <i class="fas fa-envelope"></i>
-                        </a>
-                        <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
-                            View Details
-                        </a>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <div class="dropdown-menu p-2" style="min-width: 180px;">
-                                <button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>
-                                <button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
+                    $buttons = '';
+
+                    if (auth()->user()->can('mail client')) {
+                        $buttons .= '<a href="'.route('client.email', $row->id).'" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-envelope"></i>
+                                    </a> ';
+                    }
+
+                    $buttons .= '<a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
+                                    View Details
+                                </a>';
+
+                    $buttons .= '<div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <div class="dropdown-menu p-2" style="min-width: 180px;">';
+
+                    if (auth()->user()->can('edit client')) {
+                        $buttons .= '<button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>';
+                        $buttons .= '<button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
+                    }
+
+                    $buttons .= '</div></div>';
 
                     if ($row->projects->count()) {
                         $buttons .= '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" class="btn btn-success btn-sm btn-block mb-1 d-none">

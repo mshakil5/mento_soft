@@ -5,7 +5,9 @@
     <div class="container-fluid">
         <div class="row py-3">
             <div class="col-3">
+              @can('add service')
               <button type="button" class="btn btn-secondary mr-2" id="newBtn">Add Service</button>
+              @endcan
               <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service Types</a>
             </div>
             @if (!(request()->client_id || request()->project_service_id || request()->status || request()->due))

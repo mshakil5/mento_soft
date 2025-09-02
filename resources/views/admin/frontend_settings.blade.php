@@ -8,9 +8,11 @@
         </a>
     </li>
 
+    @can('switch')
     <a href="{{ route('toggle.sidebar') }}" class="btn btn-info my-2">
         Switch to Software Settings <i class="fas fa-arrow-right"></i>
     </a>
+    @endcan
 
     <li class="nav-item">
         <a href="{{ route('allservice') }}" class="nav-link {{ Route::is('allservice') ? 'active' : '' }}">
@@ -72,8 +74,8 @@
         </ul>
     </li>
 
-    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('permissions.index') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('permissions.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
             <p>
                 Settings <i class="fas fa-angle-left right"></i>
@@ -144,6 +146,18 @@
                 <a href="{{ route('team-members.index') }}" class="nav-link {{ Route::is('team-members.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-users"></i>
                     <p>Our Team</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('roles.index') }}" class="nav-link {{ Route::is('roles.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-user-shield"></i>
+                    <p>Roles</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('permissions.index') }}" class="nav-link {{ Route::is('permissions.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-key"></i>
+                    <p>Permissions</p>
                 </a>
             </li>
         </ul>

@@ -71,8 +71,12 @@ class InvoiceController extends Controller
 
                     $btn = '';
                     if ($row->isPending()) {
+                      if (auth()->user()->can('receive invoice')) {
                         $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
+                      }
+                      if (auth()->user()->can('edit invoice')) {
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+                      }
                         $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button> ';
 
                         $btn .= '
@@ -108,7 +112,9 @@ class InvoiceController extends Controller
                         </div>';
                     }
                     $btn .= '<a href="'.route('invoices.show', $row->id).'" class="btn btn-sm btn-primary view" target="_blank">View</a> ';
+                    if (auth()->user()->can('mail invoice')) {
                     $btn .= $emailBtn;
+                    }
 
                     return $btn;
                 })

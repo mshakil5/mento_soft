@@ -5,9 +5,11 @@
      {{-- Admin Only --}}
     @endrole
 
+    @can('switch')
     <a href="{{ route('toggle.sidebar') }}" class="btn btn-info my-2">
         Switch to Frontend Settings <i class="fas fa-arrow-right"></i>
     </a>
+    @endcan
 
     <li class="nav-item">
         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ Route::is('admin.dashboard') ? 'active' : '' }}">
@@ -16,59 +18,79 @@
         </a>
     </li>
 
+    @canany(['tasks', 'add task', 'all tasks'])
     <li class="nav-item">
         <a href="{{ route('tasks.index') }}" class="nav-link {{ Route::is('tasks.index') || Route::is('tasks.all') ? 'active' : '' }}">
             <i class="fas fa-tasks nav-icon"></i>
             <p>Tasks</p>
         </a>
     </li>
+    @endcanany
 
+    @canany(['add client', 'mail client', 'edit client'])
     <li class="nav-item">
         <a href="{{ route('clients.index') }}" class="nav-link {{ Route::is('clients.index') ? 'active' : '' }}">
             <i class="fas fa-user nav-icon"></i>
             <p>Clients</p>
         </a>
     </li>
+    @endcanany
 
+    @canany(['add project', 'edit project'])
     <li class="nav-item">
         <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') || Route::is('client-projects.updates') || Route::is('client-projects.services') || Route::is('client-project-services.details') ? 'active' : '' }}">
             <i class="fas fa-project-diagram nav-icon"></i>
             <p>Projects</p>
         </a>
     </li>
+    @endcanany
 
+    @canany(['add service', 'receive service', 'edit service'])
     <li class="nav-item">
         <a href="{{ route('project-services.index') }}" class="nav-link {{ Route::is('project-services.index') ? 'active' : '' }}">
             <i class="fas fa-concierge-bell nav-icon"></i>
             <p>Services</p>
         </a>
     </li>
+    @endcanany
 
+    @canany(['add invoice', 'receive invoice', 'edit invoice', 'mail invoice'])
     <li class="nav-item">
         <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
             <i class="fas fa-file-alt nav-icon"></i>
             <p>Invoices</p>
         </a>
     </li>
+    @endcanany
 
+    @can('reports')
     <li class="nav-item">
         <a href="#" class="nav-link">
             <i class="fas fa-chart-line nav-icon"></i>
             <p>Reports</p>
         </a>
     </li>
+    @endcan
+
     <li class="nav-header">QUICK ACTIONS</li>
 
+    @can('add client')
     <button class="btn btn-success mb-2" data-toggle="modal" data-target="#quickClientModal">
         <i class="fas fa-plus"></i> New Client
     </button>
+    @endcan
 
+    @can('add project')
     <button class="btn btn-success mb-2" data-toggle="modal" data-target="#createProjectModal">
         <i class="fas fa-plus"></i> New Project
     </button>
+    @endcan
+
+    @can('add invoice')
     <button class="btn btn-success mb-2" id="createInvoiceBtn">
         <i class="fas fa-plus"></i> Create Invoice
     </button>
+    @endcan
 
     <script>
         document.getElementById('createInvoiceBtn').addEventListener('click', function() {
@@ -77,9 +99,11 @@
         });
     </script>
 
+    @can('reports')
     <button id="toggleAccounting" class="btn btn-info my-2">
         Show Accounting
     </button>
+    @endcan
 
     <div id="accountingWrapper" style="display: none;">
     <li class="nav-item">

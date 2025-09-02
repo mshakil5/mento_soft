@@ -119,8 +119,12 @@ class ProjectServiceController extends Controller
                     $btn = '';
 
                     if ($row->isPending()) {
+                      if (auth()->user()->can('receive service')) {
                         $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
+                      }
+                      if (auth()->user()->can('edit service')) {
                         $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+                      }
                         $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>';
 
                         $btn .= '
