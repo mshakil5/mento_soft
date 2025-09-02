@@ -269,6 +269,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin', 'role:ad
     Route::post('/project-services/{service}', [ProjectServiceController::class, 'update']);
     Route::delete('/project-services/{service}', [ProjectServiceController::class, 'destroy']);
     Route::post('/project-services/{service}/toggle-status', [ProjectServiceController::class, 'toggleStatus']);
+    Route::post('/client-project-service-detail/{id}/toggle-renewed', [ProjectServiceController::class, 'toggleRenwed']);
+    Route::post('/client-project-service-detail/{id}/toggle-renewed', [ProjectServiceController::class, 'toggleRenwed']);
+
     Route::post('/project-service/{id}/receive', [ProjectServiceController::class, 'receive'])->name('project-service.receive');
     Route::get('/clients/{client}/projects', [ProjectServiceController::class, 'projects'])->name('clients.projects');
 

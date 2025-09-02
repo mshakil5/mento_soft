@@ -155,6 +155,7 @@
                                     <th>Amount</th>
                                     {{-- <th>Note</th> --}}
                                     <th>Status</th>
+                                    <th>Renewed</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -369,6 +370,29 @@
           });
       });
 
+      // Status toggle
+      $(document).on('change', '.toggle-renewed', function() {
+          var detail_id = $(this).data('id');
+          var status = $(this).prop('checked') ? 1 : 0;
+          var toggleUrl = "/admin/client-project-service-detail/" + detail_id + "/toggle-renewed";
+          $.ajax({
+              url: toggleUrl,
+              method: "POST",
+              data: {
+                  is_renewed: status,
+                  _token: "{{ csrf_token() }}"
+              },
+              success: function(res) {
+                  success(res.message);
+                  reloadTable();
+              },
+              error: function(xhr) {
+                  console.error(xhr.responseText);
+                  error('Failed to update status');
+              }
+          });
+      });
+
       // Delete
       $("#contentContainer").on('click','.delete', function(){
           if(!confirm('Are you sure you want to delete this detail?')) return;
@@ -423,6 +447,7 @@
               {data: 'amount', name: 'amount', orderable: false, searchable: false},
               // {data: 'note', name: 'note', orderable: false, searchable: false},
               {data: 'status', name: 'status', orderable: false, searchable: false},
+              {data: 'is_renewed', name: 'is_renewed', orderable: false, searchable: false},
               {data: 'action', name: 'action', orderable: false, searchable: false},
           ],
           responsive: true,

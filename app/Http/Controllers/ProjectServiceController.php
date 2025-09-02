@@ -95,7 +95,7 @@ class ProjectServiceController extends Controller
                 ->addColumn('service_type', fn($row) => $row->serviceType?->name)
                 ->addColumn('client_name', fn($row) => $row->client?->name)
                 ->addColumn('project_title', fn($row) => $row->project?->title)
-                ->addColumn('amount', fn($row) => number_format($row->amount, 2))
+                ->addColumn('amount', fn($row) => '£' . number_format($row->amount, 0))
                 ->addColumn('note', fn($row) => \Str::limit(strip_tags($row->note), 100))
                 ->addColumn('status', function($row) {
                     $checked = $row->status ? 'checked' : '';
@@ -103,6 +103,17 @@ class ProjectServiceController extends Controller
                                 <input type="checkbox" class="custom-control-input toggle-status" id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
                                 <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
                             </div>';
+                })
+                ->addColumn('is_renewed', function($row) {
+                    $checked = $row->is_renewed ? 'checked' : '';
+                    return '
+                        <div class="icheck-primary d-inline">
+                            <input type="checkbox" class="toggle-renewed" 
+                                  id="renewedCheck'.$row->id.'" 
+                                  data-id="'.$row->id.'" '.$checked.'>
+                            <label for="renewedCheck'.$row->id.'"></label>
+                        </div>
+                    ';
                 })
                 ->addColumn('action', function($row) {
                     $btn = '';
@@ -150,7 +161,7 @@ class ProjectServiceController extends Controller
 
                     return $btn;
                 })
-                ->rawColumns(['status', 'action'])
+                ->rawColumns(['status', 'action', 'is_renewed'])
                 ->make(true);
         }
 
@@ -348,6 +359,15 @@ class ProjectServiceController extends Controller
         $detail->save();
 
         return response()->json(['status'=>200, 'message'=>'Status updated successfully']);
+    }
+
+    public function toggleRenwed(Request $request, $id)
+    {
+        $detail = ProjectServiceDetail::findOrFail($id);
+        $detail->is_renewed = $request->is_renewed;
+        $detail->save();
+
+        return response()->json(['status'=>200, 'message'=>'Updated successfully']);
     }
 
     public function receive(Request $request, $id)
