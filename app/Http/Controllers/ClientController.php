@@ -103,7 +103,7 @@ class ClientController extends Controller
                                     </a> ';
                     }
 
-                    $buttons .= '<a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
+                    $buttons .= '<a class="btn btn-sm btn-info mr-1" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
                                     View Details
                                 </a>';
 
@@ -115,8 +115,9 @@ class ClientController extends Controller
 
                     if (auth()->user()->can('edit client')) {
                         $buttons .= '<button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>';
-                        $buttons .= '<button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
                     }
+
+                    $buttons .= '<button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
 
                     $buttons .= '</div></div>';
 

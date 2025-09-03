@@ -56,7 +56,7 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Name</th>
-                                    <th>Action</th>
+                                    {{-- <th>Action</th> --}}
                                 </tr>
                             </thead>
                         </table>
@@ -147,11 +147,12 @@ $(document).ready(function () {
     var table = $('#example1').DataTable({
         processing: true,
         serverSide: true,
+        paging: false,
         ajax: "{{ route('permissions.index') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'name', name: 'name'},
-            {data: 'action', name: 'action', orderable: false, searchable: false},
+            // {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
     });
 

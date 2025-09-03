@@ -28,6 +28,13 @@ class ProductFeatureController extends Controller
                     }
                     return '';
                 })
+                  ->addColumn('icon', function($row) {
+                      if ($row->icon) {
+                          return '<iconify-icon class="text-ternary" icon="'.$row->icon.'" width="50" height="50"></iconify-icon>';
+                      }
+                      return '';
+                  })
+
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">
@@ -41,7 +48,7 @@ class ProductFeatureController extends Controller
                       <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
                     ';
                 })
-                ->rawColumns(['image', 'status', 'action'])
+                ->rawColumns(['image', 'status', 'action', 'icon'])
                 ->make(true);
         }
 

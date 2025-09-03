@@ -109,7 +109,7 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Image</th>
+                                    <th>Icon</th>
                                     <th>Title</th>
                                     <th>Short Des</th>
                                     <th>Sort No.</th>
@@ -361,7 +361,7 @@
           },
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-              {data: 'image', name: 'image', orderable: false, searchable: false},
+              {data: 'icon', name: 'icon', orderable: false, searchable: false},
               {data: 'title', name: 'title'},
               {data: 'short_description', name: 'short_description'},
               {data: 'sl', name: 'sl'},
