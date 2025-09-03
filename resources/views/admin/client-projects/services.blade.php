@@ -513,6 +513,34 @@
           }
       });
 
+      $(document).on('click', '.send-service-email', function () {
+          let $btn = $(this);
+          let id = $btn.data('id');
+          let spinner = $btn.find('.spinner-border');
+
+          spinner.removeClass('d-none');
+          $btn.prop('disabled', true);
+
+          $.ajax({
+              url: '/admin/project-services/send-email/' + id,
+              type: 'POST',
+              data: {
+                  _token: $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function (res) {
+                  success(res.message ?? 'Email sent successfully!');
+                  reloadTable();
+              },
+              error: function (xhr) {
+                  const msg = xhr.responseJSON?.message ?? 'Email sending failed.';
+                  error(msg);
+              },
+              complete: function () {
+                  spinner.addClass('d-none');
+                  $btn.prop('disabled', false);
+              }
+          });
+      });
   });
 </script>
 @endsection

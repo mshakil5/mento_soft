@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Transaction;
 use App\Models\ClientProject;
+use Mail;
+use App\Mail\ProjectServiceInvoiceMail;
 
 class ProjectServiceController extends Controller
 {
@@ -163,6 +165,15 @@ class ProjectServiceController extends Controller
                         $btn .= '<button class="btn btn-sm btn-success" disabled>Received</button> ';
                     }
 
+                    $btn .= '<a href="'.route('project-services.invoice.show', $row->id).'" class="btn btn-sm btn-primary" target="_blank">Invoice</a> ';
+                    $btn .= '<button class="btn btn-sm btn-warning send-service-email" 
+                          data-id="'.$row->id.'" 
+                          data-email="'.$row->client?->email.'" 
+                          title="Send Invoice Email">
+                          <span class="spinner-border spinner-border-sm d-none"></span>
+                          Mail
+                      </button>';
+
                     return $btn;
                 })
                 ->rawColumns(['status', 'action', 'is_renewed'])
@@ -173,6 +184,25 @@ class ProjectServiceController extends Controller
         $clients = Client::where('status', 1)->select('id', 'business_name')->latest()->get();
         $projects = ClientProject::select('id', 'title')->latest()->get();
         return view('admin.client-projects.services', compact('serviceTypes', 'clients', 'projects'));
+    }
+
+    public function invoice($id)
+    {
+        $service = ProjectServiceDetail::with(['serviceType', 'client'])->findOrFail($id);
+        return view('admin.client-projects.service_invoice', compact('service'));
+    }
+
+    public function sendEmail($id)
+    {
+        $service = ProjectServiceDetail::with(['serviceType', 'client'])->findOrFail($id);
+
+        if (!$service->client || !$service->client->email) {
+            return response()->json(['message' => 'Client email not found.'], 422);
+        }
+
+        Mail::to($service->client->email)->send(new ProjectServiceInvoiceMail($service));
+
+        return response()->json(['message' => 'Service invoice email sent successfully.']);
     }
 
     public function store(Request $request)

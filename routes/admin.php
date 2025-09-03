@@ -285,6 +285,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/client-project-service-detail/{detail}/toggle-status', [ProjectServiceDetailController::class, 'toggleStatus']);
     Route::post('/project-service-details/{id}/receive', [ProjectServiceDetailController::class, 'receive'])->name('project-service-details.receive');
 
+    Route::get('/project-services/invoice/{id}', [ProjectServiceController::class, 'invoice'])
+    ->name('project-services.invoice.show');
+    Route::post('/project-services/send-email/{id}', [ProjectServiceController::class, 'sendEmail'])
+    ->name('project-services.send-email');
+
     // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::post('/invoices', [InvoiceController::class, 'store']);
