@@ -7,10 +7,10 @@
         <div class="row">
             <div class="col-2">
                   @if(request()->client_type_id)
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary my-3" id="newBtn">Back</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
                   @endif
                  @can('add invoice')
-                <button type="button" class="btn btn-secondary my-3">Add new</button>
+                <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
                 @endcan
             </div>
             @if (!(request()->status))
@@ -131,7 +131,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Message on Invoice</label>
-                                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                        <textarea class="form-control" id="description" name="description" rows="5"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -310,10 +310,10 @@
                 // Load client info
                 $.get(url + '/client-info/' + clientId, function(data) {
                     var html = `
+                        <p><strong>Name:</strong> ${data.business_name || 'N/A'}</p>
                         <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
                         <p><strong>Phone:</strong> ${data.phone1 || 'N/A'} ${data.phone2 ? ', ' + data.phone2 : ''}</p>
                         <p><strong>Address:</strong> ${data.address || 'N/A'}</p>
-                        <p><strong>Business:</strong> ${data.business_name || 'N/A'}</p>
                     `;
                     $('#clientInfoContainer').html(html);
                 });

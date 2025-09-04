@@ -134,7 +134,7 @@
                                 <textarea class="form-control summernote" id="additional_info" name="additional_info" rows="5" placeholder="Enter additional information"></textarea>
                             </div>
                             
-                            <div class="row">
+                            <div class="row d-none">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Project Image (800x600 recommended)</label>

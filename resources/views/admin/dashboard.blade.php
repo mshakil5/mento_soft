@@ -108,12 +108,12 @@
           </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-dark">
-              <div class="info-box shadow-lg">
-                  <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+          <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-decoration-none">
+              <div class="info-box bg-danger text-white shadow-lg">
+                  <span class="info-box-icon"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Current Month Pending Services</span>
-                      <span class="info-box-number">£{{ number_format($currentMonthDue, 0) }}</span>
+                      <span class="info-box-number fw-bold fs-4">£{{ number_format($currentMonthDue, 0) }}</span>
                   </div>
               </div>
           </a>
@@ -136,6 +136,17 @@
                   <div class="info-box-content">
                       <span class="info-box-text">Previous Pending Services</span>
                       <span class="info-box-number">£{{ number_format($allPreviousDue, 0) }}</span>
+                  </div>
+              </div>
+          </a>
+      </div>
+      <div class="col-md-3 col-sm-6 col-12">
+          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
+              <div class="info-box shadow-lg">
+                  <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+                  <div class="info-box-content">
+                      <span class="info-box-text">Next Three Months Pending Services</span>
+                      <span class="info-box-number">£</span>
                   </div>
               </div>
           </a>

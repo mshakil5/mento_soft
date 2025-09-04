@@ -129,18 +129,7 @@ $('#tasksModal form').submit(function(e) {
     e.preventDefault();
 
     const $form = $(this);
-    const projectId = $('#projectSelect').val();
-    const employeeSelect = $('#employeeSelect').val();
-
-    if(!projectId) {
-        error('Please select a project!');
-        return;
-    }
-
-    if(!employeeSelect) {
-        error('Please select an employee!');
-        return;
-    }
+    const projectId = $form.find('[name="project_id"]').val();
 
     $.ajax({
         url: `/admin/client-projects/${projectId}/tasks`,

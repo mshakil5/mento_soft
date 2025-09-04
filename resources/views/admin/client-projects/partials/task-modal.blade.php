@@ -15,9 +15,16 @@
         <div class="modal-body">
 
           <div class="row">
+            <div class="col-md-12">
+                <label>Task <span class="text-danger">*</span></label>
+                <input type="text" name="title" class="form-control" placeholder="" required>
+            </div>
+          </div>
+
+          <div class="row">
             <div class="col-md-6">
                 <label>Project <span class="text-danger">*</span></label>
-                <select class="form-control modal-select2" name="project_id" id="projectSelect">
+                <select class="form-control modal-select2" name="project_id">
                   <option value="">Select Project</option>
                   @foreach($projects as $project)
                     <option value="{{ $project->id }}">{{ $project->title }}</option>
@@ -27,7 +34,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label>Assigned To <span class="text-danger">*</span></label>
-                <select class="form-control select2" name="employee_id" id="employeeSelect" required>
+                <select class="form-control select2" name="employee_id" required>
                   <option value="">Select Employee</option>
                   @foreach($employees as $employee)
                     <option value="{{ $employee->id }}">{{ $employee->name }}</option>

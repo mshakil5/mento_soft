@@ -146,10 +146,11 @@ table.dataTable {
 
         $(document).on('click', '[data-toggle="modal"]', function() {
             var targetModalId = $(this).data('target');
-            var taskId = targetModalId.split('-')[1];
 
-            loadTaskMessages(taskId);
-            $(targetModalId).modal('show');
+            if (targetModalId.startsWith('#taskModal-')) {
+                var taskId = targetModalId.split('-')[1];
+                loadTaskMessages(taskId);
+            }
         });
 
         $(document).on('submit', '.taskMessageForm', function(e) {
@@ -180,7 +181,6 @@ table.dataTable {
 
         $(document).on('hidden.bs.modal', '.task-modal', function () {
             reloadAllTables();
-            $('.modal-backdrop').remove();
         });
 
         setInterval(reloadAllTables, 60000);

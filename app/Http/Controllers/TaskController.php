@@ -32,7 +32,10 @@ class TaskController extends Controller
             }
 
             if ($request->search) {
-                $query->where('task', 'like', "%{$request->search}%");
+                $query->where(function($q) use ($request) {
+                    $q->where('task', 'like', "%{$request->search}%")
+                      ->orWhere('title', 'like', "%{$request->search}%");
+                });
             }
 
             if ($request->client_project_id) {
@@ -174,9 +177,9 @@ class TaskController extends Controller
                 })
                 ->addColumn('action', function($row) {
                     $html = '
-                      <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
-                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-info">Edit</a>
-                      <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                      <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
+                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>
+                      <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>
 
                       <div class="modal fade" id="taskModal'.$row->id.'" tabindex="-1">
                         <div class="modal-dialog modal-lg">

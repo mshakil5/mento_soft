@@ -78,9 +78,9 @@ class ProjectTaskController extends Controller
                 })
                 ->addColumn('action', function($row) {
                     $html = '
-                      <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
-                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-info">Edit</a>
-                      <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                      <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
+                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>
+                      <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>
 
                       <div class="modal fade" id="taskModal'.$row->id.'" tabindex="-1">
                         <div class="modal-dialog modal-lg">
@@ -123,6 +123,7 @@ class ProjectTaskController extends Controller
     public function store(ClientProject $project, Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
             'task' => 'required|string',
             'employee_id' => 'required|exists:users,id',
             'priority' => 'required|in:high,medium,low',
@@ -139,6 +140,7 @@ class ProjectTaskController extends Controller
         $data = ProjectTask::create([
             'client_project_id' => $project->id,
             'client_id' => $project->client_id,
+            'title' => $request->title,
             'task' => $request->task,
             'employee_id' => $request->employee_id,
             'priority' => $request->priority,
@@ -187,6 +189,7 @@ class ProjectTaskController extends Controller
             ], 422);
         }
 
+        $task->title = $request->title;
         $task->task = $request->task;
         $task->employee_id = $request->employee_id;
         $task->priority = $request->priority;

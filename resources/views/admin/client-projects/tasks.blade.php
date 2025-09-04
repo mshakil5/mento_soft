@@ -5,8 +5,8 @@
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
-            <div class="d-flex gap-2 my-3">
-              <a href="{{ url()->previous() }}" class="btn btn-secondary mr-2">Back to Projects</a>
+            <div class="col-2">
+              <a href="{{ url()->previous() }}" class="btn btn-secondary my-3">Back</a>
               <button type="button" class="btn btn-secondary" id="newBtn">Add new Task</button>
             </div>
         </div>
@@ -27,6 +27,15 @@
                             <input type="hidden" class="form-control" id="codeid" name="codeid">
                             <input type="hidden" name="client_project_id" value="{{ $project->id }}">
                             
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Task <span class="text-danger">*</span></label>
+                                        <input type="text" name="title" class="form-control" id="title">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -141,6 +150,7 @@
         $("#addBtn").click(function(){
             var form_data = new FormData();
             form_data.append("client_project_id", "{{ $project->id }}");
+            form_data.append("title", $("#title").val());
             form_data.append("task", $("#task").val());
             form_data.append("employee_id", $("#employee_id").val());
             form_data.append("priority", $("#priority").val());
@@ -212,6 +222,7 @@
 
         function populateForm(data){
             $("#employee_id").val(data.employee_id).trigger('change');
+            $("#title").val(data.title);
             $("#task").summernote('code', data.task);
             $("#priority").val(data.priority);
             $("#status").val(data.status);

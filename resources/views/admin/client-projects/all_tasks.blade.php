@@ -7,6 +7,7 @@
         <div class="row mb-3">
             @if (!(request()->status))
             <div class="col-2 d-flex">
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mr-2">Back</a>
                 <button type="button" class="btn btn-secondary" data-toggle="modal" 
                     data-target="#tasksModal"
                     onclick="openTaskModal()">

@@ -58,28 +58,47 @@ class InvoiceController extends Controller
                     return '<span class="badge bg-warning">Due</span>';
                 })
                 ->addColumn('action', function($row) {
-                    $emailBtn = $row->client->email 
-                        ? '<button class="btn btn-sm btn-warning send-email" 
-                                data-id="'.$row->id.'" 
-                                data-email="'.$row->client->email.'" 
-                                title="'.($row->email_logs_count > 0 ? "{$row->email_logs_count} emails sent" : 'Send first email').'">
-                            <span class="spinner-border spinner-border-sm d-none"></span>
-                            Send Email' 
-                            . ($row->email_logs_count > 0 ? " ({$row->email_logs_count})" : '') .
-                          '</button>'
-                        : '';
 
-                    $btn = '';
+                    if ($row->isPending() && auth()->user()->can('receive invoice')) {
+                        $receiveBtn = '<button class="btn btn-sm btn-success mr-1" data-toggle="modal" data-target="#receiveModal'.$row->id.'">
+                                            Receive
+                                      </button>';
+                    } else {
+                        $receiveBtn = '<button class="btn btn-sm btn-secondary mr-1" disabled>
+                                            Received
+                                      </button>';
+                    }
+
+                    $dropdown = '<div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                    </button>
+                                    <div class="dropdown-menu">';
+
+                    // View
+                    $dropdown .= '<a href="'.route('invoices.show', $row->id).'" class="dropdown-item view" target="_blank">
+                                    <i class="fas fa-eye"></i> View
+                                  </a>';
+
+                    if (auth()->user()->can('edit invoice') && $row->isPending()) {
+                        $dropdown .= '<a href="#" class="dropdown-item edit" data-id="'.$row->id.'">
+                                        <i class="fas fa-edit"></i> Edit
+                                      </a>';
+                    }
+
+                    if (auth()->user()->can('mail invoice') && $row->client->email) {
+                        $dropdown .= '<a href="#" class="dropdown-item send-email" 
+                                        data-id="'.$row->id.'" 
+                                        data-email="'.$row->client->email.'" 
+                                        title="'.($row->email_logs_count > 0 ? "{$row->email_logs_count} emails sent" : 'Send first email').'">
+                                        <i class="fas fa-envelope"></i> Send Email
+                                      </a>';
+                    }
+
+                    $dropdown .= '</div></div>';
+
                     if ($row->isPending()) {
-                      if (auth()->user()->can('receive invoice')) {
-                        $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
-                      }
-                      if (auth()->user()->can('edit invoice')) {
-                        $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
-                      }
-                        $btn .= '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button> ';
-
-                        $btn .= '
+                        $receiveModal = '
                         <div class="modal fade" id="receiveModal'.$row->id.'" tabindex="-1">
                             <div class="modal-dialog">
                                 <form method="POST" action="'.route('invoices.receive', $row->id).'" class="receive-form">
@@ -110,14 +129,13 @@ class InvoiceController extends Controller
                                 </form>
                             </div>
                         </div>';
-                    }
-                    $btn .= '<a href="'.route('invoices.show', $row->id).'" class="btn btn-sm btn-primary view" target="_blank">View</a> ';
-                    if (auth()->user()->can('mail invoice')) {
-                    $btn .= $emailBtn;
+                    } else {
+                        $receiveModal = '';
                     }
 
-                    return $btn;
+                    return $receiveBtn . $dropdown . $receiveModal;
                 })
+
                 ->rawColumns(['action', 'status', 'project'])
                 ->make(true);
         }
@@ -192,7 +210,7 @@ class InvoiceController extends Controller
 
                 $detail = new InvoiceDetail();
                 $detail->invoice_id = $invoice->id;
-                $detail->client_project_id = $project['client_project_id'] ?? null;
+                $detail->client_project_id = !empty($project['client_project_id']) ? $project['client_project_id'] : null;
                 $detail->project_name = $project['project_name'];
                 $detail->description = $project['description'] ?? null;
                 $detail->qty = $qty;
@@ -367,7 +385,7 @@ class InvoiceController extends Controller
                     $detail->invoice_id = $invoice->id;
                 }
 
-                $detail->client_project_id = $project['client_project_id'] ?? null;
+                $detail->client_project_id = !empty($project['client_project_id']) ? $project['client_project_id'] : null;
                 $detail->project_name = $project['project_name'];
                 $detail->description = $project['description'] ?? null;
                 $detail->qty = $qty;

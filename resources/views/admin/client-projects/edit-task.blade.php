@@ -16,6 +16,15 @@
                             <input type="hidden" name="client_project_id" value="{{ $task->client_project_id }}">
                             
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Task <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="title" name="title" value="{{ $task->title }}" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Assigned To <span class="text-danger">*</span></label>
@@ -71,9 +80,6 @@
                         <a href="{{ url()->previous() }}" class="btn btn-default">Cancel</a>
                     </div>
                 </div>
-            </div>
-            <div class="col-3">
-                <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
             </div>
         </div>
     </div>

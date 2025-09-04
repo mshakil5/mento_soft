@@ -1,5 +1,6 @@
 @php
   $clients = \App\Models\Client::where('status', 1)->select('id', 'business_name')->latest()->get();
+  $employees = \App\Models\User::where('status', 1)->where('user_type', 1)->select('id', 'name')->get();
 @endphp
 
 <div class="modal fade ajaxModal" id="createProjectModal" tabindex="-1" role="dialog" aria-labelledby="createProjectLabel" aria-hidden="true">
@@ -10,15 +11,13 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        <form class="ajaxForm" id="createProjectForm" action="{{ route('admin.client-projects.store') }}" method="POST" enctype="multipart/form-data">
+        <form class="ajaxForm" action="{{ route('admin.client-projects.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
-          <input type="hidden" id="codeid" name="codeid">
-
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
                 <label>Client <span class="text-danger">*</span></label>
-                <select class="form-control select2" id="client_id" name="client_id" required>
+                <select class="form-control select2" name="client_id" required>
                   <option value="">Select Client</option>
                   @foreach($clients as $client)
                     <option value="{{ $client->id }}">{{ $client->business_name }}</option>
@@ -29,7 +28,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label>Project Title <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="title" name="title" placeholder="Enter project title" required>
+                <input type="text" class="form-control" name="title" placeholder="Enter project title" required>
               </div>
             </div>
           </div>
@@ -38,25 +37,36 @@
             <div class="col-md-6 d-none">
               <div class="form-group">
                 <label>Domain</label>
-                <input type="text" class="form-control" id="domain" name="domain" placeholder="Enter domain">
+                <input type="text" class="form-control" name="domain" placeholder="Enter domain">
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group">
                 <label>Project URL</label>
-                <input type="url" class="form-control" id="project_url" name="project_url" placeholder="Enter project URL">
+                <input type="url" class="form-control" name="project_url" placeholder="Enter project URL">
               </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Project Manager <span class="text-danger">*</span></label>
+                    <select name="project_manager" class="form-control select2" required>
+                        <option value="">Select Project Manager</option>
+                        @foreach($employees as $employee)
+                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="col-md-6 d-none">
               <div class="form-group">
                 <label>Tech Stack</label>
-                <input type="text" class="form-control" id="tech_stack" name="tech_stack" placeholder="PHP,Laravel,MySQL">
+                <input type="text" class="form-control" name="tech_stack" placeholder="PHP,Laravel,MySQL">
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group">
                 <label>Status <span class="text-danger">*</span></label>
-                <select class="form-control" id="status" name="status" required>
+                <select class="form-control" name="status" required>
                   <option value="1">Planned</option>
                   <option value="2">In Progress</option>
                   <option value="3">Blocked</option>
@@ -70,31 +80,31 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label>Start Date</label>
-                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
+                <input type="date" class="form-control" name="start_date" value="{{ date('Y-m-d') }}">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label>Due Date</label>
-                <input type="date" class="form-control" id="due_date" name="due_date">
+                <input type="date" class="form-control" name="due_date">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label>Amount(£)</label>
-                <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter amount">
+                <input type="text" class="form-control" name="amount" placeholder="Enter amount">
               </div>
             </div>
           </div>
 
           <div class="form-group">
             <label>Project Concept / Idea</label>
-            <textarea class="form-control summernote" id="description" name="description" rows="4" placeholder="Enter project description"></textarea>
+            <textarea class="form-control summernote" name="description" rows="4" placeholder="Enter project description"></textarea>
           </div>
 
           <div class="form-group">
             <label>Additional Info</label>
-            <textarea class="form-control summernote" id="additional_info" name="additional_info" rows="4" placeholder="Enter additional information"></textarea>
+            <textarea class="form-control summernote" name="additional_info" rows="4" placeholder="Enter additional information"></textarea>
           </div>
 
           <div class="modal-footer">

@@ -95,34 +95,32 @@ class ClientProjectController extends Controller
                     $badgeClass = $percent >= 100 ? 'bg-success' : ($percent < 20 ? 'bg-danger' : 'bg-warning');
                     $details = view('admin.client-projects.partials.details-modal', ['row' => $row])->render();
 
-                    $buttons = '
-                        <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
-                            View Details
-                        </a>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <div class="dropdown-menu p-2" style="min-width: 160px;">
-                                <a class="btn btn-success btn-sm btn-block mb-1" href="' . route('client-projects.tasks', $row->id) . '">
+                    $buttons = '<a class="btn btn-sm btn-success mr-1" href="' . route('client-projects.tasks', $row->id) . '">
                                     Tasks
                                     <span class="badge '.$badgeClass.'" style="font-size: 0.75rem;">'.$percent.'%</span>
-                                </a>
-                                <a class="btn btn-warning btn-sm btn-block mb-1 d-none" href="' . route('client-projects.updates', $row->id) . '">
-                                    Updates ' . ($row->recent_updates_count > 0 ? '<span class="badge badge-light ml-1">'.$row->recent_updates_count.'</span>' : '') . '
-                                </a>
-                                <hr class="dropdown-divider d-none">
-                    ';
+                                </a>';
+
+                    $buttons .= '<a class="btn btn-sm btn-info mr-1" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
+                                    View
+                                </a>';
+
+                    $buttons .= '<div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                    </button>
+                                    <div class="dropdown-menu">';
 
                     if (auth()->user()->can('edit project')) {
-                        $buttons .= '<button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>';
+                        $buttons .= '<a href="#" class="dropdown-item edit" data-id="'.$row->id.'">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>';
                     }
 
-                    $buttons .= '<button class="btn btn-outline-danger btn-sm btn-block delete" data-id="'.$row->id.'">Delete</button>
-                            </div>
-                        </div>
-                        '.$details;
+                    $buttons .= '<a href="#" class="dropdown-item delete" data-id="'.$row->id.'">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>';
+
+                    $buttons .= '</div></div>'.$details;
 
                     return $buttons;
                 })
