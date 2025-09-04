@@ -12,7 +12,4 @@
 
 **Message:**  
 {{ $message }}
-
-Thanks,  
-{{ config('app.name') }}
 @endcomponent
