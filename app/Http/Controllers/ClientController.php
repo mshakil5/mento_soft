@@ -457,8 +457,9 @@ class ClientController extends Controller
         }
 
         $client = Client::findOrFail($request->id);
+        $serviceIds = $request->serviceIds ? json_decode($request->serviceIds, true) : [];
 
-        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body, $client->serviceIds));
+        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body, $serviceIds));
 
         return response()->json([
             'status'  => 'success',

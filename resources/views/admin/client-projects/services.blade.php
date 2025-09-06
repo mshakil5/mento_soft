@@ -8,7 +8,13 @@
               @can('add service')
               <button type="button" class="btn btn-secondary mr-2" id="newBtn">Add Service</button>
               @endcan
-              <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service Types</a>
+              <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service List</a>
+            </div>
+            <div class="col-1 d-flex">
+                <input type="hidden" id="selectedClientId" value="">
+                <button id="sendMail" type="button" class="btn btn-success" style="display:none;">
+                    Mail
+                </button>
             </div>
             @if (!(request()->client_id || request()->project_service_id || request()->status || request()->due))
             <div class="col-3 d-flex">
@@ -27,9 +33,9 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-3 d-flex">
+            <div class="col-2 d-flex">
                 <select id="serviceTypeFilter" class="form-control ml-2 select2">
-                    <option value="">Select Service Type</option>
+                    <option value="">Select Service</option>
                     @foreach ($serviceTypes as $serviceType)
                       <option value="{{ $serviceType->id }}">{{ $serviceType->name }}</option>
                     @endforeach
@@ -53,11 +59,20 @@
                             @csrf
                             <input type="hidden" id="codeid" name="codeid">
                             <div class="row">
+                                 <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Service Type <span class="text-danger">*</span></label>
+                                        <select class="form-control" name="type" id="type" required>
+                                            <option value="1">In House Service</option>
+                                            <option value="2">Third Party Service</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Choose Service Type <span class="text-danger">*</span></label>
+                                        <label>Choose Service <span class="text-danger">*</span></label>
                                         <select class="form-control select2" name="service_type_id" id="service_type_id" required>
-                                            <option value="">Choose Service Type</option>
+                                            <option value="">Choose Service</option>
                                             @foreach ($serviceTypes as $serviceType)
                                                 <option value="{{ $serviceType->id }}">{{ $serviceType->name }}</option>
                                             @endforeach
@@ -100,24 +115,26 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" id="end_date_div">
                                     <div class="form-group">
-                                        <label>End Date <span class="text-danger">*</span></label>
+                                        <label>Deadline <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="end_date" name="end_date" readonly required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group" style="margin-top: 35px;">
+                                    <div class="form-group" style="margin-top: 35px; margin-left: 20px;">
                                         <input type="checkbox" class="form-control-input" id="is_auto" name="is_auto" value="1">
                                         <label>Auto Renewal</label>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group mt-3">
-                                <label>Amount <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
-                            </div>
+                              <div class="col-md-6">
+                                  <div class="form-group mt-3">
+                                      <label>Amount <span class="text-danger">*</span></label>
+                                      <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                                  </div>
+                              </div>
+                           </div>
 
                             <div class="form-group">
                                 <label>Note</label>
@@ -141,23 +158,25 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Ongoing Services</h3>
+                        <h3 class="card-title">All Services</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table cell-border table-striped">
                             <thead>
                                 <tr>
                                     {{-- <th>Sl</th> --}}
-                                    <th>Service Type</th>
+                                    <th>Service</th>
                                     <th>Project</th>
                                     <th>Client</th>
                                     <th>Start</th>
-                                    <th>End</th>
-                                    <th>Renewal</th>
+                                    <th>Deadline</th>
+                                    <th>Due</th>
+                                    {{-- <th>Renewal</th> --}}
                                     <th>Amount</th>
                                     {{-- <th>Note</th> --}}
-                                    <th>Status</th>
+                                    {{-- <th>Status</th> --}}
                                     <th>Renewed</th>
+                                    <th>Mail</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -232,7 +251,21 @@
           calculateEndDate();
       });
 
-      $("#addBtn").click(function(){
+      function toggleEndDate() {
+          if ($("#type").val() == "1") { 
+              $("#end_date_div").hide();
+          } else {
+              $("#end_date_div").show();
+          }
+      }
+
+      toggleEndDate();
+
+      $("#type").change(function () {
+          toggleEndDate();
+      });
+
+      $("#addThisFormContainer").on('click','#addBtn', function(){
           var form_data = new FormData();
           form_data.append("service_type_id", $("#service_type_id").val());
           form_data.append("client_id", $("#client_id").val());
@@ -242,6 +275,7 @@
           form_data.append("amount", $("#amount").val());
           form_data.append("note", $("#note").val());
           form_data.append("cycle_type", $("#cycle_type").val());
+          form_data.append("type", $("#type").val());
           form_data.append("is_auto", $("#is_auto").is(":checked") ? 1 : 0);
 
           if($(this).val() == 'Create') {
@@ -331,7 +365,13 @@
           $("#amount").val(data.amount);
           $("#note").val(data.note);
           $("#codeid").val(data.id);
+          $("#type").val(data.type);
           $("#is_auto").prop('checked', data.is_auto == 1);
+          if (data.type == 1) {
+            $("#end_date_div").hide();
+          } else {
+            $("#end_date_div").show();
+          }
 
           $("#addBtn").val('Update');
           $("#addBtn").html('Update');
@@ -346,6 +386,7 @@
           $("#addBtn").html('Create');
           $("#addThisFormContainer").slideUp(200);
           $("#newBtnSection").slideDown(200);
+          $("#end_date_div").hide();
       }
 
       // Status toggle
@@ -445,11 +486,13 @@
               {data: 'client_name', name: 'client_name'},
               {data: 'start_date', name: 'start_date'},
               {data: 'end_date', name: 'end_date'},
-              {data: 'next_renewal', name: 'next_renewal'},
+              {data: 'due_date', name: 'due_date'},
+              // {data: 'next_renewal', name: 'next_renewal'},
               {data: 'amount', name: 'amount', orderable: false, searchable: false},
               // {data: 'note', name: 'note', orderable: false, searchable: false},
-              {data: 'status', name: 'status', orderable: false, searchable: false},
+              // {data: 'status', name: 'status', orderable: false, searchable: false},
               {data: 'is_renewed', name: 'is_renewed', orderable: false, searchable: false},
+              { data: 'checkbox', orderable: false, searchable: false }, 
               {data: 'action', name: 'action', orderable: false, searchable: false},
           ],
           responsive: true,
@@ -465,6 +508,23 @@
           reloadTable();
       });
 
+      // Init select2 inside modal
+      $(document).on('shown.bs.modal', '.modal', function () {
+          $(this).find('.bill-select').select2({
+              dropdownParent: $(this)
+          });
+      });
+
+      // Update total amount dynamically
+      $(document).on('change', '.bill-select', function () {
+          let total = 0;
+          $(this).find('option:selected').each(function () {
+              total += parseFloat($(this).data('amount'));
+          });
+          $(this).closest('.modal-body').find('.total-amount').val('£' + total.toFixed(2));
+      });
+
+      // Submit form via AJAX
       $(document).on('submit', '.receive-form', function(e) {
           e.preventDefault();
           if (!confirm('Mark as received?')) return;
@@ -479,7 +539,7 @@
                   form.closest('.modal').modal('hide');
                   reloadTable();
               },
-              error: function (xhr, status, error) {
+              error(xhr) {
                   console.error(xhr.responseText);
               }
           });
@@ -541,6 +601,56 @@
               }
           });
       });
+
+      $('#newBtnSection').on('click', '#sendMail', function(e) {
+          e.preventDefault();
+
+          let rowIds = [];
+          $('.row-checkbox:checked').each(function() {
+              rowIds.push($(this).val());
+          });
+
+          let clientId = $('#selectedClientId').val();
+
+          if(rowIds.length === 0) {
+              error("Please select at least one row!");
+              return;
+          }
+
+          let query = rowIds.map(id => 'service_ids[]=' + id).join('&');
+
+          window.location.href = `/admin/client-mail/${clientId}?${query}`;
+      });
+
+      let selectedClientId = null;
+
+      $(document).on('change', '.row-checkbox', function() {
+          let clientId = $(this).data('client_id');
+
+          if(this.checked){
+              if(!selectedClientId) {
+                  selectedClientId = clientId;
+              } else if(selectedClientId !== clientId) {
+                  this.checked = false;
+                  error("Cannot select rows from different clients!");
+                  return;
+              }
+          } else {
+              if($('.row-checkbox:checked').length === 0) {
+                  selectedClientId = null;
+              }
+          }
+
+          // store in hidden input
+          $('#selectedClientId').val(selectedClientId);
+
+          if($('.row-checkbox:checked').length > 0){
+              $('#sendMail').show();
+          } else {
+              $('#sendMail').hide();
+          }
+      });
+
   });
 </script>
 @endsection

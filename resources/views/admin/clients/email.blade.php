@@ -112,18 +112,19 @@
                   serviceIds: serviceIds
               },
               success: function(res) {
-                success(res.message);
-                subject.val('');
-                body.val('');
-                pageTop();
+                  console.log(res);
+                  success(res.message);
+                  setTimeout(function() {
+                      window.history.back();
+                  }, 1000);
               },
               error: function(xhr) {
-                console.error(xhr.responseText);
-                pageTop();
-                if (xhr.responseJSON && xhr.responseJSON.errors)
-                  error(Object.values(xhr.responseJSON.errors)[0][0]);
-                else
-                  error();
+                  console.error(xhr.responseText);
+                  pageTop();
+                  if (xhr.responseJSON && xhr.responseJSON.errors)
+                      error(Object.values(xhr.responseJSON.errors)[0][0]);
+                  else
+                      error();
               },
               complete: function() {
                   sendButton.prop('disabled', false);

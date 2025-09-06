@@ -273,7 +273,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/client-project-service-detail/{id}/toggle-renewed', [ProjectServiceController::class, 'toggleRenwed']);
     Route::post('/client-project-service-detail/{id}/toggle-renewed', [ProjectServiceController::class, 'toggleRenwed']);
 
-    Route::post('/project-service/{id}/receive', [ProjectServiceController::class, 'receive'])->name('project-service.receive');
+    Route::post('/project-service/receive', [ProjectServiceController::class, 'receive'])->name('project-service.receive');
     Route::get('/clients/{client}/projects', [ProjectServiceController::class, 'projects'])->name('clients.projects');
 
     // Project Service Details
@@ -287,8 +287,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('/project-services/invoice/{id}', [ProjectServiceController::class, 'invoice'])
     ->name('project-services.invoice.show');
-    Route::post('/project-services/send-email/{id}', [ProjectServiceController::class, 'sendEmail'])
-    ->name('project-services.send-email');
+    Route::post('/project-services/send-email/{id}', [ProjectServiceController::class, 'sendSingleEmail']);
+    Route::get('/project-services/send-multi-email', [ProjectServiceController::class, 'sendMultiEmail']);
 
     // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
