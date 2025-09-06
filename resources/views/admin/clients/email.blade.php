@@ -7,7 +7,7 @@
       <div class="row justify-content-md-center">
         <div class="col-md-10">
           <div class="mb-3">
-            <a href="{{ route('clients.index') }}" class="btn btn-secondary">
+            <a href="{{ url()->previous() }}" class="btn btn-secondary">
               <i class="fa fa-arrow-left"></i> Back
             </a>
           </div>
@@ -18,6 +18,7 @@
             </div>
             
             <form id="createThisForm">
+              <input type="hidden" name="serviceIds" value='@json($serviceIds)' id="serviceIds">
               @csrf
               <div class="card-body">
 
@@ -33,6 +34,7 @@
                         <input type="text" class="form-control" id="subject" name="subject">
                       </div>
                     </div>
+                    @if(request('type') === 'service')
                     <div class="col-sm-12">
                       <div class="form-group">
                         <label>Select Unpaid Services</label>
@@ -47,6 +49,7 @@
                           </select>
                       </div>
                     </div>
+                    @endif
                     <div class="col-sm-12">
                       <div class="form-group">
                         <label>Body</label>
@@ -88,6 +91,7 @@
           var body = $('#body').val();
           var sendButton = $('#sendEmailButton');
           var loader = $('#loader');
+          var serviceIds = $('#serviceIds').val();
 
           if (!subject || !body) {
               error('Please fill in all fields.');
@@ -104,7 +108,8 @@
                   _token: "{{ csrf_token() }}",
                   subject: subject,
                   body: body,
-                  id: "{{ $client->id }}"
+                  id: "{{ $client->id }}",
+                  serviceIds: serviceIds
               },
               success: function(res) {
                 success(res.message);

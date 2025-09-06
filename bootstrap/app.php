@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->command('project-service:auto-create')->daily();
+        $schedule->command('project-service:auto-create')->everyFiveMinutes();
         //php artisan schedule:work
     })
     ->withExceptions(function (Exceptions $exceptions) {

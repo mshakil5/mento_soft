@@ -7,7 +7,7 @@
         <div class="row" id="">
           <div class="d-flex gap-2 my-3 col-4">
               <a href="{{ route('project-services.index') }}" class="btn btn-secondary mr-2">Back to Services</a>
-              <button type="button" class="btn btn-secondary" id="newBtn">Add new Service Type</button>
+              <button type="button" class="btn btn-secondary" id="newBtn">Add new Service</button>
             </div>
         </div>
     </div>
@@ -19,7 +19,7 @@
             <div class="col-md-10">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="cardTitle">Add new Service Type</h3>
+                        <h3 class="card-title" id="cardTitle">Add new Service</h3>
                     </div>
                     <div class="card-body">
                         <form id="createThisForm">
@@ -53,7 +53,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">All Service Types</h3>
+                        <h3 class="card-title">All Services</h3>
                     </div>
                     <div class="card-body">
                         <table id="example1" class="table cell-border table-striped">
@@ -156,7 +156,7 @@ $(document).ready(function () {
 
     // Edit
     $("#contentContainer").on('click','.edit', function(){
-        $("#cardTitle").text('Update this service type');
+        $("#cardTitle").text('Update this service');
         var codeid = $(this).data('id');
         var info_url = "/admin/service-type/" + codeid + "/edit";
         $.get(info_url, {}, function(d){
@@ -181,7 +181,7 @@ $(document).ready(function () {
         $("#addBtn").html('Create');
         $("#addThisFormContainer").slideUp(200);
         $("#newBtnSection").slideDown(200);
-        $("#cardTitle").text('Add new Service Type');
+        $("#cardTitle").text('Add new Service');
     }
 
     // Status toggle
@@ -210,7 +210,7 @@ $(document).ready(function () {
 
     // Delete
     $("#contentContainer").on('click','.delete', function(){
-        if(!confirm('Are you sure you want to delete this service type?')) return;
+        if(!confirm('Are you sure you want to delete this service?')) return;
         var codeid = $(this).data('id');
         var info_url = "/admin/service-type/" + codeid;
         $.ajax({

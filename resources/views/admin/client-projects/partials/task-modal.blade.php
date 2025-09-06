@@ -24,7 +24,7 @@
           <div class="row">
             <div class="col-md-6">
                 <label>Project <span class="text-danger">*</span></label>
-                <select class="form-control modal-select2" name="project_id">
+                <select class="form-control modal-select2" name="project_id" required>
                   <option value="">Select Project</option>
                   @foreach($projects as $project)
                     <option value="{{ $project->id }}">{{ $project->title }}</option>

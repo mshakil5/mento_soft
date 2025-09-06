@@ -14,13 +14,28 @@ class AutoCreateProjectServiceDetails extends Command
 
     public function handle()
     {
-        $end = Carbon::today()->addDays(7)->format('Y-m-d');
 
         $details = ProjectServiceDetail::where('is_auto', 1)
             ->where('status', 1)
-            ->where('bill_paid', 1)
+            // ->where('bill_paid', 1)
+            ->where(function($q) {
+                $q->where('type', 1) // In House
+                  ->orWhere(function($t) {
+                      $t->where('type', 2) // Third Party
+                        ->where('bill_paid', 1);
+                  });
+            })
             ->where('next_created', 0)
-            ->where('next_start_date', '<=', $end)
+            ->where(function($q) {
+                $q->where(function($m) {
+                    $m->where('cycle_type', 1)
+                      ->where('next_start_date', '<=', Carbon::today()->format('Y-m-d'));
+                })
+                ->orWhere(function($y) {
+                    $y->where('cycle_type', 2)
+                      ->where('next_start_date', '<=', Carbon::today()->format('Y-m-d'));
+                });
+            })
             ->get();
 
         foreach ($details as $detail) {
@@ -29,6 +44,14 @@ class AutoCreateProjectServiceDetails extends Command
             $startDate = Carbon::parse($detail->next_start_date)->format('Y-m-d');
             $endDate = Carbon::parse($detail->next_end_date)->format('Y-m-d');
 
+            $dueDate = null;
+            if ($detail->cycle_type == 1) {
+                $dueDate = Carbon::parse($endDate)->subWeeks(2)->format('Y-m-d');
+            } elseif ($detail->cycle_type == 2) {
+                $dueDate = Carbon::parse($endDate)->subMonths(3)->format('Y-m-d');
+            }
+            $newDetail->due_date = $dueDate;
+
             $newDetail->start_date = $startDate;
             $newDetail->end_date = $endDate;
             $newDetail->next_created = 0;
@@ -36,8 +59,6 @@ class AutoCreateProjectServiceDetails extends Command
             $newDetail->last_auto_run = now();
             $newDetail->created_at = now();
             $newDetail->updated_at = now();
-            $newDetail->client_id = $detail->client_id;
-            $newDetail->client_project_id = $detail->client_project_id;
 
             $nextStart = Carbon::parse($endDate)->addDay();
             if ($detail->cycle_type === 1) {
@@ -48,23 +69,25 @@ class AutoCreateProjectServiceDetails extends Command
 
             $newDetail->next_start_date = $nextStart->format('Y-m-d');
             $newDetail->next_end_date = $nextEnd->format('Y-m-d');
-
+            
             $newDetail->save();
 
             $detail->next_created = 1;
             $detail->save();
 
+            $serviceName = optional($newDetail->projectService)->name ?? 'Service';
+
             $transaction = new Transaction();
             $transaction->date = $startDate;
             $transaction->project_service_detail_id = $newDetail->id;
-            $transaction->client_id = $newDetail->projectService?->clientProject?->client_id;
+            $transaction->client_id = $newDetail->client_id; 
             $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Due';
             $transaction->payment_type = 'Bank';
-            $transaction->description = $newDetail->note ?? "Due for {$newDetail->projectService->name} for service period {$startDate} to {$endDate}";
+            $transaction->description = $newDetail->note ?? "Due for {$serviceName} for service period {$startDate} to {$endDate}";
             $transaction->amount = $newDetail->amount;
             $transaction->at_amount = $newDetail->amount;
-            $transaction->created_by = $newDetail->created_by;
+            $transaction->created_by = $newDetail->created_by; 
             $transaction->save();
 
             $transaction->tran_id = 'AT' . date('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT);

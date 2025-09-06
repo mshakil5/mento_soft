@@ -116,7 +116,7 @@ class ProjectTaskController extends Controller
                 ->make(true);
         }
 
-        $employees = User::where('status', 1)->latest()->get();
+        $employees = User::where('status', 1)->where('user_type', 1)->latest()->get();
         return view('admin.client-projects.tasks', compact('project', 'employees'));
     }
 

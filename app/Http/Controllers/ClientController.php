@@ -98,26 +98,30 @@ class ClientController extends Controller
                     $buttons = '';
 
                     if (auth()->user()->can('mail client')) {
-                        $buttons .= '<a href="'.route('client.email', $row->id).'" class="btn btn-sm btn-warning">
+                        $buttons .= '<a href="'.route('client.email', ['id' => $row->id]).'" class="btn btn-sm btn-warning mr-1">
                                         <i class="fas fa-envelope"></i>
-                                    </a> ';
+                                    </a>';
                     }
 
                     $buttons .= '<a class="btn btn-sm btn-info mr-1" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
-                                    View Details
+                                    View
                                 </a>';
 
                     $buttons .= '<div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="sr-only">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu p-2" style="min-width: 180px;">';
+                        <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+                            Actions
+                        </button>
+                        <div class="dropdown-menu">';
 
                     if (auth()->user()->can('edit client')) {
-                        $buttons .= '<button class="btn btn-outline-primary btn-sm btn-block mb-1 edit" data-id="'.$row->id.'">Edit</button>';
+                        $buttons .= '<a href="#" class="dropdown-item edit" data-id="'.$row->id.'">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>';
                     }
 
-                    $buttons .= '<button class="btn btn-outline-danger btn-sm btn-block mb-1 delete" data-id="'.$row->id.'">Delete</button>';
+                    $buttons .= '<a href="#" class="dropdown-item delete d-none" data-id="'.$row->id.'">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>';
 
                     $buttons .= '</div></div>';
 
@@ -129,23 +133,27 @@ class ClientController extends Controller
 
                     $buttons .= '</div></div>';
 
-                    $buttons .= '<div class="btn-group ml-1">
-                        <button type="button" class="btn btn-sm btn-dark dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu p-2" style="min-width: 200px;">';
-
                     $groupedServices = $row->services->filter(fn($s) => $s->serviceType)->unique('project_service_id');
 
-                    foreach ($groupedServices as $service) {
-                        $buttons .= '<a href="'.route('project-services.index', [
+                    if ($groupedServices->count()) {
+                        $buttons .= '<div class="btn-group ml-1">
+                                        <button type="button" class="btn btn-sm btn-dark dropdown-toggle" data-toggle="dropdown">
+                                            Services
+                                        </button>
+                                        <div class="dropdown-menu">';
+
+                        foreach ($groupedServices as $service) {
+                            $buttons .= '<a href="'.route('project-services.index', [
                                                     'client_id' => $row->id,
                                                     'project_service_id' => $service->serviceType->id
-                                                ]).'" class="btn btn-outline-primary btn-sm btn-block mb-1">'
-                                    . $service->serviceType->name .
-                                    '</a>';
+                                                ]).'" class="dropdown-item">'
+                                        . $service->serviceType->name .
+                                        '</a>';
+                        }
+
+                        $buttons .= '</div></div>';
                     }
 
-                    $buttons .= '</div></div>';
                     $buttons .= $details;
 
                     return $buttons;
@@ -419,9 +427,10 @@ class ClientController extends Controller
                     ->withErrors(['email' => 'Credential error.']);
     }
 
-    public function clientEmail($id)
+    public function clientEmail(Request $request, $id)
     {
         $client = client::find($id)->select('id', 'name','email')->first();
+        $serviceIds = $request->service_ids ?? [];
         
         $services = ProjectServiceDetail::with(['serviceType:id,name', 'project:id,title'])
           ->where('client_id', $id)
@@ -429,7 +438,7 @@ class ClientController extends Controller
           ->get(['id','client_id','project_service_id','client_project_id','amount','bill_paid','start_date','end_date']);
 
         $mailFooter = CompanyDetails::select('mail_footer')->first();
-        return view('admin.clients.email', compact('client', 'mailFooter', 'services'));
+        return view('admin.clients.email', compact('client', 'mailFooter', 'services', 'serviceIds'));
     }
 
     public function sendClientEmail(Request $request)
@@ -449,7 +458,7 @@ class ClientController extends Controller
 
         $client = Client::findOrFail($request->id);
 
-        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body));
+        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body, $client->serviceIds));
 
         return response()->json([
             'status'  => 'success',
