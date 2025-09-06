@@ -66,12 +66,12 @@ class FrontendController extends Controller
     public function storeContact(Request $request)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required',
+            'first_name' => 'required|string|min:2|max:50',
+            'last_name'  => 'required|string|min:2|max:50',
+            'email' => 'required|email|max:50',
+            'phone' => 'required|string|regex:/^[0-9+\-\s]+$/|min:7|max:20',
             'subject' => 'nullable|string|max:255',
-            'message' => 'required|string',
+            'message' => 'required|string|max:2000',
             'product_id' => 'nullable|exists:products,id',
         ]);
 
@@ -100,12 +100,17 @@ class FrontendController extends Controller
     public function storeQuotation(Request $request)
     {
         $request->validate([
-            'first_name'        => 'required|string|max:100',
-            'last_name'         => 'required|string|max:100',
-            'email'             => 'required|email',
-            'phone'             => 'required',
-            'company'           => 'required',
-            'dream_description' => 'required',
+            'first_name'        => 'required|string|min:2|max:50',
+            'last_name'         => 'required|string|min:2|max:50',
+            'email'             => 'required|email|max:50',
+            'phone'             => 'required|string|max:20',
+            'company'           => 'required|string|max:50',
+            'website'           => 'nullable|url|max:100',
+            'dream_description' => 'required|string|max:1000',
+            'timeline'          => 'nullable|string|max:255',
+            'features'          => 'nullable|array',
+            'features.*'        => 'string|max:100',
+            'additional_info'   => 'nullable|string|max:2000',
         ]);
 
         $quotation = new Quotation();

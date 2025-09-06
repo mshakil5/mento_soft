@@ -51,27 +51,27 @@
                         </h3>
                         <input type="hidden" name="product_id" value="{{ $product->id ?? '' }}">
                         <div class="col-md-6 form-group">
-                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name', auth()->check() ? auth()->user()->name : '') }}" required>
+                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name', auth()->check() ? auth()->user()->name : '') }}" required  maxlength="50">
                             @error('first_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <input type="text" name="last_name" class="form-control" placeholder="Last Name *" value="{{ old('last_name') }}" required>
+                            <input type="text" name="last_name" class="form-control" placeholder="Last Name *" value="{{ old('last_name') }}" required  maxlength="50">
                             @error('last_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <input type="email" name="email" class="form-control" placeholder="E-mail *" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required>
+                            <input type="email" name="email" class="form-control" placeholder="E-mail *" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required maxlength="50">
                             @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <input type="number" name="phone" class="form-control" placeholder="Phone *" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required>
+                            <input type="number" name="phone" class="form-control" placeholder="Phone *" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required maxlength="20">
                             @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-12 form-group">
-                            <textarea name="message" class="textarea form-control" rows="3" placeholder="Message *" required>{{ old('message') }}@if(isset($product))I want to see a demo of {{ $product->title ?? '' }}@endif</textarea>
+                            <textarea name="message" class="textarea form-control" rows="3" placeholder="Message *" required maxlength="2000">{{ old('message') }}@if(isset($product))I want to see a demo of {{ $product->title ?? '' }}@endif</textarea>
                             @error('message') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 

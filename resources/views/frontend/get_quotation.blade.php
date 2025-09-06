@@ -22,31 +22,31 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-6 form-group">
-                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name', auth()->check() ? auth()->user()->name : '') }}" required>
+                            <input type="text" name="first_name" class="form-control" placeholder="First Name *" value="{{ old('first_name', auth()->check() ? auth()->user()->name : '') }}" required maxlength="50">
                             @error('first_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="text" name="last_name" class="form-control" placeholder="Last Name *" value="{{ old('last_name') }}" required>
+                            <input type="text" name="last_name" class="form-control" placeholder="Last Name *" value="{{ old('last_name') }}" required maxlength="50">
                             @error('last_name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="email" name="email" class="form-control" placeholder="Email Address *" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required>
+                            <input type="email" name="email" class="form-control" placeholder="Email Address *" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required maxlength="50">
                             @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="text" name="phone" class="form-control" placeholder="Phone Number *" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required>
+                            <input type="text" name="phone" class="form-control" placeholder="Phone Number *" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required maxlength="20">
                             @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="text" name="company" class="form-control" placeholder="Company/Business Name *" value="{{ old('company') }}" required>
+                            <input type="text" name="company" class="form-control" placeholder="Company/Business Name *" value="{{ old('company') }}" required maxlength="50">
                             @error('company') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-6 form-group">
-                            <input type="url" name="website" class="form-control" placeholder="Current Website (if any)" value="{{ old('website') }}">
+                            <input type="url" name="website" class="form-control" placeholder="Current Website (if any)" value="{{ old('website') }}" maxlength="100">
                             @error('website') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-12 form-group">
-                            <textarea name="dream_description" class="form-control" rows="3" placeholder="Describe Your Dream Website *" required>{{ old('dream_description') }}</textarea>
+                            <textarea name="dream_description" class="form-control" rows="3" placeholder="Describe Your Dream Website *" required maxlength="1000">{{ old('dream_description') }}</textarea>
                             @error('dream_description') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-12 form-group">
@@ -72,7 +72,7 @@
                             @error('features') <br><small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-12 form-group mt-3">
-                            <textarea name="additional_info" class="form-control" rows="3" placeholder="Additional Information">{{ old('additional_info') }}</textarea>
+                            <textarea name="additional_info" class="form-control" rows="3" placeholder="Additional Information" maxlength="2000">{{ old('additional_info') }}</textarea>
                         </div>
 
                         {{-- CAPTCHA --}}
