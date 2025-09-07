@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Models\ProjectServiceDetail;
 use App\Models\Transaction;
+use Log;
 
 class AutoCreateProjectServiceDetails extends Command
 {
@@ -94,6 +95,13 @@ class AutoCreateProjectServiceDetails extends Command
 
             $transaction->tran_id = 'AT' . date('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT);
             $transaction->save();
+
+            Log::info("AutoCreate: Created new detail and transaction", [
+                'detail_id'      => $newDetail->id,
+                'transaction_id' => $transaction->id,
+                'client_id'      => $newDetail->client_id,
+                'period'         => "{$startDate} to {$endDate}",
+            ]);
         }
 
         $this->info('Auto-create process completed.');
