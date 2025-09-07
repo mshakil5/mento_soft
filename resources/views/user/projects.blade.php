@@ -78,7 +78,7 @@
                                                       <div class="p-3 border rounded bg-light">
 
                                                           <div class="row">
-                                                              <div class="col-12">
+                                                              <div class="col-6">
                                                                   <h5>Project Concept / Idea</h5>
                                                                   <p>{!! $project->description ?? '-' !!}</p>
 
@@ -100,6 +100,31 @@
                                                                       <p class="text-muted">No attachments yet.</p>
                                                                   @endif
                                                               </div>
+                                                              @if($project->services->count())
+                                                              <div class="col-6">
+                                                                  <h5>Paid Services</h5>
+                                                                  @if($project->services->count())
+                                                                    <table class="table table-striped table-bordered text-light">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Service</th>
+                                                                                <th>Start Date</th>
+                                                                                <th>Amount</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($project->services as $service)
+                                                                                <tr>
+                                                                                    <td>{{ $service->serviceType->name ?? '-' }} ({{ $service->type == 1 ? 'In House' : 'Third Party' }})</td>
+                                                                                    <td>{{ $service->start_date ? date('d M Y', strtotime($service->start_date)) : '-' }}</td>
+                                                                                    <td>{{ number_format($service->amount, 2) }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                @endif
+                                                              </div>
+                                                              @endif
 
                                                               <div class="col-6 d-none">
                                                                   <div class="d-flex justify-content-between align-items-center mb-2">

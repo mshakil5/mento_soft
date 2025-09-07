@@ -1,7 +1,6 @@
 @extends('user.master')
 
 @section('user-content')
-
 <style>
   .custom-table-bg th,
   .custom-table-bg td,
@@ -31,7 +30,6 @@
         @endif
 
         <div class="card text-light shadow-sm mb-4 form-style fadeInUp border-light">
-
           <form method="GET" action="{{ route('user.tasks') }}" class="row mb-3">
               <div class="col-3">
                   <select name="project" class="form-select" onchange="this.form.submit()">
@@ -51,43 +49,89 @@
               </div>
           </form>
 
-            <ul class="nav nav-tabs" id="taskTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="todo-tab" data-bs-toggle="tab" data-bs-target="#todo" type="button" role="tab">To Do</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab">In Progress</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed" type="button" role="tab">Confirmed</button>
-                </li>
-            </ul>
+          <ul class="nav nav-tabs mb-2" id="taskTabs" role="tablist">
+              @php
+                  $tabs = [
+                      'all' => 'All',
+                      'tobeconfirmed' => 'To Be Confirmed',
+                      'inprogress' => 'In Progress',
+                      'todo' => 'To Do',
+                      'confirmed' => 'Confirmed'
+                  ];
+              @endphp
+              @foreach($tabs as $key => $label)
+                  <li class="nav-item" role="presentation">
+                      <a class="nav-link {{ $tab == $key ? 'active' : '' }}" href="{{ route('user.tasks', ['tab'=>$key, 'project'=>request('project')]) }}">
+                          {{ $label }}
+                      </a>
+                  </li>
+              @endforeach
+          </ul>
 
-            <div class="tab-content mt-2">
-                @php
-                    $todos = $tasks->where('status', 1);
-                    $inProgress = $tasks->where('status', 2);
-                    $confirmed = $tasks->where('status', 3);
-                @endphp
-
-                <!-- To Do -->
-                <div class="tab-pane fade show active" id="todo" role="tabpanel">
-                    @include('user.partials.task_table', ['tasks' => $todos, 'showEdit' => true])
-                </div>
-
-                <!-- In Progress -->
-                <div class="tab-pane fade" id="progress" role="tabpanel">
-                    @include('user.partials.task_table', ['tasks' => $inProgress, 'showEdit' => false])
-                </div>
-
-                <!-- Confirmed -->
-                <div class="tab-pane fade" id="confirmed" role="tabpanel">
-                    @include('user.partials.task_table', ['tasks' => $confirmed, 'showEdit' => false])
-                </div>
-            </div>
+          <div class="table-responsive my-2">
+              <table class="table mb-0 align-middle custom-table-bg">
+                  <thead>
+                      <tr>
+                          <th class="text-light">Date</th>
+                          <th class="text-light">Project</th>
+                          <th class="text-light">Task</th>
+                          <th class="text-light">Approved</th>
+                          <th class="text-light text-center">Action</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      @forelse($tasks as $task)
+                      <tr class="border-top">
+                          <td class="text-light">{{ $task->created_at ? date('d F Y', strtotime($task->created_at)) : '' }}</td>
+                          <td class="text-light">{{ $task->clientProject->title ?? '' }}</td>
+                          <td class="text-light">{{ $task->title ?? '' }}</td>
+                          <td class="text-light">
+                              @if($task->status == 3)
+                                <form action="{{ route('tasks.confirm', $task->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_confirmed" value="1" id="confirm-{{ $task->id }}"
+                                            {{ $task->is_confirmed ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <label class="form-check-label" for="confirm-{{ $task->id }}">
+                                            {{ $task->is_confirmed ? 'Yes' : 'No' }}
+                                        </label>
+                                    </div>
+                                </form>
+                              @elseif($task->status == 2)
+                                  <span>In Progress</span>
+                              @elseif($task->status == 1)
+                                  <span>To Do</span>
+                              @endif
+                          </td>
+                          <td class="text-light text-center">
+                              <button type="button" class="btn btn-sm btn-primary position-relative" data-bs-toggle="modal" data-bs-target="#taskModal-{{ $task->id }}">
+                                  View
+                                  @if($task->unread_messages_count > 0)
+                                      <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle p-1">
+                                          {{ $task->unread_messages_count }}
+                                      </span>
+                                  @endif
+                              </button>
+                              @if($task->status == 1)
+                                  <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#taskEditModal-{{ $task->id }}">
+                                      Edit
+                                  </button>
+                              @endif
+                          </td>
+                      </tr>
+                      @empty
+                      <tr>
+                          <td colspan="5" class="text-center py-3 text-light">No tasks found.</td>
+                      </tr>
+                      @endforelse
+                  </tbody>
+              </table>
+          </div>
+          <div class="mt-1">
+              {{ $tasks->links('pagination::bootstrap-5') }}
+          </div>
         </div>
-
-        {{ $tasks->links('pagination::bootstrap-5') }}
     </div>
 </div>
 

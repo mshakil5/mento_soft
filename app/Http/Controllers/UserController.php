@@ -78,11 +78,17 @@ class UserController extends Controller
             },
             'recentUpdates' => function($q) {
                 $q->latest();
+            },
+            'services' => function($q) use ($user) {
+                $q->where('bill_paid', 1)
+                  ->where('client_id', $user->client->id);
             }
         ])
         ->where('client_id', $user->client->id)
         ->latest()
         ->paginate(10);
+        // ->get();
+        // dd($projects);
 
         return view('user.projects', compact('projects'));
     }
@@ -92,20 +98,40 @@ class UserController extends Controller
         $user = auth()->user();
         $userId = $user->id;
 
-        $tasks = ProjectTask::with(['employee', 'clientProject'])
-            ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
-                $query->where('user_id', '!=', $userId)
-                      ->whereDoesntHave('views', fn($q) => $q->where('user_id', $userId));
+        $projects = ClientProject::where('client_id', $user->client->id)
+            ->whereHas('tasks')
+            ->get();
+
+        $tab = $request->tab ?? 'all';
+
+        $query = ProjectTask::with(['employee', 'clientProject'])
+            ->withCount(['messages as unread_messages_count' => function ($q) use ($userId) {
+                $q->where('user_id', '!=', $userId)
+                  ->whereDoesntHave('views', fn($q2) => $q2->where('user_id', $userId));
             }])
             ->where('client_id', $user->client->id)
-            ->when($request->project, fn($q, $projectId) => $q->where('client_project_id', $projectId))
-            ->latest()
-            ->paginate(10);
+            ->when($request->project, fn($q, $projectId) => $q->where('client_project_id', $projectId));
 
-        $projects = ClientProject::where('client_id', $user->client->id)
-          ->whereHas('tasks')
-          ->get();
-        return view('user.tasks', compact('tasks', 'projects'));
+        switch($tab) {
+            case 'tobeconfirmed':
+                $query->where('status', 3)->where('is_confirmed', 0);
+                break;
+            case 'inprogress':
+                $query->where('status', 2);
+                break;
+            case 'todo':
+                $query->where('status', 1);
+                break;
+            case 'confirmed':
+                $query->where('status', 3)->where('is_confirmed', 1);
+                break;
+            default:
+                break;
+        }
+
+        $tasks = $query->latest()->paginate(10)->withQueryString();
+
+        return view('user.tasks', compact('tasks', 'projects', 'tab'));
     }
 
     public function storeTask(Request $request)

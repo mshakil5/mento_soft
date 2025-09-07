@@ -20,8 +20,9 @@
                     <li><a href="{{ route('portfolio') }}">Portfolio</a></li>
                 </ul>
             </div>
-            <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2 pt-lg-4 pt-xl-4">
+            <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2">
                 <ul>
+                    <li><a href="{{ asset('template/index.html') }}">Free Template</a></li>
                     <li>
                         @auth
                             <a href="{{ route('dashboard') }}">Dashboard</a>
@@ -110,8 +111,6 @@
       </div>
     </div>
 </section>
-
-<button id="scrollUp" title="Go to top">↑</button>
 
 <a href="https://wa.me/{{ $company->whatsapp }}" target="_blank" class="material-whatsapp" aria-label="WhatsApp">
     <img src="{{ asset('resources/frontend/images/whatsapp.png') }}" alt="WhatsApp" style="width:24px; height:24px;">

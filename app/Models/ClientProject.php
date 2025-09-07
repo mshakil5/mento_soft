@@ -65,5 +65,11 @@ class ClientProject extends Model
     {
         return $this->hasOne(ProjectService::class);
     }
+
+    public function services()
+    {
+        return $this->hasMany(ProjectServiceDetail::class, 'client_project_id')
+                    ->with(['serviceType', 'client', 'project']);
+    }
     
 }
