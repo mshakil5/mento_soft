@@ -270,8 +270,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/project-services/{service}', [ProjectServiceController::class, 'update']);
     Route::delete('/project-services/{service}', [ProjectServiceController::class, 'destroy']);
     Route::post('/project-services/{service}/toggle-status', [ProjectServiceController::class, 'toggleStatus']);
-    Route::post('/client-project-service-detail/{id}/toggle-renewed', [ProjectServiceController::class, 'toggleRenwed']);
-    Route::post('/client-project-service-detail/{id}/toggle-renewed', [ProjectServiceController::class, 'toggleRenwed']);
 
     Route::post('/project-service/receive', [ProjectServiceController::class, 'receive'])->name('project-service.receive');
     Route::get('/clients/{client}/projects', [ProjectServiceController::class, 'projects'])->name('clients.projects');
@@ -287,7 +285,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('/project-services/invoice/{id}', [ProjectServiceController::class, 'invoice'])
     ->name('project-services.invoice.show');
-    Route::post('/project-services/send-email/{id}', [ProjectServiceController::class, 'sendSingleEmail']);
     Route::get('/project-services/send-multi-email', [ProjectServiceController::class, 'sendMultiEmail']);
 
     // Invoices

@@ -17,13 +17,16 @@ class AutoCreateProjectServiceDetails extends Command
 
         $details = ProjectServiceDetail::where('is_auto', 1)
             ->where('status', 1)
-            // ->where('bill_paid', 1)
             ->where(function($q) {
-                $q->where('type', 1) // In House
-                  ->orWhere(function($t) {
-                      $t->where('type', 2) // Third Party
-                        ->where('bill_paid', 1);
-                  });
+                $q->where(function($t1) { // In house
+                    $t1->where('type', 1)
+                      ->where('status', 1);
+                })
+                ->orWhere(function($t2) { // Third party
+                    $t2->where('type', 2)
+                      ->where('status', 1)
+                      ->where('bill_paid', 1);
+                });
             })
             ->where('next_created', 0)
             ->where(function($q) {

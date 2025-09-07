@@ -12,7 +12,6 @@ use App\Models\Client;
 use App\Models\Transaction;
 use App\Models\ClientProject;
 use Mail;
-use App\Mail\ProjectServiceInvoiceMail;
 use Illuminate\Support\Facades\DB;
 
 class ProjectServiceController extends Controller
@@ -23,13 +22,18 @@ class ProjectServiceController extends Controller
             $data = ProjectServiceDetail::with(['serviceType', 'client', 'project'])->latest();
 
             $latestType1Ids = ProjectServiceDetail::where('type', 1)
-              ->where('bill_paid', '!=', 1)
+              // ->where('bill_paid', '!=', 1)
               ->selectRaw('MAX(id) as id')
               ->groupBy('project_service_id', 'client_id', 'client_project_id')
               ->pluck('id')
               ->toArray();
 
-            $type2Ids = ProjectServiceDetail::where('type', 2)->where('bill_paid', '!=', 1)->pluck('id')->toArray();
+            $type2Ids = ProjectServiceDetail::where('type', 2)
+              ->selectRaw('MAX(id) as id')
+              ->groupBy('project_service_id', 'client_id', 'client_project_id')
+              ->pluck('id')
+              ->toArray();
+
             // $type2Ids = ProjectServiceDetail::where('type', 2)->pluck('id')->toArray();
         
             $idsToDisplay = array_merge($latestType1Ids, $type2Ids);
@@ -114,7 +118,7 @@ class ProjectServiceController extends Controller
                     return $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '';
                 })
                 ->addColumn('end_date', function ($row) {
-                    if ($row->type == 1) {
+                    if ($row->bill_paid == 1) {
                         return '';
                     }
                     return $row->end_date ? Carbon::parse($row->end_date)->format('d-m-Y') : '';
@@ -123,8 +127,6 @@ class ProjectServiceController extends Controller
                     if ($row->bill_paid == 1) return '';
                     return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
                 })
-                
-                // ->addColumn('end_date', fn($row) => $row->end_date ? Carbon::parse($row->end_date)->format('d-m-Y') : 'N/A')
                 ->addColumn('next_renewal', function($row) {
                     if ($row->is_auto == 1 && $row->next_start_date && $row->next_end_date) {
                         $cycle = $row->cycle_type == 1 ? 'Monthly' : ($row->cycle_type == 2 ? 'Yearly' : '');
@@ -141,8 +143,6 @@ class ProjectServiceController extends Controller
                 })
                 ->addColumn('client_name', fn($row) => $row->client?->name)
                 ->addColumn('project_title', fn($row) => $row->project?->title)
-                // ->addColumn('amount', fn($row) => '£' . number_format($row->amount, 0))
-                
                 ->addColumn('amount', function ($row) {
                     if ($row->bill_paid == 1) return '';
                     if ($row->type == 1) {
@@ -172,20 +172,10 @@ class ProjectServiceController extends Controller
                                 <label class="custom-control-label" for="customSwitchStatus'.$row->id.'"></label>
                             </div>';
                 })
-                ->addColumn('is_renewed', function($row) {
-                    $checked = $row->is_renewed ? 'checked' : '';
-                    return '
-                        <div class="icheck-primary d-inline">
-                            <input type="checkbox" class="toggle-renewed" 
-                                  id="renewedCheck'.$row->id.'" 
-                                  data-id="'.$row->id.'" '.$checked.'>
-                            <label for="renewedCheck'.$row->id.'"></label>
-                        </div>
-                    ';
-                })
                 ->addColumn('action', function($row) {
                     $btn = '';
 
+                    //in house service details
                     if ($row->type == 1) {
                         $btn .= '<button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#billDetailsModal'.$row->id.'">
                                     <i class="fas fa-list"></i>
@@ -204,29 +194,40 @@ class ProjectServiceController extends Controller
                                   <thead>
                                     <tr>
                                       <th>#</th>
-                                      <th>Start Date</th>
-                                      <th>End Date</th>
-                                      <th>Due Date</th>
+                                      <th>Date</th>
                                       <th>Amount</th>
+                                      <th>Status</th>
                                     </tr>
                                   </thead>
                                   <tbody>';
-                        
+
                         $bills = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                             ->where('client_id', $row->client_id)
                             ->where('client_project_id', $row->client_project_id)
                             ->where('type', 1)
-                            ->where('bill_paid', '!=', 1)
                             ->orderBy('start_date')
                             ->get();
 
                         foreach ($bills as $index => $bill) {
+                            $dateRange = '';
+                            if ($bill->start_date && $bill->end_date) {
+                                $dateRange = Carbon::parse($bill->start_date)->format('j F Y') . ' - ' .
+                                            Carbon::parse($bill->end_date)->format('j F Y');
+                            }
+
+                            if ($bill->bill_paid) {
+                                $status = '<span class="badge badge-success">Received</span>';
+                            } elseif ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today())) {
+                                $status = '<span class="badge badge-danger">Overdue</span>';
+                            } else {
+                                $status = '<span class="badge badge-warning">Pending</span>';
+                            }
+
                             $btn .= '<tr>
                                       <td>'.($index+1).'</td>
-                                      <td>'.($bill->start_date ? \Carbon\Carbon::parse($bill->start_date)->format("d-m-Y") : '').'</td>
-                                      <td>'.($bill->end_date ? \Carbon\Carbon::parse($bill->end_date)->format("d-m-Y") : '').'</td>
-                                      <td>'.($bill->due_date ? \Carbon\Carbon::parse($bill->due_date)->format("d-m-Y") : '').'</td>
+                                      <td>'.$dateRange.'</td>
                                       <td>£'.number_format($bill->amount, 0).'</td>
+                                      <td>'.$status.'</td>
                                     </tr>';
                         }
 
@@ -239,18 +240,14 @@ class ProjectServiceController extends Controller
                     }
 
                     if ($row->isPending()) {
-                        // Receive button
-                        if (auth()->user()->can('receive service')) {
-                            $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">Receive</button> ';
-                        }
-
-                        // Edit button
+                        $isType1 = $row->type == 1;
+                        $buttonText = $isType1 ? 'Receive' : 'Renew';
+                        
+                        $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
                         if (auth()->user()->can('edit service')) {
-                            $btn .= '<button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button> ';
+                            $btn .= ' <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>';
                         }
-
-                        // Delete button (hidden)
-                        $btn .= '<button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
+                        $btn .= ' <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
 
                         // Modal
                         $btn .= '
@@ -258,76 +255,69 @@ class ProjectServiceController extends Controller
                           <div class="modal-dialog">
                             <form method="POST" action="'.route('project-service.receive').'" class="receive-form">
                               '.csrf_field().'
-                              <input type="hidden" name="bill_ids[]" value="'.$row->id.'"> <!-- default single bill -->
                               <div class="modal-content">
                                 <div class="modal-header">
-                                  <h5 class="modal-title">Receive this payment</h5>
+                                  <h5 class="modal-title">'.$buttonText.' Payment</h5>
                                   <button type="button" class="close" data-dismiss="modal">&times;</button>
                                 </div>
                                 <div class="modal-body">';
-
-                        // Type 1 → multiple selectable bills
-                        if ($row->type == 1) {
-                            $btn .= '
-                              <div class="mb-3">
-                                <label>Select Month(s) <span class="text-danger">*</span></label>
-                                <select name="bill_ids[]" class="form-control bill-select select2" multiple required>';
-
-                            $bills = \App\Models\ProjectServiceDetail::where('project_service_id', $row->project_service_id)
-                                        ->where('client_id', $row->client_id)
-                                        ->where('client_project_id', $row->client_project_id)
-                                        ->where('type', 1)
-                                        ->where('bill_paid', '!=', 1)
-                                        ->orderBy('start_date')->get();
-
+                        
+                        if ($isType1) {
+                            $bills = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                                ->where('client_id', $row->client_id)
+                                ->where('client_project_id', $row->client_project_id)
+                                ->where('type', 1)
+                                ->where('bill_paid', '!=', 1)
+                                ->orderBy('start_date')->get();
+                            
+                            $btn .= '<div class="mb-3">
+                                        <label>Select Month(s) <span class="text-danger">*</span></label>
+                                        <select name="bill_ids[]" class="form-control bill-select select2" multiple required>';
                             foreach ($bills as $bill) {
                                 $btn .= '<option value="'.$bill->id.'" data-amount="'.$bill->amount.'">'.
-                                    \Carbon\Carbon::parse($bill->start_date)->format('d-m-Y').' - '.
-                                    \Carbon\Carbon::parse($bill->end_date)->format('d-m-Y').
-                                    ' ( £'.number_format($bill->amount, 0).' )</option>';
+                                        Carbon::parse($bill->start_date)->format('d-m-Y').' - '.
+                                        Carbon::parse($bill->end_date)->format('d-m-Y').
+                                        ' ( £'.number_format($bill->amount, 0).' )</option>';
                             }
-
-                            $btn .= '</select></div>
-                              <div class="mb-3">
-                                <label>Total Amount</label>
-                                <input type="text" class="form-control total-amount" readonly>
-                              </div>';
+                            $btn .= '</select></div>';
+                            $btn .= '<div class="mb-3">
+                                        <label>Total Amount</label>
+                                        <input type="text" class="form-control total-amount" readonly>
+                                    </div>';
+                        } else {
+                            $btn .= '<input type="hidden" name="bill_ids[]" value="'.$row->id.'">';
+                            $btn .= '<div class="mb-3">
+                                        <label>Total Amount</label>
+                                        <input type="text" class="form-control total-amount" readonly value="£'.number_format($row->amount,2).'">
+                                    </div>';
                         }
 
-                        // Payment type & note
-                        $btn .= '
-                              <div class="mb-3">
-                                <label>Payment Type <span class="text-danger">*</span></label>
-                                <select name="payment_type" class="form-control" required>
-                                  <option value="Cash">Cash</option>
-                                  <option value="Bank">Bank</option>
-                                </select>
+                        $btn .= '<div class="mb-3">
+                                    <label>Payment Type <span class="text-danger">*</span></label>
+                                    <select name="payment_type" class="form-control" required>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Bank">Bank</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Note</label>
+                                    <textarea name="note" class="form-control"></textarea>
+                                </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-success">'.$buttonText.'</button>
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
                               </div>
-                              <div class="mb-3">
-                                <label>Note</label>
-                                <textarea name="note" class="form-control"></textarea>
-                              </div>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="submit" class="btn btn-success">Submit</button>
-                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
+                            </form>
                           </div>
-                        </form>
-                      </div>
-                    </div>';
+                        </div>';
                     } else {
-                        $btn .= '<button class="btn btn-sm btn-success" disabled>Received</button>';
+                        $disabledText = $row->type == 1 ? 'Received' : 'Renewed';
+                        $btn .= '<button class="btn btn-sm btn-success" disabled>'.$disabledText.'</button>';
                     }
 
                     $btn .= '<a href="'.route('project-services.invoice.show', $row->id).'" class="btn btn-sm btn-primary" target="_blank">Invoice</a> ';
-                    // $btn .= '<button class="btn btn-sm btn-warning send-service-email" 
-                    //       data-id="'.$row->id.'" 
-                    //       data-email="'.$row->client?->email.'" 
-                    //       title="Send Invoice Email">
-                    //       <span class="spinner-border spinner-border-sm d-none"></span>
-                    //       Mail
-                    //   </button>';
 
                     $btn .= '<a href="'.route('client.email', ['id' => $row->client_id, 'type' => 'ProjectServiceDetail', 'type_id' => $row->id]).'" 
                                 class="btn btn-sm btn-warning" 
@@ -352,19 +342,6 @@ class ProjectServiceController extends Controller
     {
         $service = ProjectServiceDetail::with(['serviceType', 'client'])->findOrFail($id);
         return view('admin.client-projects.service_invoice', compact('service'));
-    }
-
-    public function sendSingleEmail($id)
-    {
-        $service = ProjectServiceDetail::with(['serviceType', 'client'])->findOrFail($id);
-
-        if (!$service->client || !$service->client->email) {
-            return response()->json(['message' => 'Client email not found.'], 422);
-        }
-
-        Mail::to($service->client->email)->send(new ProjectServiceInvoiceMail($service));
-
-        return response()->json(['message' => 'Service invoice email sent successfully.']);
     }
 
     public function sendMultiEmail(Request $request)
@@ -395,24 +372,37 @@ class ProjectServiceController extends Controller
         $isAuto = $request->input('is_auto') == 1 ? 1 : 0;
         $cycleType = $request->input('cycle_type');
 
+        $exists = ProjectServiceDetail::where([
+            'project_service_id' => $request->service_type_id,
+            'client_id' => $request->client_id,
+            'client_project_id' => $request->client_project_id,
+            'type' => $request->type,
+            'is_auto' => $isAuto,
+            'cycle_type' => $cycleType,
+            'status' => 1,
+        ])->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 422,
+                'errors' => [
+                    'duplicate' => ['An active record with the same details already exists.']
+                ]
+            ], 422);
+        }
+
         $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-        $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+        $endDate   = Carbon::parse($request->end_date)->format('Y-m-d');
 
-        $nextStartDate = null;
+        $nextStartDate = Carbon::parse($endDate)->addDay()->format('Y-m-d');
         $nextEndDate = null;
-
-        if ($isAuto) {
-            $nextStartDate = Carbon::parse($endDate)->addDay()->format('Y-m-d');
-
-            if ($cycleType == 1) {
-                $nextEndDate = Carbon::parse($nextStartDate)->addMonthNoOverflow()->subDay()->format('Y-m-d');
-            } elseif ($cycleType == 2) {
-                $nextEndDate = Carbon::parse($nextStartDate)->addYear()->subDay()->format('Y-m-d');
-            }
+        if ($cycleType == 1) {
+            $nextEndDate = Carbon::parse($nextStartDate)->addMonthNoOverflow()->subDay()->format('Y-m-d');
+        } elseif ($cycleType == 2) {
+            $nextEndDate = Carbon::parse($nextStartDate)->addYear()->subDay()->format('Y-m-d');
         }
 
         $dueDate = null;
-
         if ($cycleType == 1) {
             $dueDate = Carbon::parse($endDate)->subWeeks(2)->format('Y-m-d');
         } elseif ($cycleType == 2) {
@@ -584,15 +574,6 @@ class ProjectServiceController extends Controller
         return response()->json(['status'=>200, 'message'=>'Status updated successfully']);
     }
 
-    public function toggleRenwed(Request $request, $id)
-    {
-        $detail = ProjectServiceDetail::findOrFail($id);
-        $detail->is_renewed = $request->is_renewed;
-        $detail->save();
-
-        return response()->json(['status'=>200, 'message'=>'Updated successfully']);
-    }
-
     public function receive(Request $request)
     {
         $billIds = $request->bill_ids ?? [];
@@ -614,8 +595,8 @@ class ProjectServiceController extends Controller
             $transaction->transaction_type = 'Received';
             $transaction->payment_type = $paymentType;
             $transaction->description = $note ?? "Due received for {$serviceDetail->serviceType->name} for service period ".
-                \Carbon\Carbon::parse($serviceDetail->start_date)->format('d-m-Y').
-                " to ".\Carbon\Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
+                Carbon::parse($serviceDetail->start_date)->format('d-m-Y').
+                " to ".Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
             $transaction->amount = $previousTransaction->amount ?? $serviceDetail->amount;
             $transaction->at_amount = $transaction->amount;
             $transaction->created_by = auth()->id();

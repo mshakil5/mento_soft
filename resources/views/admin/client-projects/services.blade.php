@@ -121,7 +121,7 @@
                                         <input type="date" class="form-control" id="end_date" name="end_date" readonly required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <div class="form-group" style="margin-top: 35px; margin-left: 20px;">
                                         <input type="checkbox" class="form-control-input" id="is_auto" name="is_auto" value="1">
                                         <label>Auto Renewal</label>
@@ -129,7 +129,7 @@
                                 </div>
 
                               <div class="col-md-6">
-                                  <div class="form-group mt-3">
+                                  <div class="form-group">
                                       <label>Amount <span class="text-danger">*</span></label>
                                       <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
                                   </div>
@@ -168,14 +168,13 @@
                                     <th>Service</th>
                                     <th>Project</th>
                                     <th>Client</th>
-                                    <th>Start</th>
-                                    <th>Deadline</th>
-                                    <th>Due</th>
+                                    {{-- <th>Start</th> --}}
+                                    {{-- <th>Deadline</th> --}}
+                                    <th>Due Date</th>
                                     {{-- <th>Renewal</th> --}}
                                     <th>Amount</th>
                                     {{-- <th>Note</th> --}}
-                                    {{-- <th>Status</th> --}}
-                                    <th>Renewed</th>
+                                    <th>Status</th>
                                     <th>Mail</th>
                                     <th>Action</th>
                                 </tr>
@@ -341,8 +340,8 @@
       });
 
       function populateForm(data){
-          $("#service_type_id").val(data.project_service_id).trigger('change');
-          $("#client_id").val(data.client_id).trigger('change');
+          $("#service_type_id").val(data.project_service_id).trigger('change').prop('disabled', true);
+          $("#client_id").val(data.client_id).trigger('change').prop('disabled', true);
           $.ajax({
               url: '/admin/clients/' + data.client_id + '/projects',
               method: 'GET',
@@ -354,19 +353,20 @@
                       projectSelect.append('<option value="'+project.id+'">'+project.title+'</option>');
                   });
 
-                  // set the value from data
-                  projectSelect.val(data.client_project_id).trigger('change');
+                  projectSelect.val(data.client_project_id).trigger('change').prop('disabled', true);
                   $('#projectDiv').show();
               }
           });
-          $("#start_date").val(data.start_date);
-          $("#cycle_type").val(data.cycle_type);
+
+          $("#start_date").val(data.start_date).prop('readonly', true);
+          $("#cycle_type").val(data.cycle_type).prop('disabled', true);
           $("#end_date").val(data.end_date);
           $("#amount").val(data.amount);
           $("#note").val(data.note);
           $("#codeid").val(data.id);
           $("#type").val(data.type);
-          $("#is_auto").prop('checked', data.is_auto == 1);
+          $("#is_auto").prop('checked', data.is_auto == 1).prop('disabled', true);
+
           if (data.type == 1) {
             $("#end_date_div").hide();
           } else {
@@ -377,13 +377,15 @@
           $("#addBtn").html('Update');
           $("#addThisFormContainer").show(300);
           $("#newBtnSection").hide(100);
-        }
+      }
 
       function clearform(){
           $('#createThisForm')[0].reset();
-          $("#is_auto").prop('checked', false);
-          $("#addBtn").val('Create');
-          $("#addBtn").html('Create');
+          $("#service_type_id, #client_id, #client_project_id, #cycle_type").prop('disabled', false).val('');
+          $("#start_date").prop('readonly', false).val('');
+          $("#is_auto").prop('checked', false).prop('disabled', false);
+
+          $("#addBtn").val('Create').html('Create');
           $("#addThisFormContainer").slideUp(200);
           $("#newBtnSection").slideDown(200);
           $("#end_date_div").hide();
@@ -400,29 +402,6 @@
               method: "POST",
               data: {
                   status: status,
-                  _token: "{{ csrf_token() }}"
-              },
-              success: function(res) {
-                  success(res.message);
-                  reloadTable();
-              },
-              error: function(xhr) {
-                  console.error(xhr.responseText);
-                  error('Failed to update status');
-              }
-          });
-      });
-
-      // Status toggle
-      $(document).on('change', '.toggle-renewed', function() {
-          var detail_id = $(this).data('id');
-          var status = $(this).prop('checked') ? 1 : 0;
-          var toggleUrl = "/admin/client-project-service-detail/" + detail_id + "/toggle-renewed";
-          $.ajax({
-              url: toggleUrl,
-              method: "POST",
-              data: {
-                  is_renewed: status,
                   _token: "{{ csrf_token() }}"
               },
               success: function(res) {
@@ -484,14 +463,13 @@
               {data: 'service_type', name: 'service_type'},
               {data: 'project_title', name: 'project_title'},
               {data: 'client_name', name: 'client_name'},
-              {data: 'start_date', name: 'start_date'},
+              // {data: 'start_date', name: 'start_date'},
               {data: 'end_date', name: 'end_date'},
-              {data: 'due_date', name: 'due_date'},
+              // {data: 'due_date', name: 'due_date'},
               // {data: 'next_renewal', name: 'next_renewal'},
               {data: 'amount', name: 'amount', orderable: false, searchable: false},
               // {data: 'note', name: 'note', orderable: false, searchable: false},
-              // {data: 'status', name: 'status', orderable: false, searchable: false},
-              {data: 'is_renewed', name: 'is_renewed', orderable: false, searchable: false},
+              {data: 'status', name: 'status', orderable: false, searchable: false},
               { data: 'checkbox', orderable: false, searchable: false }, 
               {data: 'action', name: 'action', orderable: false, searchable: false},
           ],
@@ -508,14 +486,10 @@
           reloadTable();
       });
 
-      // Init select2 inside modal
       $(document).on('shown.bs.modal', '.modal', function () {
-          $(this).find('.bill-select').select2({
-              dropdownParent: $(this)
-          });
+          $(this).find('.bill-select').select2({ dropdownParent: $(this) });
       });
 
-      // Update total amount dynamically
       $(document).on('change', '.bill-select', function () {
           let total = 0;
           $(this).find('option:selected').each(function () {
@@ -527,7 +501,7 @@
       // Submit form via AJAX
       $(document).on('submit', '.receive-form', function(e) {
           e.preventDefault();
-          if (!confirm('Mark as received?')) return;
+          if (!confirm('Are You sure?')) return;
 
           let form = $(this);
           $.ajax({
@@ -571,35 +545,6 @@
               $('#projectDiv').hide();
               projectSelect.trigger('change.select2');
           }
-      });
-
-      $(document).on('click', '.send-service-email', function () {
-          let $btn = $(this);
-          let id = $btn.data('id');
-          let spinner = $btn.find('.spinner-border');
-
-          spinner.removeClass('d-none');
-          $btn.prop('disabled', true);
-
-          $.ajax({
-              url: '/admin/project-services/send-email/' + id,
-              type: 'POST',
-              data: {
-                  _token: $('meta[name="csrf-token"]').attr('content')
-              },
-              success: function (res) {
-                  success(res.message ?? 'Email sent successfully!');
-                  reloadTable();
-              },
-              error: function (xhr) {
-                  const msg = xhr.responseJSON?.message ?? 'Email sending failed.';
-                  error(msg);
-              },
-              complete: function () {
-                  spinner.addClass('d-none');
-                  $btn.prop('disabled', false);
-              }
-          });
       });
 
       $('#newBtnSection').on('click', '#sendMail', function(e) {
