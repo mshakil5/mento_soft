@@ -146,6 +146,7 @@ class ProjectTaskController extends Controller
             'priority' => $request->priority,
             'due_date' => $request->due_date,
             'status' => $request->status,
+            'allow_client'  => $request->input('allow_client', 0),
             'created_by' => auth()->id(),
         ]);
 
@@ -195,6 +196,7 @@ class ProjectTaskController extends Controller
         $task->priority = $request->priority;
         $task->status = $request->status;
         $task->due_date = $request->due_date;
+        $task->allow_client = $request->input('allow_client', 0);
         $task->updated_by = auth()->id();
 
         if ($task->save()) {

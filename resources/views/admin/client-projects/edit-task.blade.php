@@ -57,7 +57,7 @@
                                         <input type="date" class="form-control" id="due_date" name="due_date" value="{{ $task->due_date }}" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Status <span class="text-danger">*</span></label>
                                         <select class="form-control" id="status" name="status" required>
@@ -67,6 +67,14 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <div class="form-group" style="margin-top: 9px; margin-left: 15px;"> 
+                                        <label>Client View</label><br>
+                                        <input type="checkbox" id="allow_client" name="allow_client" value="1" class="form-control-input"
+                                              {{ $task->allow_client ? 'checked' : '' }}>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="form-group">
@@ -98,6 +106,7 @@ $(document).ready(function() {
             priority: $("#priority").val(),
             due_date: $("#due_date").val(),
             status: $("#status").val(),
+            allow_client: $("#allow_client").is(':checked') ? 1 : 0,
             _token: "{{ csrf_token() }}"
         };
 

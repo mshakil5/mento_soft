@@ -45,7 +45,7 @@
           </div>
 
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="form-group">
                 <label>Priority <span class="text-danger">*</span></label>
                 <select class="form-control" name="priority" required>
@@ -55,7 +55,7 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="form-group">
                 <label>Due Date <span class="text-danger">*</span></label>
                 <input type="date" class="form-control" name="due_date" min="{{ date('Y-m-d') }}" required>
@@ -69,6 +69,12 @@
                   <option value="2">In Progress</option>
                   <option value="3">Done</option>
                 </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group" style="margin-top: 9px; margin-left: 15px;">
+                <label>Client View</label><br>
+                <input type="checkbox" name="allow_client" value="1" class="form-check-input">
               </div>
             </div>
           </div>

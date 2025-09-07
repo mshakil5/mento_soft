@@ -73,8 +73,8 @@ class HomeController extends Controller
         $plannedprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 1)->count();
         $ongoingprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 2)->count();
         $doneProjectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 4)->count();
-        $onGoingTasksCount = ProjectTask::where('client_id', $user->client->id)->whereIn('status', [1, 2])->count();
-        $notConfirmedTasksCount = ProjectTask::where('client_id', $user->client->id)->where('status', 3)->where('is_confirmed', 0)->count();
+        $onGoingTasksCount = ProjectTask::where('client_id', $user->client->id)->whereIn('status', [1, 2])->where('allow_client', 1)->count();
+        $notConfirmedTasksCount = ProjectTask::where('client_id', $user->client->id)->where('status', 3)->where('is_confirmed', 0)->where('allow_client', 1)->count();
         return view('user.dashboard', compact('ongoingprojectsCount', 'doneProjectsCount', 'plannedprojectsCount', 'onGoingTasksCount', 'notConfirmedTasksCount'));
     }
 

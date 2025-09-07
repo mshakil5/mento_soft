@@ -74,7 +74,9 @@ class UserController extends Controller
 
         $projects = ClientProject::with([
             'tasks' => function($q) {
-                $q->latest()->with('employee');
+                $q->where('allow_client', 1)
+                  ->latest()
+                  ->with('employee');
             },
             'recentUpdates' => function($q) {
                 $q->latest();
@@ -110,6 +112,7 @@ class UserController extends Controller
                   ->whereDoesntHave('views', fn($q2) => $q2->where('user_id', $userId));
             }])
             ->where('client_id', $user->client->id)
+            ->where('allow_client', 1)
             ->when($request->project, fn($q, $projectId) => $q->where('client_project_id', $projectId));
 
         switch($tab) {

@@ -67,7 +67,7 @@
                                         <input type="date" class="form-control" id="due_date" name="due_date" min="{{ date('Y-m-d') }}" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Status <span class="text-danger">*</span></label>
                                         <select class="form-control" id="status" name="status" required>
@@ -76,6 +76,12 @@
                                             <option value="3">Done</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-md-2">
+                                  <div class="form-group" style="margin-top: 9px; margin-left: 15px;">
+                                    <label>Client View</label><br>
+                                    <input type="checkbox" name="allow_client" value="1" class="form-check-input">
+                                  </div>
                                 </div>
                             </div>
 
@@ -155,6 +161,7 @@
             form_data.append("employee_id", $("#employee_id").val());
             form_data.append("priority", $("#priority").val());
             form_data.append("due_date", $("#due_date").val());
+            form_data.append("allow_client", $('#allow_client').is(':checked') ? 1 : 0);
             form_data.append("status", $("#status").val());
 
             if($(this).val() == 'Create') {
