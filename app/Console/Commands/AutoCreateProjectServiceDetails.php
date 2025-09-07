@@ -15,8 +15,7 @@ class AutoCreateProjectServiceDetails extends Command
     public function handle()
     {
 
-        $details = ProjectServiceDetail::where('is_auto', 1)
-            ->where('status', 1)
+        $details = ProjectServiceDetail::where('status', 1)
             ->where(function($q) {
                 $q->where(function($t1) { // In house
                     $t1->where('type', 1)
