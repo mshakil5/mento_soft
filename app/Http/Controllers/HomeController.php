@@ -9,6 +9,7 @@ use App\Models\ProjectServiceDetail;
 use Illuminate\Http\Request;
 use App\Models\ProjectTask;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -102,5 +103,35 @@ class HomeController extends Controller
         } else {
             return redirect()->route('homepage');
         }
+    }
+
+    public function cleanDB()
+    {
+        $tables = [
+            'activity_log',
+            'client_email_logs',
+            'client_projects',
+            'client_types',
+            'invoices',
+            'invoice_details',
+            'login_records',
+            'project_recent_updates',
+            'project_services',
+            'project_service_details',
+            'project_tasks',
+            'task_messages',
+            'task_message_views',
+            'transactions',
+        ];
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        foreach ($tables as $table) {
+            DB::table($table)->truncate();
+        }
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        return "Cleaned successfully.";
     }
 }

@@ -373,4 +373,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('balance-sheet', [FinancialStatementController::class, 'balanceSheet'])->name('balance-sheet');
     Route::post('balance-sheet', [FinancialStatementController::class, 'balanceSheetReport'])->name('balance-sheet.report');
+
+    Route::get('/clean-db', [HomeController::class, 'cleanDB']);
 });
