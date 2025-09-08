@@ -22,7 +22,7 @@
             </div>
             <div class="col-sm-12 col-md-6 col-lg-2 col-xl-2">
                 <ul>
-                    <li><a href="{{ asset('template/index.html') }}">Free Template</a></li>
+                    <li><a href="{{ asset('template/index.html') }}">Free Website</a></li>
                     <li>
                         @auth
                             <a href="{{ route('dashboard') }}">Dashboard</a>
