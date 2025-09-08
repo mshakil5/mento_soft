@@ -59,4 +59,11 @@ class ProjectServiceDetail extends Model
 
         return ($due - $received) > 0;
     }
+
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class, 'project_service_detail_id')
+                    ->latestOfMany();
+    }
+
 }

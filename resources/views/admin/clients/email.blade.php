@@ -34,22 +34,6 @@
                         <input type="text" class="form-control" id="subject" name="subject">
                       </div>
                     </div>
-                    @if(request('type') === 'service')
-                    <div class="col-sm-12">
-                      <div class="form-group">
-                        <label>Select Unpaid Services</label>
-                          <select id="serviceSelect" class="form-control select2" multiple>
-                            @foreach($services as $service)
-                              <option value="{{ $service->id }}">
-                                {{ $service->serviceType->name ?? '' }}
-                                (Project: {{ $service->project->title ?? '' }})
-                                - £{{ number_format($service->amount, 2) }}
-                              </option>
-                            @endforeach
-                          </select>
-                      </div>
-                    </div>
-                    @endif
                     <div class="col-sm-12">
                       <div class="form-group">
                         <label>Body</label>
@@ -131,38 +115,6 @@
                   loader.hide();
               }
           });
-      });
-      $('#serviceSelect').on('change', function() {
-          let selectedIds = $(this).val() || [];
-          let allServices = {
-              @foreach($services as $service)
-              {{ $service->id }}: `
-                  <strong>Service:</strong> {{ $service->serviceType->name ?? '' }}<br>
-                  <strong>Project:</strong> {{ $service->project->title ?? '' }}<br>
-                  <strong>Amount:</strong> £{{ number_format($service->amount, 2) }}<br>
-                  <strong>Start Date:</strong> {{ $service->start_date ? \Carbon\Carbon::parse($service->start_date)->format('d-m-Y') : '' }}<br>
-                  <strong>End Date:</strong> {{ $service->start_date ? \Carbon\Carbon::parse($service->end_date)->format('d-m-Y') : '' }}
-              `,
-              @endforeach
-          };
-
-          let content = "";
-          if(selectedIds.length > 0) {
-              content = "<h4>Outstanding Services</h4>";
-              selectedIds.forEach(function(id) {
-                  content += "<div style='margin-bottom:15px;'>" + allServices[id] + "</div>";
-              });
-          }
-
-          let editorContent = $('#body').summernote('code');
-
-          let parts = editorContent.split(`{!! $mailFooter->mail_footer ?? '' !!}`);
-          let beforeFooter = parts[0];
-          let footer = parts[1] ? `{!! $mailFooter->mail_footer ?? '' !!}` + parts[1] : `{!! $mailFooter->mail_footer ?? '' !!}`;
-
-          beforeFooter = beforeFooter.replace(/<h4>Outstanding Services<\/h4>[\s\S]*?(?=$)/, '');
-
-          $('#body').summernote('code', beforeFooter + content + footer);
       });
   });
 </script>

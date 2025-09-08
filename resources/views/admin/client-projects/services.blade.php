@@ -91,7 +91,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6" id="projectDiv" style="display:none;">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Choose Project <span class="text-danger">*</span></label>
                                         <select class="form-control select2" id="client_project_id" name="client_project_id" required>
@@ -175,7 +175,7 @@
                                     <th>Amount</th>
                                     {{-- <th>Note</th> --}}
                                     <th>Status</th>
-                                    <th>Mail</th>
+                                    {{-- <th>Mail</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -470,7 +470,7 @@
               {data: 'amount', name: 'amount', orderable: false, searchable: false},
               // {data: 'note', name: 'note', orderable: false, searchable: false},
               {data: 'status', name: 'status', orderable: false, searchable: false},
-              { data: 'checkbox', orderable: false, searchable: false }, 
+              // { data: 'checkbox', orderable: false, searchable: false }, 
               {data: 'action', name: 'action', orderable: false, searchable: false},
           ],
           responsive: true,

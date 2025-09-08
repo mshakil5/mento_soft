@@ -4,7 +4,4 @@
 
 {!! $body !!}
 
-Thanks,  
-{{ config('app.name') }}
-
 @endcomponent

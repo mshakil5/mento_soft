@@ -60,9 +60,4 @@ class Invoice extends Model
         return ($due - $received) > 0;
     }
 
-    public function emailLogs()
-    {
-        return $this->hasMany(ClientEmailLog::class, 'invoice_id');
-    }
-
 }

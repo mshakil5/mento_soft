@@ -72,7 +72,10 @@
                     <tr>
                         <td style="text-align:center;">{{ $index + 1 }}</td>
                         <td style="text-align:center;">{{ $service->serviceType->name }}</td>
-                        <td style="text-align:center;">{{ $service->serviceType->description }}</td>
+                        <td style="text-align:center;">
+                            {{ \Carbon\Carbon::parse($service->start_date)->format('j F Y') }} - 
+                            {{ \Carbon\Carbon::parse($service->end_date)->format('j F Y') }}
+                        </td>
                         <td style="text-align:center;">1</td>
                         <td style="text-align:center;">{{ number_format($service->amount, 2) }}</td>
                         <td style="text-align:center;">0%</td>

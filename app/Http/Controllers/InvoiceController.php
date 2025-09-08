@@ -16,6 +16,8 @@ use App\Models\Transaction;
 use App\Models\ClientEmailLog;
 use App\Models\CompanyDetails;
 use Carbon\Carbon;
+use App\Mail\ClientEmail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -23,7 +25,6 @@ class InvoiceController extends Controller
     {
         if ($request->ajax()) {
             $query = Invoice::with(['client', 'details'])
-                            ->withCount('emailLogs')
                             ->latest();
 
             if ($request->client_id) {
@@ -90,7 +91,7 @@ class InvoiceController extends Controller
                         $dropdown .= '<a href="#" class="dropdown-item send-email" 
                                         data-id="'.$row->id.'" 
                                         data-email="'.$row->client->email.'" 
-                                        title="'.($row->email_logs_count > 0 ? "{$row->email_logs_count} emails sent" : 'Send first email').'">
+                                        title="Send Email">
                                         <i class="fas fa-envelope"></i> Send Email
                                       </a>';
                     }
@@ -281,25 +282,30 @@ class InvoiceController extends Controller
 
     private function sendInvoiceEmail($invoice)
     {
-        if (!$invoice->client || !$invoice->client->email) {
-            throw new \Exception('Client email not found');
-        }
+        $subject = 'Invoice #' . $invoice->invoice_number;
 
-        try {
-            Mail::to($invoice->client->email)->queue(new InvoiceMail($invoice));
+        $company = CompanyDetails::first();
+        $pdf = Pdf::loadView('emails.invoice-pdf', [
+            'invoice' => $invoice,
+            'company' => $company
+        ]);
 
-            ClientEmailLog::create([
-                'client_id'       => $invoice->client_id,
-                'invoice_id'      => $invoice->id,
-                'recipient_email' => $invoice->client->email,
-                'subject'         => 'Your Invoice from ' . (optional(CompanyDetails::first())->business_name ?? config('app.name')),
-                'message'         => view('emails.invoice', compact('invoice'))->render(),
-                'status'          => 1,
-                'created_by'      => auth()->id(),
-            ]);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        @mkdir(public_path('images/email-attachments'), 0755, true);
+        $attachmentPath = '/images/email-attachments/invoice_' . time() . '.pdf';
+        $pdf->save(public_path($attachmentPath));
+
+        Mail::to($invoice->client->email)
+            ->send(new ClientEmail($subject, null, [], $invoice));
+
+        ClientEmailLog::create([
+            'client_id'       => $invoice->client_id,
+            'recipient_email' => $invoice->client->email,
+            'subject'         => $subject,
+            'message'         => $company->mail_footer ?? 'Thank you.',
+            'attachment'      => $attachmentPath,
+            'status'          => 1,
+            'created_by'      => auth()->id(),
+        ]);
     }
 
     public function show($id)

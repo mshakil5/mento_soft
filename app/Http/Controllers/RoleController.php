@@ -22,7 +22,7 @@ class RoleController extends Controller
                 ->addColumn('action', function($row) {
                     return '
                         <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>
-                        <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                        <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>
                     ';
                 })
                 ->rawColumns(['action'])

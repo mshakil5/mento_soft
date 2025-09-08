@@ -22,7 +22,7 @@
 
         <div class="card card-secondary">
           <div class="card-header">
-            <h3 class="card-title">Mail Footer</h3>
+            <h3 class="card-title">Mail Body</h3>
           </div>
 
           <form action="{{ route('admin.mail-footer') }}" method="POST">

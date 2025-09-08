@@ -13,6 +13,7 @@ use App\Models\Transaction;
 use App\Models\ClientProject;
 use Mail;
 use Illuminate\Support\Facades\DB;
+use App\Models\CompanyDetails;
 
 class ProjectServiceController extends Controller
 {
@@ -22,20 +23,17 @@ class ProjectServiceController extends Controller
             $data = ProjectServiceDetail::with(['serviceType', 'client', 'project'])->latest();
 
             $latestType1Ids = ProjectServiceDetail::where('type', 1)
-              // ->where('bill_paid', '!=', 1)
               ->selectRaw('MAX(id) as id')
-              ->groupBy('project_service_id', 'client_id', 'client_project_id')
+              ->groupBy('project_service_id', 'client_id', 'client_project_id', 'amount', 'cycle_type', 'is_auto')
               ->pluck('id')
               ->toArray();
 
             $type2Ids = ProjectServiceDetail::where('type', 2)
               ->selectRaw('MAX(id) as id')
-              ->groupBy('project_service_id', 'client_id', 'client_project_id')
+              ->groupBy('project_service_id', 'client_id', 'client_project_id', 'amount', 'cycle_type', 'is_auto')
               ->pluck('id')
               ->toArray();
 
-            // $type2Ids = ProjectServiceDetail::where('type', 2)->pluck('id')->toArray();
-        
             $idsToDisplay = array_merge($latestType1Ids, $type2Ids);
 
             $data = $data->whereIn('id', $idsToDisplay);
@@ -60,44 +58,44 @@ class ProjectServiceController extends Controller
                 $data = $data->where('project_service_id', $request->project_service_id);
             }
 
-          if ($request->has('bill_paid')) {
-              $data = $data->where('bill_paid', $request->bill_paid);
-          }
+            if ($request->has('bill_paid')) {
+                $data = $data->where('bill_paid', $request->bill_paid);
+            }
 
-          if ($request->has('status')) {
-              $data = $data->where('status', $request->status);
-          }
+            if ($request->has('status')) {
+                $data = $data->where('status', $request->status);
+            }
 
-          $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
-          $yearlyLimit  = Carbon::now()->addMonths(3)->format('Y-m-d');
+            $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
+            $yearlyLimit  = Carbon::now()->addMonths(3)->format('Y-m-d');
 
-          if ($request->has('expiring') && $request->expiring == 1) {
-              $data = $data->where(function($query) use ($monthlyLimit, $yearlyLimit) {
-                  $query->where(function($q) use ($monthlyLimit) {
-                      $q->where('cycle_type', 1)
-                        ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$monthlyLimit]);
-                  })
-                  ->orWhere(function($q) use ($yearlyLimit) {
-                      $q->where('cycle_type', 2)
-                        ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$yearlyLimit]);
-                  });
-              });
-          }
+            if ($request->has('expiring') && $request->expiring == 1) {
+                $data = $data->where(function($query) use ($monthlyLimit, $yearlyLimit) {
+                    $query->where(function($q) use ($monthlyLimit) {
+                        $q->where('cycle_type', 1)
+                          ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$monthlyLimit]);
+                    })
+                    ->orWhere(function($q) use ($yearlyLimit) {
+                        $q->where('cycle_type', 2)
+                          ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$yearlyLimit]);
+                    });
+                });
+            }
 
-          if ($request->has('due')) {
-              $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
-              $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
-              $nextMonthStart    = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
-              $nextMonthEnd      = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
+            if ($request->has('due')) {
+                $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
+                $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
+                $nextMonthStart    = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
+                $nextMonthEnd      = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
 
-              if ($request->due === 'current') {
-                  $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$currentMonthStart, $currentMonthEnd]);
-              } elseif ($request->due === 'next') {
-                  $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$nextMonthStart, $nextMonthEnd]);
-              } elseif ($request->due === 'previous') {
-                  $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') < ?", [Carbon::now()->format('Y-m-d')]);
-              }
-          }
+                if ($request->due === 'current') {
+                    $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$currentMonthStart, $currentMonthEnd]);
+                } elseif ($request->due === 'next') {
+                    $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$nextMonthStart, $nextMonthEnd]);
+                } elseif ($request->due === 'previous') {
+                    $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') < ?", [Carbon::now()->format('Y-m-d')]);
+                }
+            }
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -111,6 +109,9 @@ class ProjectServiceController extends Controller
                             ->where('client_id', $row->client_id)
                             ->where('client_project_id', $row->client_project_id)
                             ->where('type', 1)
+                            ->where('amount', $row->amount)
+                            ->where('cycle_type', $row->cycle_type)
+                            ->where('is_auto', $row->is_auto)
                             ->oldest('start_date')
                             ->first();
                         return $firstRecord->start_date ? Carbon::parse($firstRecord->start_date)->format('d-m-Y') : '';
@@ -149,14 +150,20 @@ class ProjectServiceController extends Controller
                         $totalAmount = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                             ->where('client_id', $row->client_id)
                             ->where('client_project_id', $row->client_project_id)
-                            ->where('bill_paid', '!=', 1)
                             ->where('type', 1)
+                            ->where('bill_paid', '!=', 1)
+                            ->where('amount', $row->amount)
+                            ->where('cycle_type', $row->cycle_type)
+                            ->where('is_auto', $row->is_auto)
                             ->sum('amount');
                         $count = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                             ->where('client_id', $row->client_id)
-                            ->where('bill_paid', '!=', 1)
                             ->where('client_project_id', $row->client_project_id)
                             ->where('type', 1)
+                            ->where('bill_paid', '!=', 1)
+                            ->where('amount', $row->amount)
+                            ->where('cycle_type', $row->cycle_type)
+                            ->where('is_auto', $row->is_auto)
                             ->count();
 
                         $cycleText = $row->cycle_type == 1 ? 'month' : 'year';
@@ -197,6 +204,7 @@ class ProjectServiceController extends Controller
                                       <th>Date</th>
                                       <th>Amount</th>
                                       <th>Status</th>
+                                      <th>Description</th>
                                     </tr>
                                   </thead>
                                   <tbody>';
@@ -205,6 +213,9 @@ class ProjectServiceController extends Controller
                             ->where('client_id', $row->client_id)
                             ->where('client_project_id', $row->client_project_id)
                             ->where('type', 1)
+                            ->where('amount', $row->amount)
+                            ->where('cycle_type', $row->cycle_type)
+                            ->where('is_auto', $row->is_auto)
                             ->orderBy('start_date')
                             ->get();
 
@@ -214,6 +225,8 @@ class ProjectServiceController extends Controller
                                 $dateRange = Carbon::parse($bill->start_date)->format('j F Y') . ' - ' .
                                             Carbon::parse($bill->end_date)->format('j F Y');
                             }
+
+                            $note = $bill->transaction?->description ?? '-';
 
                             if ($bill->bill_paid) {
                                 $status = '<span class="badge badge-success">Received</span>';
@@ -228,6 +241,7 @@ class ProjectServiceController extends Controller
                                       <td>'.$dateRange.'</td>
                                       <td>£'.number_format($bill->amount, 0).'</td>
                                       <td>'.$status.'</td>
+                                      <td>'.$note.'</td>
                                     </tr>';
                         }
 
@@ -268,7 +282,11 @@ class ProjectServiceController extends Controller
                                 ->where('client_project_id', $row->client_project_id)
                                 ->where('type', 1)
                                 ->where('bill_paid', '!=', 1)
-                                ->orderBy('start_date')->get();
+                                ->where('amount', $row->amount)
+                                ->where('cycle_type', $row->cycle_type)
+                                ->where('is_auto', $row->is_auto)
+                                ->orderBy('start_date')
+                                ->get();
                             
                             $btn .= '<div class="mb-3">
                                         <label>Select Month(s) <span class="text-danger">*</span></label>
@@ -317,14 +335,28 @@ class ProjectServiceController extends Controller
                         $btn .= '<button class="btn btn-sm btn-success" disabled>'.$disabledText.'</button>';
                     }
 
-                    $btn .= '<a href="'.route('project-services.invoice.show', $row->id).'" class="btn btn-sm btn-primary" target="_blank">Invoice</a> ';
+                  $serviceIds = $row->type == 1
+                    ? ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                        ->where('client_id', $row->client_id)
+                        ->where('client_project_id', $row->client_project_id)
+                        ->where('type', 1)
+                        ->where('bill_paid', '!=', 1)
+                        ->where('amount', $row->amount)
+                        ->where('cycle_type', $row->cycle_type)
+                        ->where('is_auto', $row->is_auto)
+                        ->orderBy('start_date')
+                        ->pluck('id')
+                        ->toArray()
+                    : [$row->id];
 
-                    $btn .= '<a href="'.route('client.email', ['id' => $row->client_id, 'type' => 'ProjectServiceDetail', 'type_id' => $row->id]).'" 
-                                class="btn btn-sm btn-warning" 
-                                title="Send Email">
-                                <i class="fas fa-envelope"></i>
-                            </a>';
-
+                  $invoiceUrl = route('project-services.invoice.show') . '?service_ids=' . implode(',', $serviceIds);
+                  $btn .= '<a href="'.$invoiceUrl.'" class="btn btn-sm btn-info mr-1" title="Invoice" target="_blank">
+                              <i class="fas fa-file-invoice-dollar"></i> Invoice
+                          </a>';
+                  $emailUrl = route('client.email', ['id' => $row->client_id]) . '?service_ids=' . implode(',', $serviceIds);
+                  $btn .= '<a href="'.$emailUrl.'" class="btn btn-sm btn-warning" title="Send Email">
+                              <i class="fas fa-envelope"></i>
+                          </a>';
 
                     return $btn;
                 })
@@ -338,10 +370,27 @@ class ProjectServiceController extends Controller
         return view('admin.client-projects.services', compact('serviceTypes', 'clients', 'projects'));
     }
 
-    public function invoice($id)
+    public function invoice(Request $request)
     {
-        $service = ProjectServiceDetail::with(['serviceType', 'client'])->findOrFail($id);
-        return view('admin.client-projects.service_invoice', compact('service'));
+        $serviceIds = $request->query('service_ids')
+            ? explode(',', $request->query('service_ids'))
+            : [];
+
+        if (empty($serviceIds)) {
+            abort(404, 'No service IDs provided');
+        }
+
+        $services = ProjectServiceDetail::with(['serviceType', 'client'])
+            ->whereIn('id', $serviceIds)
+            ->get();
+
+        if ($services->isEmpty()) {
+            abort(404, 'No services found for invoice');
+        }
+
+        $company = CompanyDetails::first();
+
+        return view('admin.client-projects.service_invoice', compact('services', 'company'));
     }
 
     public function sendMultiEmail(Request $request)
@@ -372,15 +421,18 @@ class ProjectServiceController extends Controller
         $isAuto = $request->input('is_auto') == 1 ? 1 : 0;
         $cycleType = $request->input('cycle_type');
 
-        $exists = ProjectServiceDetail::where([
+        $latest = ProjectServiceDetail::where([
             'project_service_id' => $request->service_type_id,
             'client_id' => $request->client_id,
             'client_project_id' => $request->client_project_id,
             'type' => $request->type,
             'is_auto' => $isAuto,
             'cycle_type' => $cycleType,
-            'status' => 1,
-        ])->exists();
+        ])
+        ->orderByDesc('id')
+        ->first();
+
+        $exists = $latest && $latest->status == 1;
 
         if ($exists) {
             return response()->json([

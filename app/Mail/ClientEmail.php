@@ -16,12 +16,16 @@ class ClientEmail extends Mailable
     public $subjectText;
     public $bodyText;
     public $serviceIds;
+    public $invoice;
 
-    public function __construct($subject, $body, $serviceIds = [])
+    public function __construct($subject = null, $body = null, $serviceIds = [], $invoice = null)
     {
-        $this->subjectText = $subject;
-        $this->bodyText = $body;
-        $this->serviceIds = $serviceIds ?? [];
+        $company = CompanyDetails::first();
+
+        $this->subjectText = $subject ?? 'Invoice from ' . ($company->business_name ?? config('app.name'));
+        $this->bodyText    = $body ?? ($company->mail_footer ?? 'Thank you');
+        $this->serviceIds  = $serviceIds ?? [];
+        $this->invoice     = $invoice;
     }
 
     public function build()
@@ -39,6 +43,19 @@ class ClientEmail extends Mailable
 
             $pdf = Pdf::loadView('emails.project-service-invoice', [
                 'services' => $services,
+                'company'  => $company
+            ]);
+
+            $mail->attachData($pdf->output(), 'service_invoice.pdf', [
+                'mime' => 'application/pdf',
+            ]);
+        }
+
+        if ($this->invoice) {
+            $company = CompanyDetails::first();
+
+            $pdf = Pdf::loadView('emails.invoice-pdf', [
+                'invoice' => $this->invoice,
                 'company' => $company
             ]);
 

@@ -16,13 +16,15 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ClientEmail;
 use App\Models\CompanyDetails;
 use App\Models\ProjectServiceDetail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\ClientEmailLog;
 
 class ClientController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Client::with(['clientType', 'projects', 'invoices', 'services.serviceType'])->withCount('projects')->latest();
+            $data = Client::with(['clientType', 'projects', 'invoices', 'services.serviceType'])->withCount(['projects', 'emailLogs'])->latest();
 
             if ($request->client_type_id) {
                 $data->where('client_type_id', $request->client_type_id);
@@ -101,6 +103,14 @@ class ClientController extends Controller
                         $buttons .= '<a href="'.route('client.email', ['id' => $row->id]).'" class="btn btn-sm btn-warning mr-1">
                                         <i class="fas fa-envelope"></i>
                                     </a>';
+
+                        if ($row->email_logs_count > 0) {
+                            $buttons .= '<a href="'.route('client.email.logs', ['client_id' => $row->id]).'" 
+                                            class="btn btn-sm btn-warning mr-1" 
+                                            title="View Sent Emails">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </a>';
+                        }
                     }
 
                     $buttons .= '<a class="btn btn-sm btn-info mr-1" data-toggle="modal" data-target="#detailsModal-'.$row->id.'">
@@ -429,16 +439,10 @@ class ClientController extends Controller
 
     public function clientEmail(Request $request, $id)
     {
-        $client = client::find($id)->select('id', 'name','email')->first();
-        $serviceIds = $request->service_ids ?? [];
-        
-        $services = ProjectServiceDetail::with(['serviceType:id,name', 'project:id,title'])
-          ->where('client_id', $id)
-          ->where('bill_paid', 0)
-          ->get(['id','client_id','project_service_id','client_project_id','amount','bill_paid','start_date','end_date']);
-
+        $client = client::where('id', $id)->select('id', 'name','email')->first();
+        $serviceIds = $request->query('service_ids') ? explode(',', $request->query('service_ids')) : [];
         $mailFooter = CompanyDetails::select('mail_footer')->first();
-        return view('admin.clients.email', compact('client', 'mailFooter', 'services', 'serviceIds'));
+        return view('admin.clients.email', compact('client', 'serviceIds', 'mailFooter' ));
     }
 
     public function sendClientEmail(Request $request)
@@ -461,10 +465,63 @@ class ClientController extends Controller
 
         Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body, $serviceIds));
 
+        $attachmentPath = null;
+
+        if (!empty($serviceIds)) {
+            $services = ProjectServiceDetail::whereIn('id', $serviceIds)->get();
+            $company = CompanyDetails::first();
+
+            $pdf = Pdf::loadView('emails.project-service-invoice', [
+                'services' => $services,
+                'company'  => $company
+            ]);
+
+            @mkdir(public_path('images/email-attachments'), 0755, true);
+
+            $attachmentPath = '/images/email-attachments/service_invoice_' . time() . '.pdf';
+            $pdf->save(public_path($attachmentPath));
+        }
+
+        ClientEmailLog::create([
+            'client_id'       => $client->id,
+            'recipient_email' => $client->email,
+            'subject'         => $request->subject,
+            'message'         => $request->body,
+            'attachment'      => $attachmentPath,
+            'status'          => 1,
+            'created_by'      => auth()->id(),
+        ]);
+
         return response()->json([
             'status'  => 'success',
             'message' => 'Email sent successfully.'
         ]);
+    }
+
+    public function sentEmails(Request $request, $client_id)
+    {
+        if ($request->ajax()) {
+            $data = ClientEmailLog::where('client_id', $client_id)->latest();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('created_at', function($row) {
+                    return $row->created_at ? $row->created_at->format('d-m-Y H:i') : '-';
+                })
+                ->addColumn('recipient', fn($row) => $row->recipient_email)
+                ->addColumn('body', fn($row) => $row->message)
+                ->addColumn('attachment', function($row) {
+                    if ($row->attachment) {
+                        $url = asset($row->attachment);
+                        return '<a href="'.$url.'" target="_blank" class="btn btn-sm btn-primary">Download</a>';
+                    }
+                    return '-';
+                })
+                ->rawColumns(['attachment', 'body'])
+                ->make(true);
+        }
+
+        return view('admin.clients.sent-emails', compact('client_id'));
     }
 
 }

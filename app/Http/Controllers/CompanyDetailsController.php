@@ -174,7 +174,7 @@ class CompanyDetailsController extends Controller
     public function mailFooter()
     {
         $companyDetails = CompanyDetails::select('mail_footer')->first();
-        return view('admin.mail_footer.terms', compact('companyDetails'));
+        return view('admin.company.mail_footer', compact('companyDetails'));
     }
 
     public function mailFooterUpdate(Request $request)

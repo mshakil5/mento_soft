@@ -127,7 +127,7 @@
             <li class="nav-item">
                 <a href="{{ route('admin.mail-footer') }}" class="nav-link {{ Route::is('admin.mail-footer') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-mail-bulk"></i>
-                    <p>Mail Footer</p>
+                    <p>Mail Body</p>
                 </a>
             </li>
             <li class="nav-item">

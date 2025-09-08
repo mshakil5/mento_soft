@@ -215,6 +215,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/client-mail/{id}', [ClientController::class, 'clientEmail'])->name('client.email');
     Route::post('/client-mail', [ClientController::class, 'sendClientEmail'])->name('client.email.send');
 
+    Route::get('/clients/{client_id}/emails', [ClientController::class, 'sentEmails'])->name('client.email.logs');
+
     // Client Projects
     Route::get('/client-projects', [ClientProjectController::class, 'index'])->name('client-projects.index');
     Route::post('/client-projects', [ClientProjectController::class, 'store'])->name('admin.client-projects.store');
@@ -283,7 +285,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/client-project-service-detail/{detail}/toggle-status', [ProjectServiceDetailController::class, 'toggleStatus']);
     Route::post('/project-service-details/{id}/receive', [ProjectServiceDetailController::class, 'receive'])->name('project-service-details.receive');
 
-    Route::get('/project-services/invoice/{id}', [ProjectServiceController::class, 'invoice'])
+    Route::get('project-services/invoice', [ProjectServiceController::class, 'invoice'])
     ->name('project-services.invoice.show');
     Route::get('/project-services/send-multi-email', [ProjectServiceController::class, 'sendMultiEmail']);
 

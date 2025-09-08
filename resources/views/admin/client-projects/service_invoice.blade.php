@@ -1,187 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-      @php
-          $company = \App\Models\CompanyDetails::first();
-          use Carbon\Carbon;
-      @endphp
+    @php
+        use Carbon\Carbon;
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>{{ $company->company_name }} - Invoice</title>
     <style>
         body {
-            font-family: Arial, Helvetica;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 12px;
             margin: 0;
             padding: 20px;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .text-right {
-            text-align: right;
         }
         .invoice-body {
             max-width: 794px;
             margin: 0 auto;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .table td, .table th {
-            padding: 8px;
-        }
-        .no-print {
-            display: none;
-        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        .table td, .table th { padding: 8px; border: 1px solid #dee2e6; }
+        .no-print { display: none; }
         @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                padding: 0;
-            }
+            .no-print { display: none !important; }
+            body { padding: 0; }
         }
     </style>
 </head>
 <body>
     <section class="invoice">
         <div class="invoice-body">
+            {{-- Header --}}
             <table>
-                <tbody>
-                    <tr>
-                        <td style="width:50%;">
-                            <div style="text-align: left;">
-                                <img src="{{ asset('images/company/' . $company->company_logo) }}" width="120px" style="display:inline-block;" />
-                            </div>
-                        </td>
-                        <td style="width:50%;">
-                            <div style="text-align: right;">
-                                <h1 style="font-size: 30px; color:blue; margin: 0;">INVOICE</h1>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
+                <tr>
+                    <td style="width:50%; text-align:left;">
+                        <img src="{{ asset('images/company/' . $company->company_logo) }}" width="120px" />
+                    </td>
+                    <td style="width:50%; text-align:right;">
+                        <h1 style="font-size: 30px; color:blue; margin: 0;">INVOICE</h1>
+                    </td>
+                </tr>
             </table>
 
             <br><br>
 
+            {{-- Bill To + Invoice Date --}}
+            @php
+                $client = $services->first()->client; // all services belong to same client
+            @endphp
             <table>
-                <tbody>
-                    <tr>
-                        <td style="width:40%;">
-                            <div>
-                                <h5 style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">Bill To</h5>
-                                @if ($service->client->business_name) 
-                                <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $service->client->business_name }}</p>
-                                @endif
-                                @if ($service->client->name) 
-                                <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $service->client->name }}</p>
-                                @endif
-                                @if ($service->client->email) 
-                                <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $service->client->email }}</p>
-                                @endif
-                                @if ($service->client->phone)    
-                                <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $service->client->phone }}</p>
-                                @endif
-                                @if ($service->client->address)
-                                <p style="font-size: 12px; margin: 5px; text-align: left; line-height: 10px;">
-                                    {{ $service->client->address }}
-                                </p>
-                                @endif                              
-                            </div>
-                        </td>
-                        <td style="width:30%;"></td>
-                        <td style="width:30%;">
-                            <div style="text-align: right;">
-                                <p style="font-size: 12px; margin: 5px;text-align: right;line-height: 10px;">Date: {{ Carbon::parse($service->start_date)->format('d/m/Y') }}</p>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
+                <tr>
+                    <td style="width:60%; vertical-align: top;">
+                        <h5 style="margin: 5px;">Bill To</h5>
+                        @if ($client->business_name) <p>{{ $client->business_name }}</p> @endif
+                        @if ($client->name) <p>{{ $client->name }}</p> @endif
+                        @if ($client->email) <p>{{ $client->email }}</p> @endif
+                        @if ($client->phone) <p>{{ $client->phone }}</p> @endif
+                        @if ($client->address) <p>{{ $client->address }}</p> @endif
+                    </td>
+                    <td style="width:40%; text-align:right; vertical-align: top;">
+                        <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
+                        <p>Invoice #: INV{{ str_pad($services->first()->id, 6, '0', STR_PAD_LEFT) }}</p>
+                    </td>
+                </tr>
             </table>
+
             <br>
 
-            <div class="row overflow">
-                <table class="table" style="border: 1px solid #dee2e6;">
-                    <thead>
+            {{-- Service Table --}}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Project</th>
+                        <th class="text-center">Description</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-center">Price</th>
+                        <th class="text-center">VAT %</th>
+                        <th class="text-right">Total (Excl VAT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $subtotal = 0; @endphp
+                    @foreach ($services as $index => $service)
+                        @php 
+                            $subtotal += $service->amount; 
+                            $dateRange = $service->start_date && $service->end_date 
+                                ? Carbon::parse($service->start_date)->format('d M Y') . ' - ' . Carbon::parse($service->end_date)->format('d M Y') 
+                                : '';
+                        @endphp
                         <tr>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">#</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Project</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Description</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Qty</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Price</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">VAT %</th>
-                            <th style="border: 1px solid #dee2e6; text-align:right;">Total (Excl VAT)</th>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ $service->serviceType->name }}</td>
+                            <td class="text-center">{{ $dateRange }}</td>
+                            <td class="text-center">1</td>
+                            <td class="text-center">£{{ number_format($service->amount, 2) }}</td>
+                            <td class="text-center">0%</td>
+                            <td class="text-right">£{{ number_format($service->amount, 2) }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">1</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ $service->serviceType->name }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ $service->serviceType->description }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">1</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ number_format($service->amount, 2) }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">0%</td>
-                          <td style="border: 1px solid #dee2e6; text-align:right;">{{ number_format($service->amount, 2) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    @endforeach
+                </tbody>
+            </table>
 
-                <table style="margin-top: 20px;">
-                    <tbody>
-                        <tr>
-                            <td style="width: 20%">&nbsp;</td>
-                            <td style="width: 25%">&nbsp;</td>
-                            <td style="width: 25%">&nbsp;</td>
-                            <td>Subtotal</td>
-                            <td style="text-align:right">£{{ number_format($service->amount, 2) }}</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td>&nbsp;</td>
-                            <td style="background-color: #f2f2f2">Total</td>
-                            <td style="text-align:right; background-color: #f2f2f2">£{{ number_format($service->amount, 2) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            @if ($service->note)
-            <div style="margin-top: 30px;">
-                <p style="font-weight: bold; margin-bottom: 5px;">Notes:</p>
-                <p style="margin: 0;">{{ $service->note }}</p>
-            </div>
+            {{-- Totals --}}
+            <table style="margin-top:20px;">
+                <tr>
+                    <td style="width:70%"></td>
+                    <td style="width:30%">
+                        <table style="width:100%;">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#f2f2f2"><b>Total</b></td>
+                                <td class="text-right" style="background:#f2f2f2"><b>£{{ number_format($subtotal, 2) }}</b></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            {{-- Notes --}}
+            @if ($services->first()->note)
+                <div style="margin-top:30px;">
+                    <p style="font-weight:bold;">Notes:</p>
+                    <p>{{ $services->first()->note }}</p>
+                </div>
             @endif
-            <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 10px 20px; border-top: 1px solid #ddd; background: white;">
 
+            {{-- Footer --}}
+            <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+                        max-width: 794px; width: 100%; padding: 10px 20px;
+                        border-top: 1px solid #ddd; background: white;">
                 <table>
-                    <tbody>
-                        <tr>
-                            <td style="width: 50%; text-align:left;">
-                                <b>{{ $company->business_name ? $company->business_name : $company->company_name }}</b><br>
-                                Registration Number: {{ $company->company_reg_number ?? '' }}<br>
-                                Vat Number: {{ $company->vat_number ?? '' }}<br>
-                                {{ $company->address1 ?? '' }}
-                            </td>
-                            <td style="width: 50%; text-align:right;">
-                                {{ $company->phone1 ?? '' }} <br>
-                                {{ $company->email1 ?? '' }} <br>
-                                {{ $company->website ?? '' }} <br>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tr>
+                        <td style="width:50%; text-align:left;">
+                            <b>{{ $company->business_name ?: $company->company_name }}</b><br>
+                            Registration Number: {{ $company->company_reg_number ?? '' }}<br>
+                            Vat Number: {{ $company->vat_number ?? '' }}<br>
+                            {{ $company->address1 ?? '' }}
+                        </td>
+                        <td style="width:50%; text-align:right;">
+                            {{ $company->phone1 ?? '' }} <br>
+                            {{ $company->email1 ?? '' }} <br>
+                            {{ $company->website ?? '' }} <br>
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
     </section>
+
     <script>
         window.onload = function() {
-            setTimeout(function() {
-                window.print();
-            }, 1000);
+            setTimeout(function() { window.print(); }, 1000);
         };
     </script>
 </body>

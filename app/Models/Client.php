@@ -49,11 +49,6 @@ class Client extends Model
         return $this->hasMany(ClientEmailLog::class, 'client_id');
     }
 
-    public function invoiceEmails()
-    {
-        return $this->emailLogs()->whereNotNull('invoice_id');
-    }
-
     public function services()
     {
         return $this->hasMany(ProjectServiceDetail::class);
