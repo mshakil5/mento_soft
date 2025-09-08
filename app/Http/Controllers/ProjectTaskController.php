@@ -31,10 +31,10 @@ class ProjectTaskController extends Controller
                     return Carbon::parse($row->created_at)->format('d-m-Y');
                 })
                 ->addColumn('employee_name', function($row) {
-                    return $row->employee->name ?? 'N/A';
+                    return $row->employee->name ?? '';
                 })
                 ->addColumn('due_date', function($row) {
-                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : 'N/A';
+                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
                 })
                 ->addColumn('priority', function($row) {
                     $badgeClass = [

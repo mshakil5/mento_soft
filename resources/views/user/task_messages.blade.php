@@ -4,9 +4,9 @@
         <div class="me-2 text-center">
             <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
                  style="width:40px; height:40px; font-weight:bold;">
-                {{ substr($msg->sender->name ?? 'N/A', 0, 1) }}
+                {{ substr($msg->sender->name ?? '', 0, 1) }}
             </div>
-            <small class="d-block text-muted">{{ $msg->sender->name ?? 'N/A' }}</small>
+            <small class="d-block text-muted">{{ $msg->sender->name ?? '' }}</small>
         </div>
     @endif
 
@@ -23,9 +23,9 @@
         <div class="ms-2 text-center">
             <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" 
                  style="width:40px; height:40px; font-weight:bold;">
-                {{ substr($msg->sender->name ?? 'N/A', 0, 1) }}
+                {{ substr($msg->sender->name ?? '', 0, 1) }}
             </div>
-            <small class="d-block text-muted">{{ $msg->sender->name ?? 'N/A' }}</small>
+            <small class="d-block text-muted">{{ $msg->sender->name ?? '' }}</small>
         </div>
     @endif
 </div>

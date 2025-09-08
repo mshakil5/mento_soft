@@ -35,9 +35,6 @@ class ProjectController extends Controller
                 ->addColumn('sl', function ($row) {
                     return $row->sl ?? '';
                 })
-                // ->addColumn('service', function($row) {
-                //     return $row->service->title ?? 'N/A';
-                // })
                 ->addColumn('status', function($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="custom-control custom-switch">

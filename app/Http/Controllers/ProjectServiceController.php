@@ -104,7 +104,7 @@ class ProjectServiceController extends Controller
                 ->addColumn('checkbox', function($row) {
                     return '<input type="checkbox" class="row-checkbox" value="'.$row->id.'" data-client_id="'.$row->client_id.'">';
                 })
-                // ->addColumn('start_date', fn($row) => $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : 'N/A')
+                // ->addColumn('start_date', fn($row) => $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '')
                 ->addColumn('start_date', function ($row) {
                     if ($row->type == 1) {
                         $firstRecord = ProjectServiceDetail::where('project_service_id', $row->project_service_id)

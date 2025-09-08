@@ -120,13 +120,13 @@
                 $('#view-first-name').text(data.first_name);
                 $('#view-last-name').text(data.last_name);
                 $('#view-email').text(data.email);
-                $('#view-phone').text(data.phone || 'N/A');
-                $('#view-company').text(data.company || 'N/A');
-                $('#view-business-type').text(data.business_type || 'N/A');
-                $('#view-website').text(data.website || 'N/A');
-                $('#view-timeline').text(data.timeline || 'N/A');
-                $('#view-dream-description').text(data.dream_description || 'N/A');
-                $('#view-additional-info').text(data.additional_info || 'N/A');
+                $('#view-phone').text(data.phone || '');
+                $('#view-company').text(data.company || '');
+                $('#view-business-type').text(data.business_type || '');
+                $('#view-website').text(data.website || '');
+                $('#view-timeline').text(data.timeline || '');
+                $('#view-dream-description').text(data.dream_description || '');
+                $('#view-additional-info').text(data.additional_info || '');
                 $('#view-date').text(data.formatted_created_at);
                 
                 // Format features array
@@ -140,7 +140,7 @@
                     }
                     $('#view-features').html(featuresHtml);
                 } else {
-                    $('#view-features').text('N/A');
+                    $('#view-features').text('');
                 }
                 
                 // Set status badge

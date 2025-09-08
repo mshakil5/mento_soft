@@ -47,7 +47,7 @@ class InvoiceController extends Controller
             return DataTables::of($invoices)
                 ->addIndexColumn()
                 ->addColumn('date', fn($row) => date('d-m-Y', strtotime($row->invoice_date)))
-                ->addColumn('client_name', fn($row) => $row->client->business_name ?? 'N/A')
+                ->addColumn('client_name', fn($row) => $row->client->business_name ?? '')
                 ->addColumn('project', fn($row) => $row->details->pluck('project_name')->implode('<br>'))
                 ->addColumn('status', function($row) {
                     $invoiceDate = Carbon::parse($row->invoice_date)->startOfDay();

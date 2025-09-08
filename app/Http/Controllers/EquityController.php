@@ -42,7 +42,7 @@ class EquityController extends Controller
                     return $transaction->chartOfAccount->account_name;
                 })
                 ->addColumn('share_holder_name', function ($transaction) {
-                    return $transaction->equityHolder ? $transaction->equityHolder->name : 'N/A';
+                    return $transaction->equityHolder ? $transaction->equityHolder->name : '';
                 })
                 ->editColumn('date', function ($transaction) {
                     return Carbon::parse($transaction->date)->format('d-m-Y');

@@ -64,7 +64,7 @@ class ClientProjectController extends Controller
                     return '£' . number_format($row->amount, 0);
                 })
                 ->addColumn('client_name', function($row) {
-                    return $row->client->business_name ?? 'N/A';
+                    return $row->client->business_name ?? '';
                 })
                 ->addColumn('status', function($row) {
                     $statuses = [

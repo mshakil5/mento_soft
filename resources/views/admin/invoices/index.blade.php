@@ -310,10 +310,10 @@
                 // Load client info
                 $.get(url + '/client-info/' + clientId, function(data) {
                     var html = `
-                        <p><strong>Name:</strong> ${data.business_name || 'N/A'}</p>
-                        <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
-                        <p><strong>Phone:</strong> ${data.phone1 || 'N/A'} ${data.phone2 ? ', ' + data.phone2 : ''}</p>
-                        <p><strong>Address:</strong> ${data.address || 'N/A'}</p>
+                        <p><strong>Name:</strong> ${data.business_name || ''}</p>
+                        <p><strong>Email:</strong> ${data.email || ''}</p>
+                        <p><strong>Phone:</strong> ${data.phone1 || ''} ${data.phone2 ? ', ' + data.phone2 : ''}</p>
+                        <p><strong>Address:</strong> ${data.address || ''}</p>
                     `;
                     $('#clientInfoContainer').html(html);
                 });

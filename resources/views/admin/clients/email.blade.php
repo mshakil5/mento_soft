@@ -41,8 +41,8 @@
                           <select id="serviceSelect" class="form-control select2" multiple>
                             @foreach($services as $service)
                               <option value="{{ $service->id }}">
-                                {{ $service->serviceType->name ?? 'N/A' }}
-                                (Project: {{ $service->project->title ?? 'N/A' }})
+                                {{ $service->serviceType->name ?? '' }}
+                                (Project: {{ $service->project->title ?? '' }})
                                 - £{{ number_format($service->amount, 2) }}
                               </option>
                             @endforeach
@@ -137,8 +137,8 @@
           let allServices = {
               @foreach($services as $service)
               {{ $service->id }}: `
-                  <strong>Service:</strong> {{ $service->serviceType->name ?? 'N/A' }}<br>
-                  <strong>Project:</strong> {{ $service->project->title ?? 'N/A' }}<br>
+                  <strong>Service:</strong> {{ $service->serviceType->name ?? '' }}<br>
+                  <strong>Project:</strong> {{ $service->project->title ?? '' }}<br>
                   <strong>Amount:</strong> £{{ number_format($service->amount, 2) }}<br>
                   <strong>Start Date:</strong> {{ $service->start_date ? \Carbon\Carbon::parse($service->start_date)->format('d-m-Y') : '' }}<br>
                   <strong>End Date:</strong> {{ $service->start_date ? \Carbon\Carbon::parse($service->end_date)->format('d-m-Y') : '' }}
