@@ -24,7 +24,8 @@ class ClientProjectController extends Controller
                   'tasks' => function($query) {
                       $query->latest()->take(5)
                       ->with(['employee', 'creator']);
-                  }
+                  },
+                  'services.serviceType'
               ])
               ->withCount(['recentUpdates', 'tasks'])
               ->latest();
@@ -121,6 +122,27 @@ class ClientProjectController extends Controller
                                 </a>';
 
                     $buttons .= '</div></div>'.$details;
+
+                    $groupedServices = $row->services->filter(fn($s) => $s->serviceType)->unique('project_service_id');
+
+                    if ($groupedServices->count()) {
+                        $buttons .= '<div class="btn-group ml-1">
+                                        <button type="button" class="btn btn-sm btn-dark dropdown-toggle" data-toggle="dropdown">
+                                            Services
+                                        </button>
+                                        <div class="dropdown-menu">';
+
+                        foreach ($groupedServices as $service) {
+                            $buttons .= '<a href="'.route('project-services.index', [
+                                                    'client_project_id' => $row->id,
+                                                    'project_service_id' => $service->serviceType->id
+                                                ]).'" class="dropdown-item">'
+                                        . $service->serviceType->name .
+                                        '</a>';
+                        }
+
+                        $buttons .= '</div></div>';
+                    }
 
                     return $buttons;
                 })
