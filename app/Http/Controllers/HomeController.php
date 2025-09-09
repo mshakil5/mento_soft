@@ -16,8 +16,25 @@ class HomeController extends Controller
     public function adminHome()
     {   
         $totalClients = Client::count();
-        $activeProjects = ClientProject::where('status', 2)->count();
-        $onGoingServices = ProjectServiceDetail::where('status', 1)->count();
+
+        $activeProjects = ClientProject::count();
+
+        $latestType1Ids = ProjectServiceDetail::where('type', 1)
+          ->where('status', 1)
+          ->selectRaw('MAX(id) as id')
+          ->groupBy('project_service_id', 'client_id', 'client_project_id', 'amount', 'cycle_type', 'is_auto')
+          ->pluck('id')
+          ->toArray();
+
+        $latestType2Ids = ProjectServiceDetail::where('type', 2)
+          ->where('status', 1)
+          ->selectRaw('MAX(id) as id')
+          ->groupBy('project_service_id', 'client_id', 'client_project_id', 'amount', 'cycle_type', 'is_auto')
+          ->pluck('id')
+          ->toArray();
+
+        $onGoingServices = count($latestType1Ids) + count($latestType2Ids);
+
         $pendingInvoices = Invoice::where('status', 1)->sum('net_amount');
         $todoTasks = ProjectTask::where('status', 1)->count();
         $inProgressTasks = ProjectTask::where('status', 2)->count();
@@ -26,18 +43,8 @@ class HomeController extends Controller
         $now = Carbon::now()->format('Y-m-d');
         $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
         $yearlyLimit = Carbon::now()->addMonths(3)->format('Y-m-d');
-        $servicesExpiringSoon = ProjectServiceDetail::where('status', 1)
-            ->where(function($query) use ($monthlyLimit, $yearlyLimit) {
-                $query->where(function($q) use ($monthlyLimit) {
-                    $q->where('cycle_type', 1)
-                      ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$monthlyLimit]);
-                })
-                ->orWhere(function($q) use ($yearlyLimit) {
-                    $q->where('cycle_type', 2)
-                      ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$yearlyLimit]);
-                });
-            })
-        ->count();
+        $servicesNeedToBeRenewed = ProjectServiceDetail::where('type', 2)
+            ->where('is_renewed', 0)->where('status', 1)->where('next_created', 0)->count();
         $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
         $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
 
@@ -60,7 +67,7 @@ class HomeController extends Controller
             ->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') < ?", [$today])
             ->sum('amount');
 
-        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'pendingInvoices', 'todoTasks', 'inProgressTasks', 'doneTasks', 'doneNotConfirmedTasks', 'servicesExpiringSoon', 'currentMonthDue', 'nextMonthDue', 'allPreviousDue'));
+        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'pendingInvoices', 'todoTasks', 'inProgressTasks', 'doneTasks', 'doneNotConfirmedTasks', 'servicesNeedToBeRenewed', 'currentMonthDue', 'nextMonthDue', 'allPreviousDue'));
     }
 
     public function managerHome()

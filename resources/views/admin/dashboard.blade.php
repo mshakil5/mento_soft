@@ -24,7 +24,7 @@
           <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
 
           <div class="info-box-content">
-            <span class="info-box-text">Active Projects</span>
+            <span class="info-box-text">Projects</span>
             <span class="info-box-number">{{ $activeProjects }}</span>
           </div>
         </div>
@@ -42,15 +42,15 @@
         </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-        <a href="{{ route('project-services.index', ['status' => 1, 'expiring' => 1]) }}" class="text-dark">
-        <div class="info-box shadow-lg">
-          <span class="info-box-icon bg-danger"><i class="far fa-copy"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Services Expiring Soon</span>
-            <span class="info-box-number">{{ $servicesExpiringSoon }}</span>
-          </div>
-        </div>
-        </a>
+          <a href="{{ route('invoices.index', ['status' => 1]) }}" class="text-dark">
+              <div class="info-box shadow-lg">
+                  <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
+                  <div class="info-box-content">
+                      <span class="info-box-text">Due Invoices</span>
+                      <span class="info-box-number">£{{ number_format($pendingInvoices, 0) }}</span>
+                  </div>
+              </div>
+          </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
         <a href="{{ route('tasks.all', ['status' => 1]) }}" class="text-dark">
@@ -96,19 +96,19 @@
         </div>
         </a>
       </div>
-      <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('invoices.index', ['status' => 1]) }}" class="text-dark">
-              <div class="info-box shadow-lg">
-                  <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
-                  <div class="info-box-content">
-                      <span class="info-box-text">Due Invoices</span>
-                      <span class="info-box-number">£{{ number_format($pendingInvoices, 0) }}</span>
-                  </div>
-              </div>
-          </a>
+      <div class="col-md-3 col-sm-6 col-12 d-none">
+        <a href="{{ route('project-services.index', ['status' => 1, 'renew' => 1]) }}" class="text-dark">
+        <div class="info-box shadow-lg">
+          <span class="info-box-icon bg-danger"><i class="far fa-copy"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Services To Be Renewed</span>
+            <span class="info-box-number">{{ $servicesNeedToBeRenewed }}</span>
+          </div>
+        </div>
+        </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-decoration-none">
+          {{-- <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-decoration-none"> --}}
               <div class="info-box bg-danger text-white shadow-lg">
                   <span class="info-box-icon"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
@@ -116,40 +116,40 @@
                       <span class="info-box-number fw-bold fs-4">£{{ number_format($currentMonthDue, 0) }}</span>
                   </div>
               </div>
-          </a>
+          {{-- </a> --}}
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'next']) }}" class="text-dark">
+          {{-- <a href="{{ route('project-services.index', ['due' => 'next']) }}" class="text-dark"> --}}
               <div class="info-box shadow-lg">
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Next Month Pending Services</span>
-                      <span class="info-box-number">£{{ number_format($nextMonthDue, 0) }}</span>
+                      <span class="info-box-number">0</span>
                   </div>
               </div>
-          </a>
+          {{-- </a> --}}
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
+          {{-- <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark"> --}}
               <div class="info-box shadow-lg">
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
-                      <span class="info-box-text">Previous Pending Services</span>
-                      <span class="info-box-number">£{{ number_format($allPreviousDue, 0) }}</span>
+                      <span class="info-box-text">Next Two Months Pending Services</span>
+                      <span class="info-box-number">0</span>
                   </div>
               </div>
-          </a>
+          {{-- </a> --}}
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
+          {{-- <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark"> --}}
               <div class="info-box shadow-lg">
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Next Three Months Pending Services</span>
-                      <span class="info-box-number">£</span>
+                      <span class="info-box-number">0</span>
                   </div>
               </div>
-          </a>
+          {{-- </a> --}}
       </div>
     </div>
 

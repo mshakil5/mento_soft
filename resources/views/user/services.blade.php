@@ -45,7 +45,25 @@
                             <tr>
                                 <td class="text-light">{{ $service->serviceType?->name ?? '-' }}</td>
                                 <td class="text-light">{{ $service->project?->title ?? '-' }}</td>
-                                <td class="text-light">{{ $service->end_date ? \Carbon\Carbon::parse($service->end_date)->format('d F Y') : '-' }}</td>
+                                <td class="text-light">
+                                    @if($service->start_date)
+                                        @php
+                                            $date = \Carbon\Carbon::parse($service->start_date);
+
+                                            if ($service->cycle_type == 1) {
+                                                $date->addMonthNoOverflow();
+                                            } elseif ($service->cycle_type == 2) {
+                                                $date->addYear();
+                                            } else {
+                                                $date->addDay();
+                                            }
+                                        @endphp
+                                        {{ $date->format('d F Y') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
                                 <td class="text-center text-light">
                                     @if($service->type == 1)
                                         @php

@@ -92,21 +92,15 @@ class ProjectServiceController extends Controller
                 $data = $data->where('status', $request->status);
             }
 
+            if ($request->renew == 1) {
+                $data->where('type', 2)
+                    ->where('is_renewed', 0)
+                    ->where('status', 1)
+                    ->where('next_created', 0);
+            }
+
             $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
             $yearlyLimit  = Carbon::now()->addMonths(3)->format('Y-m-d');
-
-            if ($request->has('expiring') && $request->expiring == 1) {
-                $data = $data->where(function($query) use ($monthlyLimit, $yearlyLimit) {
-                    $query->where(function($q) use ($monthlyLimit) {
-                        $q->where('cycle_type', 1)
-                          ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$monthlyLimit]);
-                    })
-                    ->orWhere(function($q) use ($yearlyLimit) {
-                        $q->where('cycle_type', 2)
-                          ->whereRaw("STR_TO_DATE(end_date, '%Y-%m-%d') <= ?", [$yearlyLimit]);
-                    });
-                });
-            }
 
             if ($request->has('due')) {
                 $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
@@ -143,11 +137,28 @@ class ProjectServiceController extends Controller
                     }
                     return $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '';
                 })
+                // ->addColumn('end_date', function ($row) {
+                //     if ($row->bill_paid == 1) {
+                //         return '';
+                //     }
+                //     return $row->end_date ? Carbon::parse($row->end_date)->format('d-m-Y') : '';
+                // })
                 ->addColumn('end_date', function ($row) {
-                    if ($row->bill_paid == 1) {
+                    if (!$row->start_date) {
                         return '';
                     }
-                    return $row->end_date ? Carbon::parse($row->end_date)->format('d-m-Y') : '';
+
+                    $date = Carbon::parse($row->start_date);
+
+                    if ($row->cycle_type == 1) {
+                        $date->addMonthNoOverflow();
+                    } elseif ($row->cycle_type == 2) {
+                        $date->addYear();
+                    } else {
+                        $date->addDay();
+                    }
+
+                    return $date->format('d-m-Y');
                 })
                 ->addColumn('due_date', function ($row) {
                     if ($row->bill_paid == 1) return '';
@@ -496,7 +507,7 @@ class ProjectServiceController extends Controller
                 })
                 ->orWhere(function($y) {
                     $y->where('cycle_type', 2)
-                      ->where('next_start_date', '<=', now()->format('Y-m-d'));
+                      ->where('next_start_date', '<=', '2050-12-31');
                 });
             })
             ->get();
