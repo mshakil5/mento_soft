@@ -277,7 +277,7 @@ class ProjectServiceDetailController extends Controller
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
         $transaction->payment_type = $request->payment_type;
-        $transaction->description = $request->note ?? "Due received for {$serviceDetail->projectService->name} for service period ".\Carbon\Carbon::parse($serviceDetail->start_date)->format('d-m-Y')." to ".\Carbon\Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
+        $transaction->description = $request->note ?? "Due payment for {$serviceDetail->projectService->name} for service period ".\Carbon\Carbon::parse($serviceDetail->start_date)->format('d-m-Y')." to ".\Carbon\Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
         $transaction->amount = $previousTransaction->amount;
         $transaction->at_amount = $previousTransaction->amount;
         $transaction->created_by = auth()->id();
