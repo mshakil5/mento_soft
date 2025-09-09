@@ -111,18 +111,19 @@ class HomeController extends Controller
         $tables = [
             'activity_log',
             'client_email_logs',
-            'client_projects',
-            'client_types',
+            // 'client_projects',
+            // 'client_types',
             'invoices',
             'invoice_details',
             'login_records',
-            'project_recent_updates',
-            'project_services',
+            // 'project_recent_updates',
+            // 'project_services',
             'project_service_details',
-            'project_tasks',
-            'task_messages',
-            'task_message_views',
+            // 'project_tasks',
+            // 'task_messages',
+            // 'task_message_views',
             'transactions',
+            'service_renewals',
         ];
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
