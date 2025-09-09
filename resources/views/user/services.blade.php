@@ -130,7 +130,7 @@
                                                 $method = $bill->transaction?->payment_type ?? '-';
                                                 $txn = $bill->transaction?->tran_id ?? '-';
                                                 $note = $bill->transaction?->description ?? '-';
-                                                $status = $bill->bill_paid ? 'Paid' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Pending');
+                                                $status = $bill->bill_paid ? 'Received' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Pending');
                                             @endphp
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
@@ -144,10 +144,6 @@
                                                 <td>
                                                     @if($status === 'Received')
                                                         <span class="badge bg-success">{{ $status }}</span>
-                                                        @if (!($bill->renewal))
-                                                        <br>
-                                                        <span class="badge bg-danger">Needs Renewal</span>
-                                                        @endif
                                                     @elseif($status === 'Overdue')
                                                         <span class="badge bg-danger">{{ $status }}</span>
                                                     @else
@@ -158,6 +154,13 @@
                                                         <br>
                                                         <small class="text-info fst-italic">
                                                             Renewed: {{ \Carbon\Carbon::parse($bill->renewal->date)->format('j F Y') }}
+                                                            {{ $bill->renewal->note ? '- ' . $bill->renewal->note : '' }}
+                                                        </small>
+                                                    @endif
+                                                    @if($bill->type == 2 && !($bill->renewal))
+                                                        <br>
+                                                        <small class="text-danger fst-italic">
+                                                            Need to renew
                                                         </small>
                                                     @endif
                                                 </td>

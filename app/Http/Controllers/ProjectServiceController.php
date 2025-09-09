@@ -309,13 +309,18 @@ class ProjectServiceController extends Controller
                       $note = $bill->transaction?->description ?? '-';
 
                       if ($bill->bill_paid) {
+                        if ($bill->type == 2) {
                           if ($bill->renewal) {
                               $status = '<span class="badge badge-success">Received</span>
-                                        <span class="text-info fst-italic d-block">Renewed: ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '</span>';
+                                          <br>
+                                          <small class="text-info fst-italic d-block">
+                                              Renewed: ' . ($bill->renewal->note ?? '') . ' - ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '
+                                          </small>';
                           } else {
                               $status = '<span class="badge badge-success">Received</span>
                                         <span class="badge badge-danger d-block">Needs Renewal</span>';
                           }
+                        }
                       } elseif ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today())) {
                           $status = '<span class="badge badge-danger">Overdue</span>';
                       } else {
@@ -472,13 +477,18 @@ class ProjectServiceController extends Controller
         $details = ProjectServiceDetail::where('status', 1)
             ->where(function($q) {
                 $q->where(function($t1) { // In-house
-                    $t1->where('type', 1)->where('status', 1);
+                    $t1->where('type', 1)
+                    ->where('status', 1)
+                    ->where('next_created', 0);
                 })
                 ->orWhere(function($t2) { // Third-party
-                    $t2->where('type', 2)->where('status', 1)->where('bill_paid', 1)->where('is_renewed', 1);
+                    $t2->where('type', 2)
+                    ->where('status', 1)
+                    ->where('bill_paid', 1)
+                    ->where('is_renewed', 1)
+                    ->where('next_created', 0);
                 });
             })
-            ->where('next_created', 0)
             ->where(function($q) {
                 $q->where(function($m) {
                     $m->where('cycle_type', 1)
@@ -509,6 +519,7 @@ class ProjectServiceController extends Controller
             $newDetail->end_date = $endDate;
             $newDetail->next_created = 0;
             $newDetail->bill_paid = 0;
+            $newDetail->is_renewed = 0;
             $newDetail->last_auto_run = now();
             $newDetail->created_at = now();
             $newDetail->updated_at = now();
