@@ -134,7 +134,7 @@ class ClientProjectController extends Controller
 
                         foreach ($groupedServices as $service) {
                             $buttons .= '<a href="'.route('project-services.index', [
-                                                    'client_project_id' => $row->id,
+                                                    'client_id' => $row->client_id,
                                                     'project_service_id' => $service->serviceType->id
                                                 ]).'" class="dropdown-item">'
                                         . $service->serviceType->name .

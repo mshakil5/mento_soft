@@ -519,6 +519,26 @@
           });
       });
 
+      $(document).on('submit', '.renew-form', function(e) {
+          e.preventDefault();
+          if (!confirm('Are you sure to renew?')) return;
+
+          let form = $(this);
+          $.ajax({
+              url: form.attr('action'),
+              method: 'POST',
+              data: form.serialize(),
+              success(res) {
+                  success(res.message ?? 'Renewed successfully!');
+                  form.closest('.modal').modal('hide');
+                  reloadTable();
+              },
+              error(xhr) {
+                  console.error(xhr.responseText);
+              }
+          });
+      });
+
       $('#client_id').on('change', function() {
           let clientId = $(this).val();
           let projectSelect = $('#client_project_id');
@@ -595,6 +615,8 @@
               $('#sendMail').hide();
           }
       });
+
+      $(document).on('shown.bs.modal', '.modal', function () { $(this).find('.data-table').DataTable(); });
 
   });
 </script>
