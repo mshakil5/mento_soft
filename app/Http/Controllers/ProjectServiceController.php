@@ -32,7 +32,7 @@ class ProjectServiceController extends Controller
               ->toArray();
 
             $type2UnpaidIds = ProjectServiceDetail::where('type', 2)
-              ->where('bill_paid', 0)
+              // ->where('bill_paid', 0)
               ->selectRaw('MAX(id) as id')
               ->groupBy('project_service_id', 'client_id', 'client_project_id', 'amount', 'cycle_type', 'is_auto')
               ->pluck('id')
@@ -245,7 +245,7 @@ class ProjectServiceController extends Controller
                           </div>
                         </div>';
                     } elseif ($row->type == 2 && $row->is_renewed == 1) {
-                        $btn .= '<button class="btn btn-sm btn-secondary" disabled>Renewed</button>';
+                        // $btn .= '<button class="btn btn-sm btn-secondary" disabled>Renewed</button>';
                     }
 
                   // service details
@@ -284,7 +284,8 @@ class ProjectServiceController extends Controller
                           'transaction' => fn($q) => $q->where('transaction_type', 'Received'),
                           'client',
                           'serviceType',
-                          'project'
+                          'project',
+                          'renewal'
                       ])
                       ->where('project_service_id', $row->project_service_id)
                       ->where('client_id', $row->client_id)
@@ -308,7 +309,13 @@ class ProjectServiceController extends Controller
                       $note = $bill->transaction?->description ?? '-';
 
                       if ($bill->bill_paid) {
-                          $status = '<span class="badge badge-success">Received</span>';
+                          if ($bill->renewal) {
+                              $status = '<span class="badge badge-success">Received</span>
+                                        <span class="text-info fst-italic d-block">Renewed: ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '</span>';
+                          } else {
+                              $status = '<span class="badge badge-success">Received</span>
+                                        <span class="badge badge-danger d-block">Needs Renewal</span>';
+                          }
                       } elseif ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today())) {
                           $status = '<span class="badge badge-danger">Overdue</span>';
                       } else {

@@ -78,7 +78,7 @@
                                                       <div class="p-3 border rounded bg-light">
 
                                                           <div class="row">
-                                                              <div class="col-6">
+                                                              <div class="col-12">
                                                                   <h5>Project Concept / Idea</h5>
                                                                   <p>{!! $project->description ?? '-' !!}</p>
 
@@ -96,12 +96,10 @@
                                                                               @endif
                                                                           @endforeach
                                                                       </div>
-                                                                  @else
-                                                                      <p class="text-muted">No attachments yet.</p>
                                                                   @endif
                                                               </div>
                                                               @if($project->services->count())
-                                                              <div class="col-6">
+                                                              <div class="col-6 d-none">
                                                                   <h5>Paid Services</h5>
                                                                   @if($project->services->count())
                                                                     <table class="table table-striped table-bordered text-light">
@@ -160,7 +158,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-3 text-light">No projects found.</td>
+                                    <td colspan="7" class="text-center py-3 text-light">No projects found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

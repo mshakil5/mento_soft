@@ -16,6 +16,8 @@ Route::prefix('user')->middleware(['is_user'])->group(function () {
     Route::get('/tasks/{task}/messages', [UserController::class, 'messages'])->name('tasks.messages');
     Route::post('/tasks/{task}/messages', [UserController::class, 'storeMessage'])->name('tasks.messages.store');
 
+    Route::get('/services', [UserController::class, 'services'])->name('user.services');
+
     Route::get('/profile', [UserController::class, 'userProfile'])->name('user.profile');
     Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('user.profile.update');
 

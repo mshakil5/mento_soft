@@ -66,4 +66,8 @@ class ProjectServiceDetail extends Model
                     ->latestOfMany();
     }
 
+    public function renewal()
+    {
+        return $this->hasOne(ServiceRenewal::class, 'project_service_detail_id')->latest();
+    }
 }

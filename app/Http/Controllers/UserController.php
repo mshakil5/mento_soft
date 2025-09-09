@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\ClientProject;
 use App\Models\ProjectTask;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ProjectServiceDetail;
 
 class UserController extends Controller
 {
@@ -216,4 +217,58 @@ class UserController extends Controller
         return back()->with('success', 'Task status updated.');
     }
 
+    public function services(Request $request)
+    {
+        $user = auth()->user();
+        $clientId = $user->client->id;
+
+        $projects = ClientProject::where('client_id', $clientId)->get();
+
+        // Type 1: latest
+        $latestType1Ids = ProjectServiceDetail::where('type', 1)
+            ->where('client_id', $clientId)
+            ->when($request->bill_paid !== null, fn($q) => $q->where('bill_paid', $request->bill_paid))
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto')
+            ->pluck('id')->toArray();
+
+        // Type 2: unpaid first
+        $type2UnpaidIds = ProjectServiceDetail::where('type', 2)
+            ->where('client_id', $clientId)
+            ->when($request->bill_paid !== null, fn($q) => $q->where('bill_paid', $request->bill_paid))
+            // ->where('bill_paid', 0)
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto')
+            ->pluck('id')->toArray();
+
+        if (!empty($type2UnpaidIds)) {
+            $type2Ids = $type2UnpaidIds;
+        } elseif (ProjectServiceDetail::where('type', 2)->where('client_id', $clientId)->where('is_renewed', 1)->exists()) {
+            $type2Ids = ProjectServiceDetail::where('type', 2)
+                ->where('client_id', $clientId)
+                ->where('is_renewed', 1)
+                ->selectRaw('MAX(id) as id')
+                ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto')
+                ->pluck('id')->toArray();
+        } else {
+            $type2Ids = ProjectServiceDetail::where('type', 2)
+                ->where('client_id', $clientId)
+                ->where('bill_paid', 1)
+                ->where('is_renewed', 0)
+                ->selectRaw('MAX(id) as id')
+                ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto')
+                ->pluck('id')->toArray();
+        }
+
+        $idsToDisplay = array_merge($latestType1Ids, $type2Ids);
+
+        $services = ProjectServiceDetail::with(['serviceType','project','transaction'])
+            ->where('client_id', $clientId)
+            ->whereIn('id', $idsToDisplay)
+            ->when($request->project, fn($q,$p) => $q->where('client_project_id', $p))
+            ->latest()
+            ->get();
+
+        return view('user.services', compact('services','projects'));
+    }
 }
