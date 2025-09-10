@@ -347,8 +347,8 @@ class ProjectServiceController extends Controller
                                             </small>';
                               } else {
                                 
-                                    $start = Carbon::parse($row->start_date)->format('j F Y');
-                                    $end = Carbon::parse($row->end_date)->format('j F Y');
+                                    $start = Carbon::parse($bill->start_date)->format('j F Y');
+                                    $end = Carbon::parse($bill->end_date)->format('j F Y');
                                   $status = '<span class="badge badge-success">Received</span>
                                             <span class="badge badge-danger d-block">Needs Renewal</span> <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#renewModal'.$bill->id.'">
                                     <i class="fas fa-sync"></i> Renew
