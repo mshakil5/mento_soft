@@ -11,6 +11,28 @@ class Transaction extends Model
 {
     use LogsActivity, SoftDeletes;
 
+
+    protected $fillable = [
+        'date',
+        'project_service_detail_id',
+        'client_id',
+        'invoice_id',
+        'employee_id',
+        'tran_id',
+        'table_type',
+        'authoriser',
+        'ref',
+        'transaction_type',
+        'payment_type',
+        'description',
+        'amount',
+        'at_amount',
+        'created_by',
+        'created_ip',
+    ];
+
+
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

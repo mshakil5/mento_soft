@@ -200,11 +200,11 @@ class ProjectServiceController extends Controller
                 ->addColumn('project_title', fn($row) => $row->project?->title)
                 ->addColumn('amount', function ($row) {
                     if ($row->bill_paid == 1) return '';
-                    if ($row->type == 1) {
+                    if ($row->type == 1 || $row->type == 2) {
                         $totalAmount = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                             ->where('client_id', $row->client_id)
                             ->where('client_project_id', $row->client_project_id)
-                            ->where('type', 1)
+                            //->where('type', 1)
                             ->where('bill_paid', '!=', 1)
                             ->where('amount', $row->amount)
                             ->where('cycle_type', $row->cycle_type)
@@ -213,7 +213,7 @@ class ProjectServiceController extends Controller
                         $count = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                             ->where('client_id', $row->client_id)
                             ->where('client_project_id', $row->client_project_id)
-                            ->where('type', 1)
+                            //->where('type', 1)
                             ->where('bill_paid', '!=', 1)
                             ->where('amount', $row->amount)
                             ->where('cycle_type', $row->cycle_type)
@@ -257,7 +257,7 @@ class ProjectServiceController extends Controller
                                 </div>
                                 <div class="modal-body">
                                   <div class="mb-3">
-                                    <label>Renewal Date</label>
+                                    <label>Renewal Date </label>
                                     <input type="date" class="form-control" name="renewal_date" value="'.now()->format('Y-m-d').'" required>
                                   </div>
                                   <div class="mb-3">
@@ -346,8 +346,41 @@ class ProjectServiceController extends Controller
                                                 Renewed: ' . ($bill->renewal->note ?? '') . ' - ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '
                                             </small>';
                               } else {
+                                
+                                    $start = Carbon::parse($row->start_date)->format('j F Y');
+                                    $end = Carbon::parse($row->end_date)->format('j F Y');
                                   $status = '<span class="badge badge-success">Received</span>
-                                            <span class="badge badge-danger d-block">Needs Renewal</span>';
+                                            <span class="badge badge-danger d-block">Needs Renewal</span> <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#renewModal'.$bill->id.'">
+                                    <i class="fas fa-sync"></i> Renew
+                                </button>
+                                <div class="modal fade" id="renewModal'.$bill->id.'" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form method="POST" action="'.route('project-service.renew').'" class="renew-form">
+                                        '.csrf_field().'
+                                            <input type="hidden" name="service_id" value="'.$bill->id.'">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title">Renewal for period '.$start.' - '.$end.'</h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label>Renewal Date</label>
+                                                    <input type="date" class="form-control" name="renewal_date" value="'.now()->format('Y-m-d').'" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Note</label>
+                                                    <textarea name="note" class="form-control"></textarea>
+                                                </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Renew</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>';
                               }
                           } else {
                               $status = '<span class="badge badge-success">Received</span>';
@@ -382,7 +415,7 @@ class ProjectServiceController extends Controller
 
 
                   if ($row->isPending()) {
-                      $isType1 = $row->type == 1;
+                      $isType1 = ($row->type == 1 || $row->type == 2);
                       $buttonText = $isType1 ? 'Receive' : 'Receive';
                       
                       $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
@@ -408,7 +441,7 @@ class ProjectServiceController extends Controller
                           $bills = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                               ->where('client_id', $row->client_id)
                               ->where('client_project_id', $row->client_project_id)
-                              ->where('type', 1)
+                              // ->where('type', 1)
                               ->where('bill_paid', '!=', 1)
                               ->where('amount', $row->amount)
                               ->where('cycle_type', $row->cycle_type)
@@ -626,7 +659,7 @@ class ProjectServiceController extends Controller
       return response()->json(['message' => 'Service invoice email sent successfully.']);
     }
 
-    public function store(Request $request)
+    public function store2(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'service_type_id' => 'required',
@@ -671,9 +704,9 @@ class ProjectServiceController extends Controller
         }
 
         $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-        if ($cycleType == 1) {
+        if ($cycleType == 1) { // monthly
             $endDate = Carbon::parse($startDate)->addMonthNoOverflow()->format('Y-m-d');
-        } elseif ($cycleType == 2) {
+        } elseif ($cycleType == 2) { // yearly
             $endDate = Carbon::parse($startDate)->addYear()->format('Y-m-d');
         }
 
@@ -737,6 +770,124 @@ class ProjectServiceController extends Controller
             'data' => $detail
         ], 201);
     }
+
+public function store(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'service_type_id'   => 'required|exists:project_services,id',
+        'client_id'         => 'required|exists:clients,id',
+        'client_project_id' => 'required|exists:client_projects,id',
+        'start_date'        => 'required|date',
+        'amount'            => 'required|numeric|min:0',
+        'note'              => 'nullable|string',
+        'cycle_type'        => 'required|in:1,2', // 1=Monthly, 2=Yearly
+        'is_auto'           => 'nullable|boolean',
+        'type'              => 'required|string'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 422,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $data = $validator->validated();
+    $isAuto = $request->boolean('is_auto');
+    $cycleType = $data['cycle_type'];
+    $service = ProjectService::findOrFail($data['service_type_id']);
+    $today = Carbon::today();
+
+    $startDate = Carbon::parse($data['start_date'])->startOfDay();
+
+    $createdDetails = [];
+    $parentId = null;
+
+    DB::transaction(function () use ($data, $isAuto, $cycleType, $service, $today, $startDate, $request, &$createdDetails, &$parentId) {
+
+        $currentStart = $startDate;
+
+        while ($currentStart->lessThanOrEqualTo($today)) {
+
+            // ✅ Calculate end date
+            $currentEnd = $cycleType == 1
+                ? $currentStart->copy()->endOfMonth()
+                : $currentStart->copy()->addYear()->subDay();
+
+            // stop if start > today
+            if ($currentStart->greaterThan($today)) {
+                break;
+            }
+
+            // ✅ Due date
+            $dueDate = $cycleType == 1
+                ? $currentEnd->copy()->subWeeks(2)
+                : $currentEnd->copy()->subMonths(3);
+
+            // ✅ Create detail
+            $detail = ProjectServiceDetail::create([
+                'project_service_id' => $data['service_type_id'],
+                'client_id'          => $data['client_id'],
+                'client_project_id'  => $data['client_project_id'],
+                'start_date'         => $currentStart,
+                'end_date'           => $currentEnd,
+                'due_date'           => $dueDate,
+                'amount'             => $data['amount'],
+                'note'               => $data['note'] ?? null,
+                'status'             => true,
+                'type'               => $data['type'],
+                'is_auto'            => $isAuto,
+                'cycle_type'         => $cycleType,
+                'created_by'         => auth()->id(),
+            ]);
+
+            // ✅ Set parent_id to the first record's id
+            if ($parentId === null) {
+                $parentId = $detail->id;
+                $detail->update(['parent_id' => $parentId]);
+            } else {
+                $detail->update(['parent_id' => $parentId]);
+            }
+
+            // ✅ Create transaction
+            $transaction = Transaction::create([
+                'date'                      => $currentStart,
+                'project_service_detail_id' => $detail->id,
+                'client_id'                 => $data['client_id'],
+                'table_type'                => 'Income',
+                'transaction_type'          => 'Due',
+                'payment_type'              => 'Bank',
+                'description'               => $detail->note
+                    ?? "Due for {$service->name} from {$currentStart->toDateString()} to {$currentEnd->toDateString()}",
+                'amount'       => $detail->amount,
+                'at_amount'    => $detail->amount,
+                'created_by'   => auth()->id(),
+                'created_ip'   => $request->ip(),
+            ]);
+
+            $transaction->update([
+                'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
+            ]);
+
+            $createdDetails[] = $detail;
+
+            // ✅ Move start date forward
+            $currentStart = $cycleType == 1
+                ? $currentStart->copy()->addMonthNoOverflow()->startOfMonth()
+                : $currentStart->copy()->addYear()->startOfDay();
+        }
+    });
+
+    return response()->json([
+        'status'  => 201,
+        'message' => 'Created successfully.',
+        'parent_id' => $parentId,
+        'count'   => count($createdDetails),
+        'data'    => $createdDetails
+    ], 201);
+}
+
+
 
     public function edit(ProjectServiceDetail $service)
     {
@@ -889,9 +1040,15 @@ class ProjectServiceController extends Controller
             'note'          => 'nullable|string',
         ]);
 
-        $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
+        
 
-        if ($serviceDetail->is_renewed) {
+        $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
+            Log::info("renew info", [
+                'request'      => $request->all(),
+                'serviceDetail' => $serviceDetail,
+            ]);
+
+        if ($serviceDetail->is_renewed == 1) {
             return response()->json(['message' => 'Service already renewed!'], 422);
         }
 
