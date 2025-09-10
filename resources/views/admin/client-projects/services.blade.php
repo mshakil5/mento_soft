@@ -379,7 +379,10 @@
 
       function clearform(){
           $('#createThisForm')[0].reset();
-          $("#service_type_id, #client_id, #client_project_id, #cycle_type").prop('disabled', false).val('');
+          $("#service_type_id").prop('disabled', false).val('').trigger('change');
+          $("#client_id").prop('disabled', false).val('').trigger('change');
+          $("#client_project_id").prop('disabled', false).val('').trigger('change');
+          $("#cycle_type").prop('disabled', false).val('');
           $("#start_date").prop('readonly', false).val('');
           $("#is_auto").prop('checked', false).prop('disabled', false);
 

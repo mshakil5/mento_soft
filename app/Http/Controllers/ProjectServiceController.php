@@ -236,7 +236,7 @@ class ProjectServiceController extends Controller
                 ->addColumn('action', function($row) {
                     $btn = '';
 
-                    if ($row->type == 2 && $row->is_renewed == 0 && $row->bill_paid == 1 && $row->status == 1) {
+                    if ($row->type == 2 && $row->status == 1) {
                         $start = Carbon::parse($row->start_date)->format('j F Y');
                         $end = Carbon::parse($row->end_date)->format('j F Y');
 
@@ -257,7 +257,7 @@ class ProjectServiceController extends Controller
                                 </div>
                                 <div class="modal-body">
                                   <div class="mb-3">
-                                    <label>Renewal Date </label>
+                                    <label>Renewal Date '.$row->id.'</label>
                                     <input type="date" class="form-control" name="renewal_date" value="'.now()->format('Y-m-d').'" required>
                                   </div>
                                   <div class="mb-3">
@@ -809,22 +809,18 @@ public function store(Request $request)
 
         while ($currentStart->lessThanOrEqualTo($today)) {
 
-            // ✅ Calculate end date
             $currentEnd = $cycleType == 1
                 ? $currentStart->copy()->endOfMonth()
                 : $currentStart->copy()->addYear()->subDay();
 
-            // stop if start > today
             if ($currentStart->greaterThan($today)) {
                 break;
             }
 
-            // ✅ Due date
             $dueDate = $cycleType == 1
                 ? $currentEnd->copy()->subWeeks(2)
                 : $currentEnd->copy()->subMonths(3);
 
-            // ✅ Create detail
             $detail = ProjectServiceDetail::create([
                 'project_service_id' => $data['service_type_id'],
                 'client_id'          => $data['client_id'],
@@ -841,7 +837,6 @@ public function store(Request $request)
                 'created_by'         => auth()->id(),
             ]);
 
-            // ✅ Set parent_id to the first record's id
             if ($parentId === null) {
                 $parentId = $detail->id;
                 $detail->update(['parent_id' => $parentId]);
@@ -849,7 +844,6 @@ public function store(Request $request)
                 $detail->update(['parent_id' => $parentId]);
             }
 
-            // ✅ Create transaction
             $transaction = Transaction::create([
                 'date'                      => $currentStart,
                 'project_service_detail_id' => $detail->id,
@@ -871,7 +865,6 @@ public function store(Request $request)
 
             $createdDetails[] = $detail;
 
-            // ✅ Move start date forward
             $currentStart = $cycleType == 1
                 ? $currentStart->copy()->addMonthNoOverflow()->startOfMonth()
                 : $currentStart->copy()->addYear()->startOfDay();
@@ -1032,7 +1025,7 @@ public function store(Request $request)
         return response()->json(['message' => 'Received successfully.']);
     }
 
-    public function renew(Request $request)
+    public function renew2(Request $request)
     {
         $request->validate([
             'service_id'    => 'required|exists:project_service_details,id',
@@ -1043,10 +1036,9 @@ public function store(Request $request)
         
 
         $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
+        $parentService = ProjectServiceDetail::find($serviceDetail->parent_id);
+        // repeat based on $parentService last data. take necessary date from last dat and tak only amount from first data
 
-        if ($serviceDetail->is_renewed == 1) {
-            return response()->json(['message' => 'Service already renewed!'], 422);
-        }
 
         $renewal = new ServiceRenewal();
         $renewal->project_service_detail_id = $serviceDetail->id;
@@ -1054,13 +1046,102 @@ public function store(Request $request)
         $renewal->note = $request->note;
         $renewal->status = 1;
         $renewal->created_by = auth()->id();
+        if ($serviceDetail->is_renewed != 1) {
         $renewal->save();
+        }
+
 
         $serviceDetail->is_renewed = 1;
         $serviceDetail->save();
 
         return response()->json(['message' => 'Renewed successfully!']);
     }
+
+public function renew(Request $request)
+{
+    $request->validate([
+        'service_id'    => 'required|exists:project_service_details,id',
+        'renewal_date'  => 'required|date',
+        'note'          => 'nullable|string',
+    ]);
+
+    $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
+
+    $parentService = ProjectServiceDetail::find($serviceDetail->parent_id ?? $serviceDetail->id);
+
+    $lastDetail = ProjectServiceDetail::where('parent_id', $parentService->id)
+        ->orderByDesc('end_date')
+        ->first();
+
+    if (!$lastDetail) {
+        $lastDetail = $parentService;
+    }
+
+    $newStart = Carbon::parse($lastDetail->end_date)->addDay()->startOfDay();
+
+    if ($parentService->cycle_type == 1) {
+        $newEnd = $newStart->copy()->endOfMonth();
+        $dueDate = $newEnd->copy()->subWeeks(2);
+    } else {
+        $newEnd = $newStart->copy()->addYear()->subDay();
+        $dueDate = $newEnd->copy()->subMonths(3);
+    }
+
+    DB::transaction(function () use ($request, $serviceDetail, $parentService, $lastDetail, $newStart, $newEnd, $dueDate) {
+        $renewal = new ServiceRenewal();
+        $renewal->project_service_detail_id = $serviceDetail->id;
+        $renewal->date = $request->renewal_date;
+        $renewal->note = $request->note;
+        $renewal->status = 1;
+        $renewal->created_by = auth()->id();
+
+        if ($serviceDetail->is_renewed != 1) {
+            $renewal->save();
+        }
+
+        $serviceDetail->update(['is_renewed' => 1]);
+
+        $newDetail = ProjectServiceDetail::create([
+            'project_service_id' => $parentService->project_service_id,
+            'client_id'          => $parentService->client_id,
+            'client_project_id'  => $parentService->client_project_id,
+            'start_date'         => $newStart,
+            'end_date'           => $newEnd,
+            'due_date'           => $dueDate,
+            'amount'             => $parentService->amount, // always from first row
+            'note'               => $request->note ?? null,
+            'status'             => true,
+            'type'               => $parentService->type,
+            'is_auto'            => $parentService->is_auto,
+            'cycle_type'         => $parentService->cycle_type,
+            'parent_id'          => $parentService->id, // keep same parent id
+            'created_by'         => auth()->id(),
+        ]);
+
+        $transaction = Transaction::create([
+            'date'                      => $newStart,
+            'project_service_detail_id' => $newDetail->id,
+            'client_id'                 => $parentService->client_id,
+            'table_type'                => 'Income',
+            'transaction_type'          => 'Due',
+            'payment_type'              => 'Bank',
+            'description'               => $request->note
+                ?? "Due for service renewal from {$newStart->toDateString()} to {$newEnd->toDateString()}",
+            'amount'       => $newDetail->amount,
+            'at_amount'    => $newDetail->amount,
+            'created_by'   => auth()->id(),
+            'created_ip'   => $request->ip(),
+        ]);
+
+        $transaction->update([
+            'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
+        ]);
+    });
+
+    return response()->json(['message' => 'Renewed successfully!']);
+}
+
+
 
     public function projects(Client $client)
     {
