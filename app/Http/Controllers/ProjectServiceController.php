@@ -343,7 +343,7 @@ class ProjectServiceController extends Controller
                                   $status = '<span class="badge badge-success">Received</span>
                                             <br>
                                             <small class="text-info fst-italic d-block">
-                                                Renewed: ' . ($bill->renewal->note ?? '') . ' - ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '
+                                                Renewed: ' . ($bill->renewal->note ?? 'no note found') .'
                                             </small>';
                               } else {
                                 
@@ -1043,10 +1043,6 @@ public function store(Request $request)
         
 
         $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
-            Log::info("renew info", [
-                'request'      => $request->all(),
-                'serviceDetail' => $serviceDetail,
-            ]);
 
         if ($serviceDetail->is_renewed == 1) {
             return response()->json(['message' => 'Service already renewed!'], 422);
