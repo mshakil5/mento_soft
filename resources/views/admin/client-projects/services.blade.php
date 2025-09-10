@@ -52,7 +52,7 @@
             <div class="col-md-8">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="cardTitle">Create New Service </h3>
+                        <h3 class="card-title" id="cardTitle">Service Details</h3>
                     </div>
                     <div class="card-body">
                         <form id="createThisForm">
@@ -331,7 +331,6 @@
 
       // Edit
       $("#contentContainer").on('click','.edit', function(){
-          $("#cardTitle").text('Update this detail');
           var codeid = $(this).data('id');
           var info_url = "/admin/client-project-service-detail/" + codeid + "/edit";
           $.get(info_url, {}, function(d){
@@ -340,32 +339,32 @@
       });
 
       function populateForm(data){
-          $("#service_type_id").val(data.project_service_id).trigger('change').prop('disabled', true);
-          $("#client_id").val(data.client_id).trigger('change').prop('disabled', true);
+          $("#start_date").val(data.start_date).prop('readonly', true);
+          $("#cycle_type").val(data.cycle_type).prop('disabled', true);
+
+          $("#service_type_id").val(data.project_service_id).trigger('change').prop('disabled', false);
+          $("#client_id").val(data.client_id).trigger('change').prop('disabled', false);
+
           $.ajax({
               url: '/admin/clients/' + data.client_id + '/projects',
               method: 'GET',
               success: function(projects) {
                   let projectSelect = $('#client_project_id');
                   projectSelect.empty().append('<option value="">Select Project</option>');
-
                   projects.forEach(project => {
                       projectSelect.append('<option value="'+project.id+'">'+project.title+'</option>');
                   });
-
-                  projectSelect.val(data.client_project_id).trigger('change').prop('disabled', true);
+                  projectSelect.val(data.client_project_id).trigger('change').prop('disabled', false);
                   $('#projectDiv').show();
               }
           });
 
-          $("#start_date").val(data.start_date).prop('readonly', true);
-          $("#cycle_type").val(data.cycle_type).prop('disabled', true);
           $("#end_date").val(data.end_date);
           $("#amount").val(data.amount);
           $("#note").val(data.note);
           $("#codeid").val(data.id);
           $("#type").val(data.type);
-          $("#is_auto").prop('checked', data.is_auto == 1).prop('disabled', true);
+          $("#is_auto").prop('checked', data.is_auto == 1).prop('disabled', false);
 
           if (data.type == 1) {
             $("#end_date_div").hide();
@@ -373,8 +372,7 @@
             $("#end_date_div").show();
           }
 
-          $("#addBtn").val('Update');
-          $("#addBtn").html('Update');
+          $("#addBtn").val('Update').html('Update');
           $("#addThisFormContainer").show(300);
           $("#newBtnSection").hide(100);
       }
@@ -388,7 +386,7 @@
           $("#addBtn").val('Create').html('Create');
           $("#addThisFormContainer").slideUp(200);
           $("#newBtnSection").slideDown(200);
-          $("#end_date_div").hide();
+          $("#end_date_div").show();
       }
 
       // Status toggle

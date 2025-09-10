@@ -355,7 +355,7 @@ class ProjectServiceController extends Controller
                       } else {
                           $status = ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today()))
                               ? '<span class="badge badge-danger">Overdue</span>'
-                              : '<span class="badge badge-warning">Pending</span>';
+                              : '<span class="badge badge-warning">Due</span>';
                       }
 
                       $btn .= '<tr>
@@ -387,7 +387,7 @@ class ProjectServiceController extends Controller
                       
                       $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
                       if (auth()->user()->can('edit service')) {
-                          $btn .= ' <button class="btn btn-sm btn-info edit" data-id="'.$row->id.'">Edit</button>';
+                          $btn .= ' <button class="btn btn-sm btn-info edit" data-id="'.$row->parent_id.'">Edit</button>';
                       }
                       $btn .= ' <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
 
@@ -534,6 +534,7 @@ class ProjectServiceController extends Controller
 
         foreach ($details as $detail) {
             $newDetail = $detail->replicate();
+            $newDetail->parent_id = $detail->parent_id;
 
             $startDate = Carbon::parse($detail->next_start_date)->format('Y-m-d');
             $endDate = Carbon::parse($detail->next_end_date)->format('Y-m-d');
@@ -670,7 +671,11 @@ class ProjectServiceController extends Controller
         }
 
         $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-        $endDate   = Carbon::parse($request->end_date)->format('Y-m-d');
+        if ($cycleType == 1) {
+            $endDate = Carbon::parse($startDate)->addMonthNoOverflow()->format('Y-m-d');
+        } elseif ($cycleType == 2) {
+            $endDate = Carbon::parse($startDate)->addYear()->format('Y-m-d');
+        }
 
         $nextStartDate = Carbon::parse($endDate)->addDay()->format('Y-m-d');
         $nextEndDate = null;
@@ -704,7 +709,10 @@ class ProjectServiceController extends Controller
             'next_end_date' => $nextEndDate,
             'created_by' => auth()->id(),
         ]);
-        
+
+        $detail->parent_id = $detail->id;
+        $detail->save();
+
         $service = ProjectService::find($request->service_type_id);
 
         $transaction = new Transaction();
@@ -744,8 +752,6 @@ class ProjectServiceController extends Controller
             'service_type_id' => 'required',
             'client_id' => 'required',
             'client_project_id' => 'required',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
             'cycle_type' => 'nullable|in:1,2',
@@ -756,65 +762,48 @@ class ProjectServiceController extends Controller
             return response()->json(['status' => 422, 'errors' => $validator->errors()], 422);
         }
 
-        $isAuto = $request->input('is_auto') == 1 ? 1 : 0;
-        $cycleType = $isAuto ? (int) $request->input('cycle_type', 2) : null;
-
-        $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-        $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
-
-        $nextStartDate = null;
-        $nextEndDate = null;
-
-        if ($isAuto) {
-            $nextStartDate = Carbon::parse($endDate)->addDay();
-
-            if ($cycleType === 1) {
-                $nextEndDate = $nextStartDate->copy()->addMonthNoOverflow()->subDay();
-            } elseif ($cycleType === 2) {
-                $nextEndDate = $nextStartDate->copy()->addYear()->subDay();
-            }
-
-            $nextStartDate = $nextStartDate->format('Y-m-d');
-            $nextEndDate = $nextEndDate->format('Y-m-d');
-        }
-
-        $dueDate = null;
-
-        if ($cycleType == 1) {
-            $dueDate = Carbon::parse($endDate)->subWeeks(2)->format('Y-m-d');
-        } elseif ($cycleType == 2) {
-            $dueDate = Carbon::parse($endDate)->subMonths(3)->format('Y-m-d');
-        }
-
         $detail = ProjectServiceDetail::find($request->codeid);
+        if (!$detail) {
+            return response()->json(['status' => 404, 'message' => 'Record not found.'], 404);
+        }
+
         $detail->project_service_id = $request->service_type_id;
         $detail->client_id = $request->client_id;
         $detail->client_project_id = $request->client_project_id;
-        $detail->start_date = $startDate;
-        $detail->end_date = $endDate;
-        $detail->due_date = $dueDate;
         $detail->type = $request->type;
-        $detail->amount = $request->amount;
         $detail->note = $request->note;
-        $detail->is_auto = $isAuto;
-        $detail->cycle_type = $request->cycle_type;
-        $detail->next_start_date = $nextStartDate;
-        $detail->next_end_date = $nextEndDate;
         $detail->updated_by = auth()->id();
 
+        if($detail->bill_paid == 0) {
+          $detail->amount = $request->amount;
+        }
         if ($detail->save()) {
-           $service = ProjectService::find($request->service_type_id);
-            $transaction = Transaction::where('project_service_detail_id', $detail->id)->first();
-            if ($transaction) {
-                $transaction->date = $startDate;
-                $transaction->client_id = $request->client_id;
-                $transaction->description = $detail->note;
-                $transaction->amount = $detail->amount;
-                $transaction->at_amount = $detail->amount;
-                $transaction->updated_by = auth()->id();
-                $transaction->updated_ip = $request->ip();
-                $transaction->save();
-            }
+
+          $children = ProjectServiceDetail::where('parent_id', $detail->id)
+              ->where('bill_paid', 0)
+              ->get();
+
+          foreach ($children as $child) {
+              $child->project_service_id = $request->service_type_id;
+              $child->client_id = $request->client_id;
+              $child->client_project_id = $request->client_project_id;
+              $child->amount = $request->amount;
+              $child->note = $request->note;
+              $child->type = $request->type;
+              $child->updated_by = auth()->id();
+              $child->save();
+
+              $transactions = Transaction::where('project_service_detail_id', $child->id)->get();
+              foreach ($transactions as $transaction) {
+                  $transaction->client_id = $request->client_id;
+                  $transaction->description = $request->note ?? '';
+                  $transaction->amount = $child->amount;
+                  $transaction->at_amount = $child->amount;
+                  $transaction->updated_by = auth()->id();
+                  $transaction->updated_ip = $request->ip();
+                  $transaction->save();
+              }
+          }
 
             return response()->json([
                 'status' => 200,

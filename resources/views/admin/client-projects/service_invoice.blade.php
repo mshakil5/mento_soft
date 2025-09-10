@@ -33,6 +33,8 @@
     <section class="invoice">
         <div class="invoice-body">
             {{-- Header --}}
+            <br>
+            <br>
             <table>
                 <tr>
                     <td style="width:50%; text-align:left;">
@@ -53,9 +55,8 @@
             <table>
                 <tr>
                     <td style="width:60%; vertical-align: top;">
-                        <h5 style="margin: 5px;">Bill To</h5>
+                        <h3 style="margin-bottom: 2px;">Bill To</h3>
                         @if ($client->business_name) <p>{{ $client->business_name }}</p> @endif
-                        @if ($client->name) <p>{{ $client->name }}</p> @endif
                         @if ($client->email) <p>{{ $client->email }}</p> @endif
                         @if ($client->phone) <p>{{ $client->phone }}</p> @endif
                         @if ($client->address) <p>{{ $client->address }}</p> @endif

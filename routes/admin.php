@@ -43,6 +43,7 @@ use App\Http\Controllers\ServiceTypeController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\TransactionsController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 // Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin', 'role:admin']], function () {
@@ -303,6 +304,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/invoices/project-info/{id}', [InvoiceController::class, 'getProjectInfo']);
     Route::post('/invoices/send-email/{id}', [InvoiceController::class, 'sendEmail'])->name('invoices.send.email');
     Route::post('/invoices/{invoice}/receive', [InvoiceController::class, 'receive'])->name('invoices.receive');
+
+    //Transactions
+    Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions.index');
 
     // Permissions
     Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');

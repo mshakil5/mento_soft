@@ -146,7 +146,7 @@
                                                 $method = $bill->transaction?->payment_type ?? '-';
                                                 $txn = $bill->transaction?->tran_id ?? '-';
                                                 $note = $bill->transaction?->description ?? '-';
-                                                $status = $bill->bill_paid ? 'Paid' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Pending');
+                                                $status = $bill->bill_paid ? 'Paid' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Due');
                                             @endphp
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>

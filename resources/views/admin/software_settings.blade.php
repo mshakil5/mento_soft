@@ -63,6 +63,13 @@
     </li>
     @endcanany
 
+    <li class="nav-item">
+        <a href="{{ route('transactions.index') }}" class="nav-link">
+            <i class="fas fa-exchange-alt nav-icon"></i>
+            <p>Transactions</p>
+        </a>
+    </li>
+
     @can('reports')
     <li class="nav-item">
         <a href="#" class="nav-link">
