@@ -99,21 +99,45 @@ class ProjectServiceController extends Controller
                     ->where('next_created', 0);
             }
 
-            $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
-            $yearlyLimit  = Carbon::now()->addMonths(3)->format('Y-m-d');
-
             if ($request->has('due')) {
-                $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
-                $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
-                $nextMonthStart    = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
-                $nextMonthEnd      = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
+                $due = $request->due;
 
-                if ($request->due === 'current') {
-                    $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$currentMonthStart, $currentMonthEnd]);
-                } elseif ($request->due === 'next') {
-                    $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') BETWEEN ? AND ?", [$nextMonthStart, $nextMonthEnd]);
-                } elseif ($request->due === 'previous') {
-                    $data->whereRaw("STR_TO_DATE(start_date, '%Y-%m-%d') < ?", [Carbon::now()->format('Y-m-d')]);
+                if ($due == 'current') {
+                    $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
+                    $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
+
+                    $data = $data->where('bill_paid', 0)
+                        ->where(function($q) use ($currentMonthStart, $currentMonthEnd) {
+                            $q->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
+                              ->orWhere('start_date', '<', $currentMonthStart);
+                        });
+                }
+
+                if ($due == 'next') {
+                    $nextMonthStart = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
+                    $nextMonthEnd   = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
+
+                    $data = $data->where('type', 2)
+                        ->where('bill_paid', 0)
+                        ->whereBetween('start_date', [$nextMonthStart, $nextMonthEnd]);
+                }
+
+                if ($due == 'next2') {
+                    $next2MonthStart = Carbon::now()->addMonths(2)->startOfMonth()->format('Y-m-d');
+                    $next2MonthEnd   = Carbon::now()->addMonths(2)->endOfMonth()->format('Y-m-d');
+
+                    $data = $data->where('type', 2)
+                        ->where('bill_paid', 0)
+                        ->whereBetween('start_date', [$next2MonthStart, $next2MonthEnd]);
+                }
+
+                if ($due == 'next3') {
+                    $next3MonthStart = Carbon::now()->addMonths(3)->startOfMonth()->format('Y-m-d');
+                    $next3MonthEnd   = Carbon::now()->addMonths(3)->endOfMonth()->format('Y-m-d');
+
+                    $data = $data->where('type', 2)
+                        ->where('bill_paid', 0)
+                        ->whereBetween('start_date', [$next3MonthStart, $next3MonthEnd]);
                 }
             }
 

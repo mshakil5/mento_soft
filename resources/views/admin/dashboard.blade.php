@@ -108,14 +108,18 @@
         </a>
       </div>
 
-{{--       
       <div class="col-md-3 col-sm-6 col-12">
           <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-decoration-none">
               <div class="info-box bg-danger text-white shadow-lg">
+                  <div class="ribbon-wrapper ribbon-md">
+                      <div class="ribbon bg-white">
+                          Current
+                      </div>
+                  </div>
                   <span class="info-box-icon"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Current Month Pending Services</span>
-                      <span class="info-box-number fw-bold fs-4">£{{ number_format($currentMonthDue, 0) }}</span>
+                      <span class="info-box-number fw-bold fs-4">{{ $currentMonthCount }}</span>
                   </div>
               </div>
           </a>
@@ -123,36 +127,51 @@
       <div class="col-md-3 col-sm-6 col-12">
           <a href="{{ route('project-services.index', ['due' => 'next']) }}" class="text-dark">
               <div class="info-box shadow-lg">
+                  <div class="ribbon-wrapper ribbon-md">
+                      <div class="ribbon bg-danger">
+                          N1
+                      </div>
+                  </div>
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Next Month Pending Services</span>
-                      <span class="info-box-number">0</span>
+                      <span class="info-box-number">{{ $nextMonthCount }}</span>
                   </div>
               </div>
           </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
+          <a href="{{ route('project-services.index', ['due' => 'next2']) }}" class="text-dark">
               <div class="info-box shadow-lg">
+                  <div class="ribbon-wrapper ribbon-md">
+                      <div class="ribbon bg-danger">
+                          N2
+                      </div>
+                  </div>
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Next Two Months Pending Services</span>
-                      <span class="info-box-number">0</span>
+                      <span class="info-box-number">{{ $next2MonthCount }}</span>
                   </div>
               </div>
           </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
+          <a href="{{ route('project-services.index', ['due' => 'next3']) }}" class="text-dark">
               <div class="info-box shadow-lg">
+                  <div class="ribbon-wrapper ribbon-md">
+                      <div class="ribbon bg-danger">
+                          N3
+                      </div>
+                  </div>
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text">Next Three Months Pending Services</span>
-                      <span class="info-box-number">0</span>
+                      <span class="info-box-number">{{ $next3MonthCount }}</span>
                   </div>
               </div>
           </a>
-      </div> --}}
+      </div>
     </div>
 
     <div class="row mt-4 d-none">
