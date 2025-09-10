@@ -17,6 +17,7 @@ use App\Models\ClientEmailLog;
 use App\Models\CompanyDetails;
 use Carbon\Carbon;
 use App\Mail\ClientEmail;
+use App\Models\ProjectServiceDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
@@ -492,9 +493,15 @@ class InvoiceController extends Controller
     public function getProjectInfo($id)
     {
         $project = ClientProject::findOrFail($id);
+
+        $dueServiceDetails = ProjectServiceDetail::where('client_project_id', $id)
+                            ->where('bill_paid', 0)
+                            ->get();
+
         return response()->json([
             'title' => $project->title,
-            'description' => $project->description
+            'description' => $project->description,
+            'dueServiceDetails' => $dueServiceDetails
         ]);
     }
 

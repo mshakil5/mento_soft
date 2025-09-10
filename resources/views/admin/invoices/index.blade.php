@@ -26,6 +26,8 @@
     </div>
 </section>
 
+<input type="hidden" id="projectInfo">
+
 <section class="content pt-3" id="addThisFormContainer">
     <div class="container-fluid">
         <div class="row justify-content-md-center">
@@ -338,53 +340,101 @@
                 $.get(url + '/project-info/' + projectId, function(data) {
                     // This data can be used when adding to the table
                     $('#projectInfo').data('info', data);
+                    console.log(data);
                 });
             }
         });
         
         // Add project to invoice items table
+        // $('#addProjectBtn').click(function() {
+        //     var projectId = $('#project_id').val();
+        //     var projectName = $('#project_id option:selected').text();
+            
+        //     if (!projectId) {
+        //         alert('Please select a project first');
+        //         return;
+        //     }
+            
+        //     // Check if project already exists in table
+        //     // var exists = false;
+        //     // $('#invoiceItemsTable tbody tr').each(function() {
+        //     //     if ($(this).data('project-id') == projectId) {
+        //     //         exists = true;
+        //     //         return false;
+        //     //     }
+        //     // });
+            
+        //     // if (exists) {
+        //     //     alert('This project is already added to the invoice');
+        //     //     return;
+        //     // }
+            
+        //     // Get project info (description from project if available)
+        //     var description = '';
+        //     if ($('#projectInfo').data('info')) {
+        //         description = $('#projectInfo').data('info').description || '';
+        //     }
+            
+        //     // Add row to table
+        //     addRowToInvoiceTable({
+        //         client_project_id: projectId,
+        //         project_name: projectName,
+        //         description: description,
+        //         qty: 1,
+        //         unit_price: 0,
+        //         vat_percent: 0
+        //     });
+            
+        //     // Reset project select
+        //     $('#project_id').val('').trigger('change');
+        // });
+
         $('#addProjectBtn').click(function() {
             var projectId = $('#project_id').val();
             var projectName = $('#project_id option:selected').text();
-            
+
             if (!projectId) {
                 alert('Please select a project first');
                 return;
             }
-            
-            // Check if project already exists in table
-            // var exists = false;
-            // $('#invoiceItemsTable tbody tr').each(function() {
-            //     if ($(this).data('project-id') == projectId) {
-            //         exists = true;
-            //         return false;
-            //     }
-            // });
-            
-            // if (exists) {
-            //     alert('This project is already added to the invoice');
-            //     return;
-            // }
-            
-            // Get project info (description from project if available)
-            var description = '';
-            if ($('#projectInfo').data('info')) {
-                description = $('#projectInfo').data('info').description || '';
+
+            // Get project info (already stored in #projectInfo by the change event)
+            var projectInfo = $('#projectInfo').data('info');
+
+            if (!projectInfo) {
+                alert('Project info not loaded yet. Please try again.');
+                return;
             }
-            
-            // Add row to table
-            addRowToInvoiceTable({
-                client_project_id: projectId,
-                project_name: projectName,
-                description: description,
-                qty: 1,
-                unit_price: 0,
-                vat_percent: 0
-            });
-            
+
+            // Loop through all dueServiceDetails and add them as rows
+            if (projectInfo.dueServiceDetails && projectInfo.dueServiceDetails.length > 0) {
+                projectInfo.dueServiceDetails.forEach(function(service) {
+                    addRowToInvoiceTable({
+                        id: service.id, // service id
+                        client_project_id: projectId,
+                        project_name: projectName,
+                        description: service.note || projectInfo.description || '',
+                        qty: 1,
+                        unit_price: parseFloat(service.amount) || 0,
+                        vat_percent: 0
+                    });
+                });
+            } else {
+                // If no due service details, just add project row with description
+                addRowToInvoiceTable({
+                    client_project_id: projectId,
+                    project_name: projectName,
+                    description: projectInfo.description || '',
+                    qty: 1,
+                    unit_price: 0,
+                    vat_percent: 0
+                });
+            }
+
             // Reset project select
             $('#project_id').val('').trigger('change');
         });
+
 
         // Add custom item to invoice items table
         $('#addCustomItemBtn').click(function() {
