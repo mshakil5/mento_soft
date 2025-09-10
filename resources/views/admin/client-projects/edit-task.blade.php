@@ -81,11 +81,11 @@
                                 <label>Task Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control summernote" id="task" name="task" rows="5">{{ $task->task }}</textarea>
                             </div>
+                            <div class="card-footer">
+                                <button type="submit" id="updateBtn" class="btn btn-secondary">Update</button>
+                                <a href="{{ url()->previous() }}" class="btn btn-default">Cancel</a>
+                            </div>
                         </form>
-                    </div>
-                    <div class="card-footer">
-                        <button type="submit" id="updateBtn" class="btn btn-secondary">Update</button>
-                        <a href="{{ url()->previous() }}" class="btn btn-default">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -97,10 +97,11 @@
 @section('script')
 <script>
 $(document).ready(function() {
-    $("#updateBtn").click(function(e){
+    $("#editThisForm").on("submit", function(e){
         e.preventDefault();
         let taskId = $("#task_id").val();
         let formData = {
+            title: $("#title").val(),
             task: $("#task").val(),
             employee_id: $("#employee_id").val(),
             priority: $("#priority").val(),
@@ -118,12 +119,12 @@ $(document).ready(function() {
                 success(res.message);
             },
             error: function(xhr) {
-              console.error(xhr.responseText);
-              pageTop();
-              if (xhr.responseJSON && xhr.responseJSON.errors)
-                error(Object.values(xhr.responseJSON.errors)[0][0]);
-              else
-                error();
+                console.error(xhr.responseText);
+                pageTop();
+                if (xhr.responseJSON && xhr.responseJSON.errors)
+                    error(Object.values(xhr.responseJSON.errors)[0][0]);
+                else
+                    error();
             }
         });
     });

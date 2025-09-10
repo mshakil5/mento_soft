@@ -525,7 +525,7 @@ class InvoiceController extends Controller
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
         $transaction->payment_type = $request->payment_type;
-        $transaction->description = $request->note ?? 'Due Received for Invoice: ' . $invoice->invoice_number;
+        $transaction->description = $request->note ?? 'Due paid for Invoice: ' . $invoice->invoice_number;
         $transaction->amount = $invoice->subtotal;
         $transaction->at_amount = $invoice->net_amount;
         $transaction->vat_amount = $invoice->vat_amount;

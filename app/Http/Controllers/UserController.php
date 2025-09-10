@@ -8,6 +8,8 @@ use App\Models\ClientProject;
 use App\Models\ProjectTask;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProjectServiceDetail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\CompanyDetails;
 
 class UserController extends Controller
 {
@@ -270,5 +272,14 @@ class UserController extends Controller
             ->get();
 
         return view('user.services', compact('services','projects'));
+    }
+
+    public function downloadInvoice($id)
+    {
+        $detail = ProjectServiceDetail::with(['serviceType', 'project', 'client'])->findOrFail($id);
+        $company = CompanyDetails::first();
+        $totalAmount = $detail->amount;
+        $pdf = Pdf::loadView('user.invoice', compact('detail', 'company', 'totalAmount'));
+        return $pdf->download("Invoice_{$detail->id}.pdf");
     }
 }

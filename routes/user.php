@@ -18,6 +18,8 @@ Route::prefix('user')->middleware(['is_user'])->group(function () {
 
     Route::get('/services', [UserController::class, 'services'])->name('user.services');
 
+    Route::get('/invoice/{id}', [UserController::class, 'downloadInvoice'])->name('invoice.download');
+
     Route::get('/profile', [UserController::class, 'userProfile'])->name('user.profile');
     Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('user.profile.update');
 

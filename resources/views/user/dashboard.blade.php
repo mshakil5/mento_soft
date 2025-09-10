@@ -36,15 +36,17 @@
                           </p>
                       @endif
                   </div>
+                  @if ($outstandingAmount > 0)
                   <div class="row mt-3">
-                      <h2 class="card-title">Outstanding Amount</h2>
+                      <h2 class="card-title">Due Amount</h2>
                       <p class="card-text">
-                          You have an outstanding amount of         
+                          Due amount to pay:         
                           <a href="{{ route('user.services', ['bill_paid' => 0]) }}" class="text-light">
                               £{{ number_format($outstandingAmount, 0) }}
                           </a>
                       </p>
                   </div>
+                  @endif
                 </div>
             </div>
         </div>

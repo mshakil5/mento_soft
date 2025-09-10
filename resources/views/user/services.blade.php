@@ -58,7 +58,7 @@
                                                 $date->addDay();
                                             }
                                         @endphp
-                                        {{ $date->format('d F Y') }}
+                                        {{ $date->format('d-m-Y') }}
                                     @else
                                         -
                                     @endif
@@ -122,19 +122,17 @@
                                         ->latest()
                                         ->get();
                                 @endphp
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-hover" style="font-size: 12px;">
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Client</th>
                                             <th>Service</th>
-                                            <th>Project</th>
                                             <th>Duration</th>
                                             <th>Payment Date</th>
                                             <th>Amount</th>
                                             <th>Method</th>
                                             <th>Status</th>
-                                            <th>Txn</th>
+                                            <th>Invoice</th>
                                             <th>Note</th>
                                         </tr>
                                     </thead>
@@ -142,25 +140,23 @@
                                         @foreach($bills as $index => $bill)
                                             @php
                                                 $duration = $bill->start_date && $bill->end_date
-                                                    ? \Carbon\Carbon::parse($bill->start_date)->format('j F Y') . ' - ' . \Carbon\Carbon::parse($bill->end_date)->format('j F Y')
+                                                    ? \Carbon\Carbon::parse($bill->start_date)->format('d-m-y') . ' to ' . \Carbon\Carbon::parse($bill->end_date)->format('d-m-y')
                                                     : '-';
-                                                $paymentDate = $bill->transaction?->date ? \Carbon\Carbon::parse($bill->transaction->date)->format('j F Y') : '-';
+                                                $paymentDate = $bill->transaction?->date ? \Carbon\Carbon::parse($bill->transaction->date)->format('d-m-y') : '-';
                                                 $method = $bill->transaction?->payment_type ?? '-';
                                                 $txn = $bill->transaction?->tran_id ?? '-';
                                                 $note = $bill->transaction?->description ?? '-';
-                                                $status = $bill->bill_paid ? 'Received' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Pending');
+                                                $status = $bill->bill_paid ? 'Paid' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Pending');
                                             @endphp
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $bill->client?->name }}</td>
                                                 <td>{{ $bill->serviceType?->name }}</td>
-                                                <td>{{ $bill->project?->title }}</td>
                                                 <td>{{ $duration }}</td>
                                                 <td>{{ $paymentDate }}</td>
                                                 <td>£{{ number_format($bill->amount, 0) }}</td>
                                                 <td>{{ $method }}</td>
                                                 <td>
-                                                    @if($status === 'Received')
+                                                    @if($status === 'Paid')
                                                         <span class="badge bg-success">{{ $status }}</span>
                                                     @elseif($status === 'Overdue')
                                                         <span class="badge bg-danger">{{ $status }}</span>
@@ -175,14 +171,12 @@
                                                             {{ $bill->renewal->note ? '- ' . $bill->renewal->note : '' }}
                                                         </small>
                                                     @endif
-                                                    @if($bill->type == 2 && !($bill->renewal))
-                                                        <br>
-                                                        <small class="text-danger fst-italic">
-                                                            Need to renew
-                                                        </small>
-                                                    @endif
                                                 </td>
-                                                <td>{{ $txn }}</td>
+                                                <td>
+                                                  <a href="{{ route('invoice.download', $bill->id) }}" class="btn btn-sm btn-secondary" target="_blank">
+                                                      Download
+                                                  </a>
+                                                </td>
                                                 <td>{{ $note }}</td>
                                             </tr>
                                         @endforeach

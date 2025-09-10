@@ -107,8 +107,10 @@
         </div>
         </a>
       </div>
+
+{{--       
       <div class="col-md-3 col-sm-6 col-12">
-          {{-- <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-decoration-none"> --}}
+          <a href="{{ route('project-services.index', ['due' => 'current']) }}" class="text-decoration-none">
               <div class="info-box bg-danger text-white shadow-lg">
                   <span class="info-box-icon"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
@@ -116,10 +118,10 @@
                       <span class="info-box-number fw-bold fs-4">£{{ number_format($currentMonthDue, 0) }}</span>
                   </div>
               </div>
-          {{-- </a> --}}
+          </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          {{-- <a href="{{ route('project-services.index', ['due' => 'next']) }}" class="text-dark"> --}}
+          <a href="{{ route('project-services.index', ['due' => 'next']) }}" class="text-dark">
               <div class="info-box shadow-lg">
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
@@ -127,10 +129,10 @@
                       <span class="info-box-number">0</span>
                   </div>
               </div>
-          {{-- </a> --}}
+          </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          {{-- <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark"> --}}
+          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
               <div class="info-box shadow-lg">
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
@@ -138,10 +140,10 @@
                       <span class="info-box-number">0</span>
                   </div>
               </div>
-          {{-- </a> --}}
+          </a>
       </div>
       <div class="col-md-3 col-sm-6 col-12">
-          {{-- <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark"> --}}
+          <a href="{{ route('project-services.index', ['due' => 'previous']) }}" class="text-dark">
               <div class="info-box shadow-lg">
                   <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
                   <div class="info-box-content">
@@ -149,8 +151,8 @@
                       <span class="info-box-number">0</span>
                   </div>
               </div>
-          {{-- </a> --}}
-      </div>
+          </a>
+      </div> --}}
     </div>
 
     <div class="row mt-4 d-none">

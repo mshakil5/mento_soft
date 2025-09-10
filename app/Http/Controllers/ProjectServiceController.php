@@ -137,12 +137,6 @@ class ProjectServiceController extends Controller
                     }
                     return $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '';
                 })
-                // ->addColumn('end_date', function ($row) {
-                //     if ($row->bill_paid == 1) {
-                //         return '';
-                //     }
-                //     return $row->end_date ? Carbon::parse($row->end_date)->format('d-m-Y') : '';
-                // })
                 ->addColumn('end_date', function ($row) {
                     if (!$row->start_date) {
                         return '';
@@ -310,32 +304,34 @@ class ProjectServiceController extends Controller
                   foreach ($bills as $index => $bill) {
                       $duration = '';
                       if ($bill->start_date && $bill->end_date) {
-                          $duration = Carbon::parse($bill->start_date)->format('j F Y') . ' - ' .
-                                      Carbon::parse($bill->end_date)->format('j F Y');
+                          $duration = Carbon::parse($bill->start_date)->format('d-m-y') . ' to ' .
+                                      Carbon::parse($bill->end_date)->format('d-m-y');
                       }
 
-                      $paymentDate = $bill->transaction?->date ? Carbon::parse($bill->transaction->date)->format('j F Y') : '-';
+                      $paymentDate = $bill->transaction?->date ? Carbon::parse($bill->transaction->date)->format('d-m-y') : '-';
                       $method = $bill->transaction?->payment_type ?? '-';
                       $txn = $bill->transaction?->tran_id ?? '-';
                       $note = $bill->transaction?->description ?? '-';
 
                       if ($bill->bill_paid) {
-                        if ($bill->type == 2) {
-                          if ($bill->renewal) {
-                              $status = '<span class="badge badge-success">Received</span>
-                                          <br>
-                                          <small class="text-info fst-italic d-block">
-                                              Renewed: ' . ($bill->renewal->note ?? '') . ' - ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '
-                                          </small>';
+                          if ($bill->type == 2) {
+                              if ($bill->renewal) {
+                                  $status = '<span class="badge badge-success">Received</span>
+                                            <br>
+                                            <small class="text-info fst-italic d-block">
+                                                Renewed: ' . ($bill->renewal->note ?? '') . ' - ' . Carbon::parse($bill->renewal->date)->format('j F Y') . '
+                                            </small>';
+                              } else {
+                                  $status = '<span class="badge badge-success">Received</span>
+                                            <span class="badge badge-danger d-block">Needs Renewal</span>';
+                              }
                           } else {
-                              $status = '<span class="badge badge-success">Received</span>
-                                        <span class="badge badge-danger d-block">Needs Renewal</span>';
+                              $status = '<span class="badge badge-success">Received</span>';
                           }
-                        }
-                      } elseif ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today())) {
-                          $status = '<span class="badge badge-danger">Overdue</span>';
                       } else {
-                          $status = '<span class="badge badge-warning">Pending</span>';
+                          $status = ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today()))
+                              ? '<span class="badge badge-danger">Overdue</span>'
+                              : '<span class="badge badge-warning">Pending</span>';
                       }
 
                       $btn .= '<tr>
@@ -502,11 +498,11 @@ class ProjectServiceController extends Controller
             })
             ->where(function($q) {
                 $q->where(function($m) {
-                    $m->where('cycle_type', 1)
+                    $m->where('type', 1)
                       ->where('next_start_date', '<=', now()->format('Y-m-d'));
                 })
                 ->orWhere(function($y) {
-                    $y->where('cycle_type', 2)
+                    $y->where('type', 2)
                       ->where('next_start_date', '<=', '2050-12-31');
                 });
             })
@@ -853,7 +849,7 @@ class ProjectServiceController extends Controller
             $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Received';
             $transaction->payment_type = $paymentType;
-            $transaction->description = $note ?? "Due received for {$serviceDetail->serviceType->name} for service period ".
+            $transaction->description = $note ?? "Due paid for {$serviceDetail->serviceType->name} for service period ".
                 Carbon::parse($serviceDetail->start_date)->format('d-m-Y').
                 " to ".Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
             $transaction->amount = $previousTransaction->amount ?? $serviceDetail->amount;

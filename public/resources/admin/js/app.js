@@ -52,7 +52,28 @@ $(document).ready(function () {
     height: 200,
     resize: true,
     fontNamesIgnoreCheck: ['Titillium Web'],
-    fontNames: $.summernote.options.fontNames.concat(['Titillium Web'])
+    fontNames: $.summernote.options.fontNames.concat(['Titillium Web']),
+  });
+
+  $(document).on('shown.bs.modal', '.modal', function () {
+      $(this).find('.summernote').each(function () {
+          if (!$(this).hasClass('summernote-initialized')) {
+              $(this).summernote({
+                  height: 200,
+                  dialogsInBody: true,
+              });
+              $(this).addClass('summernote-initialized');
+          }
+      });
+  });
+
+  $(document).on('hidden.bs.modal', '.modal', function () {
+      $(this).find('.summernote').each(function () {
+          if ($(this).hasClass('summernote-initialized')) {
+              $(this).summernote('destroy');
+              $(this).removeClass('summernote-initialized');
+          }
+      });
   });
 
   //Selct2
