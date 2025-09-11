@@ -17,7 +17,6 @@
                     <table class="table mb-0 align-middle custom-table-bg">
                         <thead>
                             <tr>
-                                <th class="text-light">Invoice</th>
                                 <th class="text-light">Project</th>
                                 <th class="text-light">Service</th>
                                 <th class="text-light">Duration</th>
@@ -25,13 +24,11 @@
                                 <th class="text-light">Amount</th>
                                 <th class="text-light">Method</th>
                                 <th class="text-light">Status</th>
-                                <th class="text-light">Note</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($combined as $row)
                                 <tr>
-                                    <td class="text-light">{!! $row['invoice_no'] !!}</td>
                                     <td class="text-light">{!! $row['project'] !!}</td>
                                     <td class="text-light">{{ $row['service'] }}</td>
                                     <td class="text-light">{{ $row['duration'] }}</td>
@@ -51,7 +48,6 @@
                                             {{ $row['status'] }}
                                         </span>
                                     </td>
-                                    <td class="text-light">{{ $row['note'] }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -62,6 +58,9 @@
                     </table>
                 </div>
             </div>
+        </div>
+        <div class="mt-3">
+            {{ $combined->links('pagination::bootstrap-5') }}
         </div>
 
     </div>

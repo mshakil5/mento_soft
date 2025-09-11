@@ -157,8 +157,7 @@ class UserController extends Controller
                       });
                   });
             })
-            ->latest()
-            ->get();
+            ->latest();
 
         $dueInvoices = Invoice::with('client', 'details')
             ->where('client_id', $user->client->id)
@@ -166,10 +165,9 @@ class UserController extends Controller
             ->whereDoesntHave('transactions', function($q) {
                 $q->where('transaction_type', 'Received');
             })
-            ->latest()
-            ->get();
+            ->latest();
 
-        $combined = $transactions->map(function($row) {
+        $combinedCollection = $transactions->get()->map(function($row) {
             if ($row->invoice) {
                 return [
                     'invoice_no'   => $row->invoice->invoice_number,
@@ -200,7 +198,7 @@ class UserController extends Controller
                 'note'         => $row->description,
             ];
         })->concat(
-            $dueInvoices->map(function($inv) {
+            $dueInvoices->get()->map(function($inv) {
                 return [
                     'invoice_no'   => $inv->invoice_number,
                     'project'      => $inv->details->pluck('project_name')->implode('<br>'),
@@ -216,9 +214,19 @@ class UserController extends Controller
                     'note'         => $inv->note ?? '-',
                 ];
             })
-        )->sortByDesc('invoice_no')->values();
+        )->sortByDesc('invoice_no');
 
-        return view('user.transactions', compact('combined'));
+        $page = request()->get('page', 1);
+        $perPage = 10;
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $combinedCollection->forPage($page, $perPage),
+            $combinedCollection->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('user.transactions', ['combined' => $paginated]);
     }
 
     public function storeTask(Request $request)
