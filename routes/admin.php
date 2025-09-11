@@ -308,6 +308,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     //Transactions
     Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions.index');
 
+    Route::get('/transaction-invoice/{id}', [TransactionsController::class, 'transactionInvoice'])->name('transaction.invoice');
+
     // Permissions
     Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
     Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');

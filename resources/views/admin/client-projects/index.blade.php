@@ -118,7 +118,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Amount(£)</label>
+                                        <label>Budget(£)</label>
                                         <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter amount">
                                     </div>
                                 </div>
@@ -176,7 +176,8 @@
                                     <th>Due</th>
                                     {{-- <th>Domain</th> --}}
                                     <th>Status</th>
-                                    <th>Amount</th>
+                                    <th>Budget</th>
+                                    <th>Received</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -410,6 +411,7 @@
                 // {data: 'domain', name: 'domain'},
                 {data: 'status', name: 'status', orderable: false},
                 {data: 'amount', name: 'amount'},
+                {data: 'received', name: 'received'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],
             responsive: true,

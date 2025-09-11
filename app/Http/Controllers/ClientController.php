@@ -18,6 +18,8 @@ use App\Models\CompanyDetails;
 use App\Models\ProjectServiceDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ClientEmailLog;
+use App\Models\Invoice;
+use App\Models\Transaction;
 
 class ClientController extends Controller
 {
@@ -65,10 +67,23 @@ class ClientController extends Controller
                             'client_id' => $row->id,
                             'bill_paid' => 0
                         ]);
-                        return '<a href="'.$url.'" class="badge badge-success" title="View Outstanding Amount">£' . number_format($amount, 2) . '</a>';
+                        return '<a href="'.$url.'" class="badge badge-info" title="View Outstanding Amount">£' . number_format($amount, 0) . '</a>';
                     }
 
-                    return '<span class="badge badge-secondary">£0.00</span>';
+                    return '<span class="badge badge-secondary">£0</span>';
+                })
+                ->addColumn('received', function($row) {
+                    $totalReceived = Transaction::where('transaction_type', 'Received')
+                        ->where('client_id', $row->id)
+                        ->sum('amount');
+
+                    if ($totalReceived > 0) {
+                        $badge = '<a href="' . route('transactions.index', ['client_id' => $row->id, 'received' => 1]) . '" class="badge bg-success text-white" style="text-decoration:none;">£' . number_format($totalReceived, 0) . '</a>';
+                    } else {
+                        $badge = '<span class="badge bg-secondary">£0</span>';
+                    }
+
+                    return $badge;
                 })
                 ->addColumn('status', function($row) {
                     $statuses = [
@@ -168,7 +183,7 @@ class ClientController extends Controller
 
                     return $buttons;
                 })
-                ->rawColumns(['image', 'status', 'action', 'projects_count', 'outstanding_amount'])
+                ->rawColumns(['image', 'status', 'action', 'projects_count', 'outstanding_amount', 'received'])
                 ->make(true);
         }
 

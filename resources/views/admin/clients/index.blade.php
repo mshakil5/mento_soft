@@ -122,6 +122,7 @@
                                     <th>Phone</th>
                                     <th>Projects</th>
                                     <th>Outstanding</th>
+                                    <th>Received</th>
                                     {{-- <th>Name</th> --}}
                                     {{-- <th>Client Type</th> --}}
                                     <th>Status</th>
@@ -351,6 +352,7 @@
                 {data: 'phone1', name: 'phone1'},
                 {data: 'projects_count', name: 'projects_count'},
                 {data: 'outstanding_amount', name: 'outstanding_amount'},
+                {data: 'received', name: 'received'},
                 // {data: 'image', name: 'image', orderable: false, searchable: false},
                 // {data: 'name', name: 'name'},
                 //{data: 'client_type', name: 'client_type'},

@@ -10,6 +10,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Validator;
 use Illuminate\Support\Carbon;
 use App\Models\User;
+use App\Models\Transaction;
+use App\Models\Invoice;
 
 class ClientProjectController extends Controller
 {
@@ -63,6 +65,27 @@ class ClientProjectController extends Controller
                 })
                 ->addColumn('amount', function($row) {
                     return '£' . number_format($row->amount, 0);
+                })
+                ->addColumn('received', function($row) {
+                    $serviceTxnsSum = Transaction::where('transaction_type', 'Received')
+                        ->whereHas('projectServiceDetail', function($q) use ($row) {
+                            $q->where('client_project_id', $row->id);
+                        })->sum('amount');
+
+                    $invoiceSum = Invoice::where('status', 1)
+                        ->whereHas('details', function($q) use ($row) {
+                            $q->where('client_project_id', $row->id);
+                        })->sum('subtotal');
+
+                    $totalReceived = $serviceTxnsSum + $invoiceSum;
+
+                    if ($totalReceived > 0) {
+                        $badge = '<a href="' . route('transactions.index', ['client_project_id' => $row->id, 'received' => 2]) . '" class="badge bg-success text-white" style="text-decoration:none;">£' . number_format($totalReceived, 0) . '</a>';
+                    } else {
+                        $badge = '<span class="badge bg-secondary">£0</span>';
+                    }
+
+                    return $badge;
                 })
                 ->addColumn('client_name', function($row) {
                     return $row->client->business_name ?? '';
@@ -146,7 +169,7 @@ class ClientProjectController extends Controller
 
                     return $buttons;
                 })
-                ->rawColumns(['image', 'status', 'action'])
+                ->rawColumns(['image', 'status', 'action', 'received'])
                 ->make(true);
         }
 

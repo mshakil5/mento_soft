@@ -77,9 +77,6 @@
                                 @if ($invoice->client->business_name) 
                                 <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $invoice->client->business_name }}</p>
                                 @endif
-                                @if ($invoice->client->name) 
-                                <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $invoice->client->name }}</p>
-                                @endif
                                 @if ($invoice->client->email) 
                                 <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $invoice->client->email }}</p>
                                 @endif

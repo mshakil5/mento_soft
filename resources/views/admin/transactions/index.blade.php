@@ -1,6 +1,38 @@
 @extends('admin.master')
 
 @section('content')
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-3">
+            <div class="col-4 d-flex">
+                <select id="clientFilter" class="form-control ml-2 select2">
+                    <option value="">Choose Client</option>
+                    @foreach ($clients as $client)
+                      <option value="{{ $client->id }}">{{ $client->business_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-4 d-flex">
+                <select id="projectFilter" class="form-control ml-2 select2">
+                    <option value="">Choose Project</option>
+                    @foreach ($clientProjects as $project)
+                      <option value="{{ $project->id }}">{{ $project->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-4 d-flex">
+                <select id="projectFilter" class="form-control ml-2 select2">
+                    <option value="">Choose Service</option>
+                    @foreach ($services as $service)
+                      <option value="{{ $service->id }}">{{ $service->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="content pt-3">
     <div class="container-fluid">
         <div class="row">
@@ -42,7 +74,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('transactions.index') }}",
+            url: "{{ route('transactions.index') }}" + window.location.search,
             type: "GET",
             error: function (xhr) {
                 console.error(xhr.responseText);

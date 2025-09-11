@@ -64,7 +64,7 @@
     @endcanany
 
     <li class="nav-item">
-        <a href="{{ route('transactions.index') }}" class="nav-link">
+        <a href="{{ route('transactions.index') }}" class="nav-link {{ request()->routeIs('transactions.index') ? 'active' : '' }}">
             <i class="fas fa-exchange-alt nav-icon"></i>
             <p>Transactions</p>
         </a>
