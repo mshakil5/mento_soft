@@ -277,6 +277,63 @@ class ProjectServiceController extends Controller
                         // $btn .= '<button class="btn btn-sm btn-secondary" disabled>Renewed</button>';
                     }
 
+                    if ($row->type == 1 && $row->status == 1) {
+                        $startDate = Carbon::parse($row->start_date);
+                        $endDate = Carbon::parse($row->end_date);
+                        if ($row->cycle_type == 1) { // 1 month cycle
+                            $start = $startDate->copy()->addMonthNoOverflow()->format('j F Y');
+                            $end = $endDate->copy()->addMonthNoOverflow()->format('j F Y');
+                        } else { // 1 year cycle
+                            $start = $startDate->copy()->addYear()->format('j F Y');
+                            $end = $endDate->copy()->addYear()->format('j F Y');
+                        }
+
+                        $btn .= '<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#advanceReceiveModal'.$row->id.'">
+                                  Advance Receive
+                                </button>';
+
+                        $btn .= '
+                        <div class="modal fade" id="advanceReceiveModal'.$row->id.'" tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <form method="POST" action="'.route('project-service.advance-receive').'" class="advance-receive-form">
+                              '.csrf_field().'
+                              <input type="hidden" name="service_id" value="'.$row->id.'">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Advance Receive for period '.$start.' - '.$end.'</h5>
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                      <label>Advance Amount</label>
+                                      <input type="number" class="form-control" name="advance_amount" value="'.$row->amount.'" required readonly>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label>Payment Date</label>
+                                      <input type="date" class="form-control" name="payment_date" value="'.now()->format('Y-m-d').'" required>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label>Payment Type</label>
+                                      <select name="payment_type" class="form-control" required>
+                                          <option value="Cash">Cash</option>
+                                          <option value="Bank">Bank</option>
+                                      </select>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label>Note</label>
+                                      <textarea name="note" class="form-control"></textarea>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-primary">Receive</button>
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>';
+                    }
+
                   // service details
                   $btn .= '<button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#billDetailsModal'.$row->id.'">
                               <i class="fas fa-list"></i>
@@ -294,7 +351,7 @@ class ProjectServiceController extends Controller
                           <table class="table cell-border table-hover data-table">
                             <thead>
                               <tr>
-                                <th>#</th>
+                                <th class="d-none">#</th>
                                 <th>Client</th>
                                 <th>Service</th>
                                 <th>Project</th>
@@ -322,7 +379,7 @@ class ProjectServiceController extends Controller
                       ->where('amount', $row->amount)
                       ->where('cycle_type', $row->cycle_type)
                       ->where('is_auto', $row->is_auto)
-                      ->latest()
+                      ->orderBy('id', 'desc')
                       ->get();
 
                   foreach ($bills as $index => $bill) {
@@ -392,7 +449,7 @@ class ProjectServiceController extends Controller
                       }
 
                       $btn .= '<tr>
-                                <td>'.($index + 1).'</td>
+                                <td class="d-none">'.$bill->id.'</td>
                                 <td>'.$bill->client?->name.'</td>
                                 <td>'.$bill->serviceType?->name.'</td>
                                 <td>'.$bill->project?->title.'</td>
@@ -1057,91 +1114,160 @@ public function store(Request $request)
         return response()->json(['message' => 'Renewed successfully!']);
     }
 
-public function renew(Request $request)
-{
-    $request->validate([
-        'service_id'    => 'required|exists:project_service_details,id',
-        'renewal_date'  => 'required|date',
-        'note'          => 'nullable|string',
-    ]);
+    public function renew(Request $request)
+    {
+        $request->validate([
+            'service_id'    => 'required|exists:project_service_details,id',
+            'renewal_date'  => 'required|date',
+            'note'          => 'nullable|string',
+        ]);
 
-    $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
+        $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
 
-    $parentService = ProjectServiceDetail::find($serviceDetail->parent_id ?? $serviceDetail->id);
+        $parentService = ProjectServiceDetail::find($serviceDetail->parent_id ?? $serviceDetail->id);
 
-    $lastDetail = ProjectServiceDetail::where('parent_id', $parentService->id)
-        ->orderByDesc('end_date')
-        ->first();
+        $lastDetail = ProjectServiceDetail::where('parent_id', $parentService->id)
+            ->orderByDesc('end_date')
+            ->first();
 
-    if (!$lastDetail) {
-        $lastDetail = $parentService;
-    }
-
-    $newStart = Carbon::parse($lastDetail->end_date)->addDay()->startOfDay();
-
-    if ($parentService->cycle_type == 1) {
-        $newEnd = $newStart->copy()->endOfMonth();
-        $dueDate = $newEnd->copy()->subWeeks(2);
-    } else {
-        $newEnd = $newStart->copy()->addYear()->subDay();
-        $dueDate = $newEnd->copy()->subMonths(3);
-    }
-
-    DB::transaction(function () use ($request, $serviceDetail, $parentService, $lastDetail, $newStart, $newEnd, $dueDate) {
-        $renewal = new ServiceRenewal();
-        $renewal->project_service_detail_id = $serviceDetail->id;
-        $renewal->date = $request->renewal_date;
-        $renewal->note = $request->note;
-        $renewal->status = 1;
-        $renewal->created_by = auth()->id();
-
-        if ($serviceDetail->is_renewed != 1) {
-            $renewal->save();
+        if (!$lastDetail) {
+            $lastDetail = $parentService;
         }
 
-        $serviceDetail->update(['is_renewed' => 1]);
+        $newStart = Carbon::parse($lastDetail->end_date)->addDay()->startOfDay();
 
-        $newDetail = ProjectServiceDetail::create([
-            'project_service_id' => $parentService->project_service_id,
-            'client_id'          => $parentService->client_id,
-            'client_project_id'  => $parentService->client_project_id,
-            'start_date'         => $newStart,
-            'end_date'           => $newEnd,
-            'due_date'           => $dueDate,
-            'amount'             => $parentService->amount, // always from first row
-            'note'               => $request->note ?? null,
-            'status'             => true,
-            'type'               => $parentService->type,
-            'is_auto'            => $parentService->is_auto,
-            'cycle_type'         => $parentService->cycle_type,
-            'parent_id'          => $parentService->id, // keep same parent id
-            'created_by'         => auth()->id(),
+        if ($parentService->cycle_type == 1) {
+            $newEnd = $newStart->copy()->endOfMonth();
+            $dueDate = $newEnd->copy()->subWeeks(2);
+        } else {
+            $newEnd = $newStart->copy()->addYear()->subDay();
+            $dueDate = $newEnd->copy()->subMonths(3);
+        }
+
+        DB::transaction(function () use ($request, $serviceDetail, $parentService, $lastDetail, $newStart, $newEnd, $dueDate) {
+            $renewal = new ServiceRenewal();
+            $renewal->project_service_detail_id = $serviceDetail->id;
+            $renewal->date = $request->renewal_date;
+            $renewal->note = $request->note;
+            $renewal->status = 1;
+            $renewal->created_by = auth()->id();
+
+            if ($serviceDetail->is_renewed != 1) {
+                $renewal->save();
+            }
+
+            $serviceDetail->update(['is_renewed' => 1]);
+
+            $newDetail = ProjectServiceDetail::create([
+                'project_service_id' => $parentService->project_service_id,
+                'client_id'          => $parentService->client_id,
+                'client_project_id'  => $parentService->client_project_id,
+                'start_date'         => $newStart,
+                'end_date'           => $newEnd,
+                'due_date'           => $dueDate,
+                'amount'             => $parentService->amount, // always from first row
+                'note'               => $request->note ?? null,
+                'status'             => true,
+                'type'               => $parentService->type,
+                'is_auto'            => $parentService->is_auto,
+                'cycle_type'         => $parentService->cycle_type,
+                'parent_id'          => $parentService->id, // keep same parent id
+                'created_by'         => auth()->id(),
+            ]);
+
+            $transaction = Transaction::create([
+                'date'                      => $newStart,
+                'project_service_detail_id' => $newDetail->id,
+                'client_id'                 => $parentService->client_id,
+                'table_type'                => 'Income',
+                'transaction_type'          => 'Due',
+                'payment_type'              => 'Bank',
+                'description'               => $request->note
+                    ?? "Due for service renewal from {$newStart->toDateString()} to {$newEnd->toDateString()}",
+                'amount'       => $newDetail->amount,
+                'at_amount'    => $newDetail->amount,
+                'created_by'   => auth()->id(),
+                'created_ip'   => $request->ip(),
+            ]);
+
+            $transaction->update([
+                'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
+            ]);
+        });
+
+        return response()->json(['message' => 'Renewed successfully!']);
+    }
+
+    public function advanceReceive(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:project_service_details,id',
+            'advance_amount' => 'required|numeric|min:1',
+            'payment_date' => 'required|date',
+            'payment_type' => 'required|string',
+            'note' => 'nullable|string',
         ]);
 
-        $transaction = Transaction::create([
-            'date'                      => $newStart,
-            'project_service_detail_id' => $newDetail->id,
-            'client_id'                 => $parentService->client_id,
-            'table_type'                => 'Income',
-            'transaction_type'          => 'Due',
-            'payment_type'              => 'Bank',
-            'description'               => $request->note
-                ?? "Due for service renewal from {$newStart->toDateString()} to {$newEnd->toDateString()}",
-            'amount'       => $newDetail->amount,
-            'at_amount'    => $newDetail->amount,
-            'created_by'   => auth()->id(),
-            'created_ip'   => $request->ip(),
-        ]);
+        $serviceDetail = ProjectServiceDetail::with('serviceType')->find($request->service_id);
+        if (!$serviceDetail) {
+            return response()->json(['message' => 'Invalid service.'], 422);
+        }
 
-        $transaction->update([
-            'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
-        ]);
-    });
+        $newDetail = $serviceDetail->replicate();
+        $newDetail->parent_id = $serviceDetail->id;
 
-    return response()->json(['message' => 'Renewed successfully!']);
-}
+        $startDate = Carbon::parse($serviceDetail->next_start_date)->format('Y-m-d');
+        $endDate = Carbon::parse($serviceDetail->next_end_date)->format('Y-m-d');
 
+        $dueDate = $serviceDetail->cycle_type == 1 ? Carbon::parse($endDate)->subWeeks(2)->format('Y-m-d') : Carbon::parse($endDate)->subMonths(3)->format('Y-m-d');
 
+        $newDetail->start_date = $startDate;
+        $newDetail->end_date = $endDate;
+        $newDetail->due_date = $dueDate;
+        $newDetail->next_created = 0;
+        $newDetail->bill_paid = 1;
+        $newDetail->is_renewed = 0;
+
+        $nextStart = Carbon::parse($endDate)->addDay();
+        $nextEnd = $serviceDetail->cycle_type === 1 ? $nextStart->copy()->addMonthNoOverflow()->subDay(): $nextStart->copy()->addYear()->subDay();
+
+        $newDetail->next_start_date = $nextStart->format('Y-m-d');
+        $newDetail->next_end_date = $nextEnd->format('Y-m-d');
+        $newDetail->save();
+
+        $dueTransaction = new Transaction();
+        $dueTransaction->date = $startDate;
+        $dueTransaction->project_service_detail_id = $newDetail->id;
+        $dueTransaction->client_id = $newDetail->client_id;
+        $dueTransaction->table_type = 'Income';
+        $dueTransaction->transaction_type = 'Due';
+        $dueTransaction->payment_type = 'Bank';
+        $dueTransaction->description = $newDetail->note ?? "Due for {$serviceDetail->serviceType->name} for period {$startDate} to {$endDate}";
+        $dueTransaction->amount = $newDetail->amount;
+        $dueTransaction->at_amount = $newDetail->amount;
+        $dueTransaction->created_by = $newDetail->created_by;
+        $dueTransaction->save();
+        $dueTransaction->tran_id = 'AT' . date('ymd') . str_pad($dueTransaction->id, 4, '0', STR_PAD_LEFT);
+        $dueTransaction->save();
+
+        $receivedTransaction = new Transaction();
+        $receivedTransaction->date = $request->payment_date;
+        $receivedTransaction->project_service_detail_id = $newDetail->id;
+        $receivedTransaction->client_id = $serviceDetail->client_id;
+        $receivedTransaction->table_type = 'Income';
+        $receivedTransaction->transaction_type = 'Received';
+        $receivedTransaction->payment_type = $request->payment_type;
+        $receivedTransaction->description = $request->note ?? "Advance payment for {$serviceDetail->serviceType->name} for period ". Carbon::parse($serviceDetail->start_date)->format('d-m-Y').' to '. Carbon::parse($serviceDetail->end_date)->format('d-m-Y');
+        $receivedTransaction->amount = $request->advance_amount;
+        $receivedTransaction->at_amount = $request->advance_amount;
+        $receivedTransaction->created_by = auth()->id();
+        $receivedTransaction->created_ip = $request->ip();
+        $receivedTransaction->save();
+        $receivedTransaction->tran_id = 'AT' . date('ymd') . str_pad($receivedTransaction->id, 4, '0', STR_PAD_LEFT);
+        $receivedTransaction->save();
+
+        return response()->json(['message' => 'Advance payment received successfully.']);
+    }
 
     public function projects(Client $client)
     {

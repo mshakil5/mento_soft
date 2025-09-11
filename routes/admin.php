@@ -278,6 +278,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/clients/{client}/projects', [ProjectServiceController::class, 'projects'])->name('clients.projects');
 
     Route::post('/project-service/renew', [ProjectServiceController::class, 'renew'])->name('project-service.renew');
+    Route::post('/project-service/advance-receive', [ProjectServiceController::class, 'advanceReceive'])->name('project-service.advance-receive');
 
     // Project Service Details
     Route::get('/client-project-services/{service}/details', [ProjectServiceDetailController::class, 'index'])->name('client-project-services.details');

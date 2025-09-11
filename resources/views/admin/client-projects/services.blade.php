@@ -540,6 +540,27 @@
           });
       });
 
+      $(document).on('submit', '.advance-receive-form', function(e) {
+          e.preventDefault();
+
+          if (!confirm('Are you sure to receive advance payment?')) return;
+
+          let form = $(this);
+          $.ajax({
+              url: form.attr('action'),
+              method: 'POST',
+              data: form.serialize(),
+              success(res) {
+                  success(res.message ?? 'Advance payment received successfully!');
+                  form.closest('.modal').modal('hide');
+                  reloadTable();
+              },
+              error(xhr) {
+                  console.error(xhr.responseText);
+              }
+          });
+      });
+
       $('#client_id').on('change', function() {
           let clientId = $(this).val();
           let projectSelect = $('#client_project_id');
@@ -617,7 +638,12 @@
           }
       });
 
-      $(document).on('shown.bs.modal', '.modal', function () { $(this).find('.data-table').DataTable(); });
+      $(document).on('shown.bs.modal', '.modal', function () {
+          $(this).find('.data-table').DataTable().destroy();
+          $(this).find('.data-table').DataTable({
+              ordering: false
+          });
+      });
 
   });
 </script>
