@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ProjectServiceDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\CompanyDetails;
+use Carbon\Carbon;
+use App\Models\Invoice;
+use App\Models\Transaction;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
@@ -139,6 +143,130 @@ class UserController extends Controller
 
         return view('user.tasks', compact('tasks', 'projects', 'tab'));
     }
+
+
+    public function transactions2()
+    {
+        $user = auth()->user();
+        $allTransactions = Transaction::with('service.client', 'service.project', 'service.serviceType', 'invoice.client')
+                ->where('client_id', $user->client->id)
+                ->where(function ($q) {
+                    $q->where('transaction_type', 'Received')
+                      ->orWhereHas('service', function ($sub) {
+                          $sub->whereDoesntHave('transactions', function ($t) {
+                              $t->where('transaction_type', 'Received');
+                          });
+                      });
+                })
+                ->latest()
+                ->get();
+
+
+
+        // ->get();
+        dd($allTransactions);
+
+        return view('user.transactions', compact('allTransactions'));
+    }
+
+
+
+    public function transactions(Request $request)
+{
+    if ($request->ajax()) {
+        $user = auth()->user();
+
+        // ✅ 1. Fetch transactions
+        $transactions = Transaction::with('service.client', 'service.project', 'service.serviceType', 'invoice.client')
+            ->where('client_id', $user->client->id)
+            ->latest()
+            ->get()
+            ->map(function ($row, $key) {
+                if ($row->invoice) {
+                    return [
+                        'id'          => $row->id,
+                        'invoice_no'  => $row->invoice->invoice_number,
+                        'project'     => $row->invoice->details->pluck('project_name')->implode('<br>'),
+                        'service'     => '-',
+                        'duration'    => '-',
+                        'payment_date'=> Carbon::parse($row->date)->format('d-m-Y'),
+                        'amount'      => $row->amount,
+                        'method'      => $row->payment_type ?? '-',
+                        'status'      => 'Received',
+                        'txn'         => $row->tran_id ?? '-',
+                        'note'        => $row->description,
+                    ];
+                }
+
+                return [
+                    'id'          => $row->id,
+                    'invoice_no'  => '-',
+                    'project'     => $row->service?->project?->title ?? '-',
+                    'service'     => $row->service?->serviceType?->name ?? '-',
+                    'duration'    => $row->service?->start_date && $row->service?->end_date
+                        ? Carbon::parse($row->service->start_date)->format('d-m-Y') . ' to ' . Carbon::parse($row->service->end_date)->format('d-m-Y')
+                        : '-',
+                    'payment_date'=> $row->transaction_type === 'Received'
+                        ? Carbon::parse($row->date)->format('d-m-Y')
+                        : '-',
+                    'amount'      => $row->amount,
+                    'method'      => $row->transaction_type === 'Received' ? $row->payment_type : '-',
+                    'status'      => $row->transaction_type,
+                    'txn'         => $row->transaction_type === 'Received' ? $row->tran_id : '-',
+                    'note'        => $row->description,
+                ];
+            });
+
+        // ✅ 2. Fetch due invoices
+        $dueInvoices = Invoice::with('client', 'details')
+            ->where('client_id', $user->client->id)
+            ->where('status', '!=', 2)
+            ->latest()
+            ->get()
+            ->map(function ($inv, $key) {
+                return [
+                    'id'          => $inv->id,
+                    'invoice_no'  => $inv->invoice_number,
+                    'project'     => $inv->details->pluck('project_name')->implode('<br>'),
+                    'service'     => '-',
+                    'duration'    => '-',
+                    'payment_date'=> '-',
+                    'amount'      => $inv->subtotal,
+                    'method'      => '-',
+                    'status'      => ($inv->status == 1 && Carbon::parse($inv->invoice_date)->startOfDay() < Carbon::today())
+                        ? 'Overdue'
+                        : 'Due',
+                    'txn'         => '-',
+                    'note'        => $inv->note ?? '-',
+                ];
+            });
+
+        // ✅ 3. Combine & return for DataTables
+        $combined = $transactions->concat($dueInvoices)->sortByDesc('id')->values();
+
+        return DataTables::of($combined)
+            ->addIndexColumn()
+            ->editColumn('amount', fn($row) => '£' . number_format($row['amount'], 2))
+            ->editColumn('status', function ($row) {
+                $statusBadge = match ($row['status']) {
+                    'Received'   => '<span class="badge bg-success">Received</span>',
+                    'Overdue'    => '<span class="badge bg-danger">Overdue</span>',
+                    'Due'        => '<span class="badge bg-warning">Due</span>',
+                    'Receivable' => '<span class="badge bg-warning">Receivable</span>',
+                    default      => '<span class="badge bg-secondary">' . $row['status'] . '</span>'
+                };
+
+                return $statusBadge;
+            })
+            ->rawColumns(['status', 'project'])
+            ->make(true);
+    }
+
+    return view('user.transactions');
+}
+
+
+    
 
     public function storeTask(Request $request)
     {

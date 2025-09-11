@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 Route::prefix('user')->middleware(['is_user'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'userHome'])->name('user.dashboard');
 
+    Route::get('/transactions', [UserController::class, 'transactions'])->name('user.transactions');
     Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
     Route::get('/tasks', [UserController::class, 'tasks'])->name('user.tasks');
     Route::put('/tasks/{task}', [UserController::class, 'updateTask'])->name('tasks.update');
