@@ -1,28 +1,64 @@
 @extends('user.master')
 
 @section('user-content')
-
+<style>
+  .custom-table-bg th,
+  .custom-table-bg td,
+  .custom-table-bg tbody {
+      background-color: transparent !important;
+  }
+</style>
 <div class="row px-2">
     <div class="col-12">
 
-        <div class="card text-light shadow-sm mb-4 form-style border-light">
+        <div class="card text-light shadow-sm mb-4 form-style fadeInUp border-light">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table mb-0 align-middle" id="transactionsTable">
+                    <table class="table mb-0 align-middle custom-table-bg">
                         <thead>
                             <tr>
-                                <th>Invoice No.</th>
-                                <th>Project</th>
-                                <th>Service</th>
-                                <th>Duration</th>
-                                <th>Payment Date</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Status</th>
-                                <th>Txn</th>
-                                <th>Note</th>
+                                <th class="text-light">Invoice</th>
+                                <th class="text-light">Project</th>
+                                <th class="text-light">Service</th>
+                                <th class="text-light">Duration</th>
+                                <th class="text-light">Payment Date</th>
+                                <th class="text-light">Amount</th>
+                                <th class="text-light">Method</th>
+                                <th class="text-light">Status</th>
+                                <th class="text-light">Note</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            @forelse($combined as $row)
+                                <tr>
+                                    <td class="text-light">{!! $row['invoice_no'] !!}</td>
+                                    <td class="text-light">{!! $row['project'] !!}</td>
+                                    <td class="text-light">{{ $row['service'] }}</td>
+                                    <td class="text-light">{{ $row['duration'] }}</td>
+                                    <td class="text-light">{{ $row['payment_date'] }}</td>
+                                    <td class="text-light">£{{ number_format($row['amount'], 2) }}</td>
+                                    <td class="text-light">{{ $row['method'] }}</td>
+                                    <td class="text-light">
+                                        @php
+                                            $statusClasses = [
+                                                'Received' => 'bg-success',
+                                                'Overdue'  => 'bg-danger',
+                                                'Due'      => 'bg-warning',
+                                                'Receivable'=> 'bg-warning',
+                                            ];
+                                        @endphp
+                                        <span class="badge {{ $statusClasses[$row['status']] ?? 'bg-secondary' }}">
+                                            {{ $row['status'] }}
+                                        </span>
+                                    </td>
+                                    <td class="text-light">{{ $row['note'] }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center py-3 text-light">No transactions found.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -30,31 +66,4 @@
 
     </div>
 </div>
-@endsection
-
-@section('script')
-<script>
-$(function () {
-    $('#transactionsTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('user.transactions') }}",
-        columns: [
-            { data: 'invoice_no', name: 'invoice_no' },
-            { data: 'project', name: 'project' },
-            { data: 'service', name: 'service' },
-            { data: 'duration', name: 'duration' },
-            { data: 'payment_date', name: 'payment_date' },
-            { data: 'amount', name: 'amount', orderable: false, searchable: false },
-            { data: 'method', name: 'method' },
-            { data: 'status', name: 'status', orderable: false, searchable: false },
-            { data: 'txn', name: 'txn' },
-            { data: 'note', name: 'note', orderable: false, searchable: false },
-        ],
-        responsive: true,
-        lengthChange: false,
-        autoWidth: false,
-    });
-});
-</script>
 @endsection
