@@ -864,15 +864,11 @@ public function store(Request $request)
 
         $currentStart = $startDate;
 
-        while ($currentStart->lessThanOrEqualTo($today)) {
-
+        // ✅ CASE 1: Start date is in the future → only ONE record
+        if ($currentStart->greaterThan($today)) {
             $currentEnd = $cycleType == 1
                 ? $currentStart->copy()->endOfMonth()
                 : $currentStart->copy()->addYear()->subDay();
-
-            if ($currentStart->greaterThan($today)) {
-                break;
-            }
 
             $dueDate = $cycleType == 1
                 ? $currentEnd->copy()->subWeeks(2)
@@ -894,14 +890,10 @@ public function store(Request $request)
                 'created_by'         => auth()->id(),
             ]);
 
-            if ($parentId === null) {
-                $parentId = $detail->id;
-                $detail->update(['parent_id' => $parentId]);
-            } else {
-                $detail->update(['parent_id' => $parentId]);
-            }
+            $parentId = $detail->id;
+            $detail->update(['parent_id' => $parentId]);
 
-            $transaction = Transaction::create([
+            Transaction::create([
                 'date'                      => $currentStart,
                 'project_service_detail_id' => $detail->id,
                 'client_id'                 => $data['client_id'],
@@ -914,17 +906,67 @@ public function store(Request $request)
                 'at_amount'    => $detail->amount,
                 'created_by'   => auth()->id(),
                 'created_ip'   => $request->ip(),
-            ]);
-
-            $transaction->update([
-                'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
+                'tran_id'      => 'AT' . now()->format('ymd') . str_pad(1, 4, '0', STR_PAD_LEFT)
             ]);
 
             $createdDetails[] = $detail;
+        }
 
-            $currentStart = $cycleType == 1
-                ? $currentStart->copy()->addMonthNoOverflow()->startOfMonth()
-                : $currentStart->copy()->addYear()->startOfDay();
+        // ✅ CASE 2: Start date is today or past → generate all cycles up to today
+        else {
+            while ($currentStart->lessThanOrEqualTo($today)) {
+
+                $currentEnd = $cycleType == 1
+                    ? $currentStart->copy()->endOfMonth()
+                    : $currentStart->copy()->addYear()->subDay();
+
+                $dueDate = $cycleType == 1
+                    ? $currentEnd->copy()->subWeeks(2)
+                    : $currentEnd->copy()->subMonths(3);
+
+                $detail = ProjectServiceDetail::create([
+                    'project_service_id' => $data['service_type_id'],
+                    'client_id'          => $data['client_id'],
+                    'client_project_id'  => $data['client_project_id'],
+                    'start_date'         => $currentStart,
+                    'end_date'           => $currentEnd,
+                    'due_date'           => $dueDate,
+                    'amount'             => $data['amount'],
+                    'note'               => $data['note'] ?? null,
+                    'status'             => true,
+                    'type'               => $data['type'],
+                    'is_auto'            => $isAuto,
+                    'cycle_type'         => $cycleType,
+                    'created_by'         => auth()->id(),
+                ]);
+
+                if ($parentId === null) {
+                    $parentId = $detail->id;
+                }
+                $detail->update(['parent_id' => $parentId]);
+
+                Transaction::create([
+                    'date'                      => $currentStart,
+                    'project_service_detail_id' => $detail->id,
+                    'client_id'                 => $data['client_id'],
+                    'table_type'                => 'Income',
+                    'transaction_type'          => 'Due',
+                    'payment_type'              => 'Bank',
+                    'description'               => $detail->note
+                        ?? "Due for {$service->name} from {$currentStart->toDateString()} to {$currentEnd->toDateString()}",
+                    'amount'       => $detail->amount,
+                    'at_amount'    => $detail->amount,
+                    'created_by'   => auth()->id(),
+                    'created_ip'   => $request->ip(),
+                    'tran_id'      => 'AT' . now()->format('ymd') . str_pad(1, 4, '0', STR_PAD_LEFT)
+                ]);
+
+                $createdDetails[] = $detail;
+
+                $currentStart = $cycleType == 1
+                    ? $currentStart->copy()->addMonthNoOverflow()->startOfMonth()
+                    : $currentStart->copy()->addYear()->startOfDay();
+            }
         }
     });
 
