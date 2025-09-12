@@ -168,13 +168,13 @@ class ProjectServiceController extends Controller
 
                     $date = Carbon::parse($row->start_date);
 
-                    if ($row->cycle_type == 1) {
-                        $date->addMonthNoOverflow();
-                    } elseif ($row->cycle_type == 2) {
-                        $date->addYear();
-                    } else {
-                        $date->addDay();
-                    }
+                    // if ($row->cycle_type == 1) {
+                    //     $date->addMonthNoOverflow();
+                    // } elseif ($row->cycle_type == 2) {
+                    //     $date->addYear();
+                    // } else {
+                    //     $date->addDay();
+                    // }
 
                     return $date->format('d-m-Y');
                 })
@@ -277,7 +277,7 @@ class ProjectServiceController extends Controller
                         // $btn .= '<button class="btn btn-sm btn-secondary" disabled>Renewed</button>';
                     }
 
-                    if ($row->type == 1 && $row->status == 1) {
+                    if ($row->type == 1 && $row->status == 1 && $row->bill_paid == 1) {
                         $startDate = Carbon::parse($row->start_date);
                         $endDate = Carbon::parse($row->end_date);
                         if ($row->cycle_type == 1) { // 1 month cycle

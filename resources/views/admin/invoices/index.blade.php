@@ -401,6 +401,8 @@
             // Get project info (already stored in #projectInfo by the change event)
             var projectInfo = $('#projectInfo').data('info');
 
+            console.log(projectInfo);
+
             if (!projectInfo) {
                 alert('Project info not loaded yet. Please try again.');
                 return;
@@ -411,9 +413,10 @@
                 projectInfo.dueServiceDetails.forEach(function(service) {
                     addRowToInvoiceTable({
                         id: service.id, // service id
+                        sdtl_id: service.id, // service id
                         client_project_id: projectId,
                         project_name: projectName,
-                        description: service.note || projectInfo.description || '',
+                        description: (service.start_date ? service.start_date.split(' ')[0] : projectInfo.description || service.note || ''),
                         qty: 1,
                         unit_price: parseFloat(service.amount) || 0,
                         vat_percent: 0
@@ -458,6 +461,7 @@
                 <tr id="${rowId}" data-project-id="${data.client_project_id || ''}">
                     <input type="hidden" name="projects[${rowId}][client_project_id]" value="${data.client_project_id || ''}">
                     <input type="hidden" name="projects[${rowId}][id]" value="${data.id || ''}">
+                    <input type="hidden" name="projects[${rowId}][sdtl_id]" value="${data.sdtl_id || ''}">
                     <td>
                         <input type="text" class="form-control" name="projects[${rowId}][project_name]" value="${data.project_name || 'Custom Item'}" required>
                     </td>
@@ -584,6 +588,10 @@
                     
                     if ($(this).find('input[name*="[id]"]').length) {
                         project.id = $(this).find('input[name*="[id]"]').val();
+                    }
+
+                    if ($(this).find('input[name*="[sdtl_id]"]').length) {
+                        project.sdtl_id = $(this).find('input[name*="[sdtl_id]"]').val();
                     }
                     
                     projects.push(project);

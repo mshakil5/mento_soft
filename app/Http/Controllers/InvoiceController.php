@@ -213,6 +213,7 @@ class InvoiceController extends Controller
                 $detail = new InvoiceDetail();
                 $detail->invoice_id = $invoice->id;
                 $detail->client_project_id = !empty($project['client_project_id']) ? $project['client_project_id'] : null;
+                $detail->project_service_detail_id = !empty($project['sdtl_id']) ? $project['sdtl_id'] : null;
                 $detail->project_name = $project['project_name'];
                 $detail->description = $project['description'] ?? null;
                 $detail->qty = $qty;
@@ -225,6 +226,7 @@ class InvoiceController extends Controller
 
                 $subtotal += $totalExcVat;
                 $totalVat += $vatAmount;
+
             }
 
             $discountAmount = $subtotal * ($invoice->discount_percent / 100);
