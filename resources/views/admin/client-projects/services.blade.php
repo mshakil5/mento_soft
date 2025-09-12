@@ -134,6 +134,12 @@
                                       <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
                                   </div>
                               </div>
+                                <div class="col-md-6" id="service_renewal_date_div">
+                                    <div class="form-group">
+                                        <label>Third Party Service Renewal Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="service_renewal_date" name="service_renewal_date">
+                                    </div>
+                                </div>
                            </div>
 
                             <div class="form-group">
@@ -253,8 +259,10 @@
       function toggleEndDate() {
           if ($("#type").val() == "1") { 
               $("#end_date_div").hide();
+              $("#service_renewal_date_div").show();
           } else {
               $("#end_date_div").show();
+              $("#service_renewal_date_div").hide();
           }
       }
 
@@ -271,6 +279,7 @@
           form_data.append("client_project_id", $("#client_project_id").val());
           form_data.append("start_date", $("#start_date").val());
           form_data.append("end_date", $("#end_date").val());
+          form_data.append("service_renewal_date", $("#service_renewal_date").val());
           form_data.append("amount", $("#amount").val());
           form_data.append("note", $("#note").val());
           form_data.append("cycle_type", $("#cycle_type").val());
@@ -334,12 +343,13 @@
           var codeid = $(this).data('id');
           var info_url = "/admin/client-project-service-detail/" + codeid + "/edit";
           $.get(info_url, {}, function(d){
+            console.log(d);
               populateForm(d);
           });
       });
 
       function populateForm(data){
-          $("#start_date").val(data.start_date).prop('readonly', true);
+          $("#start_date").val(data.start_date.split(' ')[0]).prop('readonly', true);
           $("#cycle_type").val(data.cycle_type).prop('disabled', true);
 
           $("#service_type_id").val(data.project_service_id).trigger('change').prop('disabled', false);
@@ -359,6 +369,7 @@
               }
           });
 
+          $("#service_renewal_date").val(data.service_renewal_date);
           $("#end_date").val(data.end_date);
           $("#amount").val(data.amount);
           $("#note").val(data.note);
@@ -368,8 +379,10 @@
 
           if (data.type == 1) {
             $("#end_date_div").hide();
+            $("#service_renewal_date_div").show();
           } else {
             $("#end_date_div").show();
+            $("#service_renewal_date_div").hide();
           }
 
           $("#addBtn").val('Update').html('Update');

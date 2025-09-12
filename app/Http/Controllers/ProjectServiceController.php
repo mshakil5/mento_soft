@@ -831,15 +831,16 @@ class ProjectServiceController extends Controller
 public function store(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'service_type_id'   => 'required|exists:project_services,id',
-        'client_id'         => 'required|exists:clients,id',
-        'client_project_id' => 'required|exists:client_projects,id',
-        'start_date'        => 'required|date',
-        'amount'            => 'required|numeric|min:0',
-        'note'              => 'nullable|string',
-        'cycle_type'        => 'required|in:1,2', // 1=Monthly, 2=Yearly
-        'is_auto'           => 'nullable|boolean',
-        'type'              => 'required|string'
+        'service_type_id'       => 'required|exists:project_services,id',
+        'client_id'             => 'required|exists:clients,id',
+        'client_project_id'     => 'required|exists:client_projects,id',
+        'start_date'            => 'required|date',
+        'service_renewal_date'  => 'nullable|date',
+        'amount'                => 'required|numeric|min:0',
+        'note'                  => 'nullable|string',
+        'cycle_type'            => 'required|in:1,2', // 1=Monthly, 2=Yearly
+        'is_auto'               => 'nullable|boolean',
+        'type'                  => 'required|string'
     ]);
 
     if ($validator->fails()) {
@@ -878,6 +879,7 @@ public function store(Request $request)
                 'project_service_id' => $data['service_type_id'],
                 'client_id'          => $data['client_id'],
                 'client_project_id'  => $data['client_project_id'],
+                'service_renewal_date'  => $data['service_renewal_date'],
                 'start_date'         => $currentStart,
                 'end_date'           => $currentEnd,
                 'due_date'           => $dueDate,
@@ -928,6 +930,7 @@ public function store(Request $request)
                     'project_service_id' => $data['service_type_id'],
                     'client_id'          => $data['client_id'],
                     'client_project_id'  => $data['client_project_id'],
+                    'service_renewal_date'  => $data['service_renewal_date'],
                     'start_date'         => $currentStart,
                     'end_date'           => $currentEnd,
                     'due_date'           => $dueDate,
@@ -998,6 +1001,7 @@ public function store(Request $request)
             'amount' => 'required|numeric|min:0',
             'note' => 'nullable|string',
             'cycle_type' => 'nullable|in:1,2',
+            'service_renewal_date'  => 'nullable|date',
             'is_auto' => 'nullable|boolean'
         ]);
 
@@ -1013,6 +1017,7 @@ public function store(Request $request)
         $detail->project_service_id = $request->service_type_id;
         $detail->client_id = $request->client_id;
         $detail->client_project_id = $request->client_project_id;
+        $detail->service_renewal_date = $request->service_renewal_date;
         $detail->type = $request->type;
         $detail->note = $request->note;
         $detail->updated_by = auth()->id();
