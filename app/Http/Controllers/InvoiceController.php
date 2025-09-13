@@ -147,7 +147,7 @@ class InvoiceController extends Controller
 
     public function create()
     {
-        $clients = Client::where('status', 1)->get();
+        $clients = Client::where('status', 1)->latest()->get();
 
         $latest = Invoice::orderBy('id', 'desc')->first();
         $invoiceNumber = $latest ? ($latest->invoice_number + 1) : 1001;

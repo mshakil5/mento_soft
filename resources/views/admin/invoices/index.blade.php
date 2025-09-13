@@ -811,7 +811,7 @@
                 {data: 'client_name', name: 'client_name'},
                 {data: 'project', name: 'project'},
                 {data: 'net_amount', name: 'net_amount', render: function(data) {
-                    return '£' + parseFloat(data).toFixed(2);
+                    return '£' + parseFloat(data).toFixed(0);
                 }},
                 {data: 'date', name: 'date'},
                 {data: 'status', name: 'status'},

@@ -38,7 +38,7 @@ class HomeController extends Controller
         $pendingInvoices = Invoice::where('status', 1)->sum('net_amount');
         $todoTasks = ProjectTask::where('status', 1)->count();
         $inProgressTasks = ProjectTask::where('status', 2)->count();
-        $doneNotConfirmedTasks = ProjectTask::where('status', 3)->where('is_confirmed', 0)->count();
+        $doneNotConfirmedTasks = ProjectTask::where('status', 3)->where('is_confirmed', 0)->where('allow_client', 1)->count();
         $doneTasks = ProjectTask::where('status', 3)->where('is_confirmed', 1)->count();
         $now = Carbon::now()->format('Y-m-d');
         $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');

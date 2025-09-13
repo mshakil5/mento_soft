@@ -51,7 +51,7 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Date</th>
+                                    {{-- <th>Date</th> --}}
                                     <th>Project</th>
                                     <th>Task</th>
                                     <th>Assigned To</th>
@@ -149,7 +149,7 @@
             },
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                {data: 'date', name: 'date'},
+                // {data: 'date', name: 'date'},
                 {data: 'project_title', name: 'project_title'},
                 {data: 'title', name: 'title'},
                 {data: 'employee_name', name: 'employee_name'},

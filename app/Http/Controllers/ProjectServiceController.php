@@ -241,7 +241,7 @@ class ProjectServiceController extends Controller
                         $end = Carbon::parse($row->end_date)->format('j F Y');
 
                         $btnClass = ($row->cycle_type == 2 && now()->diffInMonths($row->end_date) <= 3) ? 'btn-danger' : 'btn-info';
-
+ 
                         $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#renewModal'.$row->id.'">
                                     <i class="fas fa-sync"></i> Renew
                                 </button>';
@@ -484,7 +484,7 @@ class ProjectServiceController extends Controller
 
                   if ($bills->count() > 0) {
                       $buttonText = 'Receive';
-                      $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
+                      $btn .= '<button class="btn btn-sm '.((now()->between(Carbon::parse($row->start_date)->subDays(10), Carbon::parse($row->start_date))) ? 'btn-danger' : 'btn-success').'" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
                       $btn .= ' <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
 
                       // Modal
@@ -1258,8 +1258,13 @@ public function store(Request $request)
         $newDetail = $serviceDetail->replicate();
         $newDetail->parent_id = $serviceDetail->id;
 
-        $startDate = Carbon::parse($serviceDetail->next_start_date)->format('Y-m-d');
-        $endDate = Carbon::parse($serviceDetail->next_end_date)->format('Y-m-d');
+        $startDate = Carbon::parse($serviceDetail->end_date)->addDay()->format('Y-m-d');
+
+        if ($serviceDetail->cycle_type == 1) {
+            $endDate = Carbon::parse($startDate)->copy()->addMonthNoOverflow()->subDay()->format('Y-m-d');
+        } else {
+            $endDate = Carbon::parse($startDate)->copy()->addYear()->subDay()->format('Y-m-d');
+        }
 
         $dueDate = $serviceDetail->cycle_type == 1 ? Carbon::parse($endDate)->subWeeks(2)->format('Y-m-d') : Carbon::parse($endDate)->subMonths(3)->format('Y-m-d');
 

@@ -110,6 +110,7 @@
                                     <div class="form-group">
                                         <label>Cycle Type <span class="text-danger">*</span></label>
                                         <select class="form-control" name="cycle_type" id="cycle_type" required>
+                                            <option value="">Select Cycle</option>
                                             <option value="1">Monthly</option>
                                             <option value="2">Yearly</option>
                                         </select>

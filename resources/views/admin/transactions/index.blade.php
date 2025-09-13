@@ -94,7 +94,7 @@ $(document).ready(function () {
             { data: 'note', name: 'note', orderable: false, searchable: false },
         ],
         responsive: true,
-        lengthChange: false,
+        lengthChange: true,
         autoWidth: false,
     });
 });
