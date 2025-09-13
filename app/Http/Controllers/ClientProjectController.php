@@ -80,7 +80,7 @@ class ClientProjectController extends Controller
                     $totalReceived = $serviceTxnsSum + $invoiceSum;
 
                     if ($totalReceived > 0) {
-                        $badge = '<a href="' . route('transactions.index', ['client_project_id' => $row->id, 'received' => 2]) . '" class="badge bg-success text-white" style="text-decoration:none;">£' . number_format($totalReceived, 0) . '</a>';
+                        $badge = '<a href="' . route('transactions.index', ['project_id' => $row->id, 'status' => 'Received']) . '" class="badge bg-success text-white" style="text-decoration:none;">£' . number_format($totalReceived, 0) . '</a>';
                     } else {
                         $badge = '<span class="badge bg-secondary">£0</span>';
                     }

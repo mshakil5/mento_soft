@@ -13,6 +13,7 @@ use App\Models\CompanyDetails;
 use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\Transaction;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserController extends Controller
 {
@@ -143,90 +144,101 @@ class UserController extends Controller
         return view('user.tasks', compact('tasks', 'projects', 'tab'));
     }
 
-    public function transactions()
+    public function transactions(Request $request)
     {
-        $user = auth()->user();
+        $clientId = auth()->user()->client->id;
 
-        $transactions = Transaction::with('service.client', 'service.project', 'service.serviceType', 'invoice.client')
-            ->where('client_id', $user->client->id)
-            ->where(function($q) {
-                $q->where('transaction_type', 'Received')
-                  ->orWhereHas('service', function($sub) {
-                      $sub->whereDoesntHave('transactions', function($t) {
-                          $t->where('transaction_type', 'Received');
-                      });
-                  });
-            })
-            ->latest();
-
-        $dueInvoices = Invoice::with('client', 'details')
-            ->where('client_id', $user->client->id)
-            ->where('status', '!=', 2)
-            ->whereDoesntHave('transactions', function($q) {
+        $invoiceReceivables = Transaction::with('invoice.details.clientProject', 'invoice.client')
+            ->whereHas('invoice')
+            ->where('transaction_type', 'Due')
+            ->whereDoesntHave('invoice.transactions', function ($q) {
                 $q->where('transaction_type', 'Received');
             })
-            ->latest();
+            ->where('client_id', $clientId)
+            ->get();
 
-        $combinedCollection = $transactions->get()->map(function($row) {
-            if ($row->invoice) {
-                return [
-                    'invoice_no'   => $row->invoice->invoice_number,
-                    'project'      => $row->invoice->details->pluck('project_name')->implode('<br>'),
-                    'service'      => '-',
-                    'duration'     => '-',
-                    'payment_date' => Carbon::parse($row->date)->format('d-m-Y'),
-                    'amount'       => $row->amount,
-                    'method'       => $row->payment_type ?? '-',
-                    'status'       => 'Received',
-                    'txn'          => $row->tran_id ?? '-',
-                    'note'         => $row->description,
-                ];
+        // Invoice Received
+        $invoiceReceived = Transaction::with('invoice.details.clientProject', 'invoice.client')
+            ->whereHas('invoice')
+            ->where('transaction_type', 'Received')
+            ->where('client_id', $clientId)
+            ->get();
+
+        // Service Receivables
+        $serviceReceivables = Transaction::with(['projectServiceDetail.project', 'projectServiceDetail.serviceType', 'projectServiceDetail.client'])
+            ->where('transaction_type', 'Due')
+            ->whereHas('projectServiceDetail')
+            ->whereDoesntHave('projectServiceDetail.transactions', function ($q) {
+                $q->where('transaction_type', 'Received');
+            })
+            ->where('client_id', $clientId)
+            ->get();
+
+        // Service Received
+        $serviceReceived = Transaction::with(['projectServiceDetail.project', 'projectServiceDetail.serviceType', 'projectServiceDetail.client'])
+            ->where('transaction_type', 'Received')
+            ->whereHas('projectServiceDetail')
+            ->where('client_id', $clientId)
+            ->get();
+
+        // Merge all
+        $allTransactions = $invoiceReceivables
+            ->merge($invoiceReceived)
+            ->merge($serviceReceivables)
+            ->merge($serviceReceived)
+            ->sortByDesc('id')
+            ->values();
+
+        // Pagination manually
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $allTransactions->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $paginated = new LengthAwarePaginator(
+            $currentItems,
+            $allTransactions->count(),
+            $perPage,
+            $currentPage,
+            ['path' => url()->current()]
+        );
+
+        $data = $paginated->getCollection()->map(function ($row, $key) {
+            $isInvoice = !empty($row->invoice);
+            $clientName = $isInvoice ? $row->invoice->client?->business_name ?? '-' : $row->projectServiceDetail?->client?->business_name ?? '-';
+            $invoiceNo = $isInvoice ? $row->invoice->invoice_number : '-';
+            $project = $isInvoice
+                ? $row->invoice->details->pluck('project_name')->implode('<br>')
+                : $row->projectServiceDetail?->project?->title ?? '-';
+            $service = $isInvoice ? '-' : $row->projectServiceDetail?->serviceType?->name ?? '-';
+            $duration = $isInvoice ? '-' 
+                : ($row->projectServiceDetail?->start_date && $row->projectServiceDetail?->end_date
+                    ? Carbon::parse($row->projectServiceDetail->start_date)->format('d-m-Y') . ' to ' . Carbon::parse($row->projectServiceDetail->end_date)->format('d-m-Y')
+                    : '-');
+            $paymentDate = $row->transaction_type === 'Received' ? Carbon::parse($row->date)->format('d-m-Y') : '-';
+            $method = $row->transaction_type === 'Received' ? $row->payment_type : '-';
+
+            $status = 'Due';
+            if ($row->transaction_type === 'Received') {
+                $status = 'Received';
+            } elseif ($row->transaction_type === 'Due' && Carbon::parse($row->date)->startOfDay() < Carbon::today()) {
+                $status = 'Overdue';
             }
 
             return [
-                'invoice_no'   => '-',
-                'project'      => $row->service?->project?->title ?? '-',
-                'service'      => $row->service?->serviceType?->name ?? '-',
-                'duration'     => $row->service?->start_date && $row->service?->end_date
-                    ? Carbon::parse($row->service->start_date)->format('d-m-Y') . ' to ' . Carbon::parse($row->service->end_date)->format('d-m-Y')
-                    : '-',
-                'payment_date' => $row->transaction_type === 'Received' ? Carbon::parse($row->date)->format('d-m-Y') : '-',
-                'amount'       => $row->amount,
-                'method'       => $row->transaction_type === 'Received' ? $row->payment_type : '-',
-                'status'       => $row->transaction_type,
-                'txn'          => $row->transaction_type === 'Received' ? $row->tran_id : '-',
-                'note'         => $row->description,
+                'client_name' => $clientName,
+                'invoice_no'  => $invoiceNo,
+                'project'     => $project,
+                'service'     => $service,
+                'duration'    => $duration,
+                'payment_date'=> $paymentDate,
+                'amount'      => '£' . number_format($row->amount, 0),
+                'method'      => $method,
+                'status'      => $status,
+                'txn'         => $row->tran_id ?? '-',
+                'note'        => $row->transaction_type === 'Received' ? $row->description : '-',
             ];
-        })->concat(
-            $dueInvoices->get()->map(function($inv) {
-                return [
-                    'invoice_no'   => $inv->invoice_number,
-                    'project'      => $inv->details->pluck('project_name')->implode('<br>'),
-                    'service'      => '-',
-                    'duration'     => '-',
-                    'payment_date' => '-',
-                    'amount'       => $inv->subtotal,
-                    'method'       => '-',
-                    'status'       => ($inv->status == 1 && Carbon::parse($inv->invoice_date)->startOfDay() < Carbon::today()) 
-                                        ? 'Overdue' 
-                                        : 'Due',
-                    'txn'          => '-',
-                    'note'         => $inv->note ?? '-',
-                ];
-            })
-        )->sortByDesc('invoice_no');
+        });
 
-        $page = request()->get('page', 1);
-        $perPage = 10;
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-            $combinedCollection->forPage($page, $perPage),
-            $combinedCollection->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return view('user.transactions', ['combined' => $paginated]);
+        return view('user.transactions', compact('data', 'paginated'));
     }
 
     public function storeTask(Request $request)

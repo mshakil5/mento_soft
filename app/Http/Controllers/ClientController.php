@@ -78,7 +78,7 @@ class ClientController extends Controller
                         ->sum('amount');
 
                     if ($totalReceived > 0) {
-                        $badge = '<a href="' . route('transactions.index', ['client_id' => $row->id, 'received' => 1]) . '" class="badge bg-success text-white" style="text-decoration:none;">£' . number_format($totalReceived, 0) . '</a>';
+                        $badge = '<a href="' . route('transactions.index', ['client_id' => $row->id, 'status' => 'Received']) . '" class="badge bg-success text-white" style="text-decoration:none;">£' . number_format($totalReceived, 0) . '</a>';
                     } else {
                         $badge = '<span class="badge bg-secondary">£0</span>';
                     }

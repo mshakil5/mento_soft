@@ -2,7 +2,7 @@
 
 @section('content')
 
-<section class="content">
+{{-- <section class="content">
     <div class="container-fluid">
         <div class="row pt-3">
             <div class="col-4 d-flex">
@@ -31,7 +31,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> --}}
 
 <section class="content pt-3">
     <div class="container-fluid">
@@ -96,6 +96,9 @@ $(document).ready(function () {
         responsive: true,
         lengthChange: true,
         autoWidth: false,
+        columnDefs: [
+            { targets: 0, orderable: false }
+        ],
     });
 });
 </script>

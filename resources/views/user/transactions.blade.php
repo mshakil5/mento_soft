@@ -8,9 +8,9 @@
       background-color: transparent !important;
   }
 </style>
+
 <div class="row px-2">
     <div class="col-12">
-
         <div class="card text-light shadow-sm mb-4 form-style fadeInUp border-light">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -27,13 +27,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($combined as $row)
+                            @forelse($data as $row)
                                 <tr>
                                     <td class="text-light">{!! $row['project'] !!}</td>
                                     <td class="text-light">{{ $row['service'] }}</td>
                                     <td class="text-light">{{ $row['duration'] }}</td>
                                     <td class="text-light">{{ $row['payment_date'] }}</td>
-                                    <td class="text-light">£{{ number_format($row['amount'], 2) }}</td>
+                                    <td class="text-light">{{ $row['amount'] }}</td>
                                     <td class="text-light">{{ $row['method'] }}</td>
                                     <td class="text-light">
                                         @php
@@ -51,7 +51,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="10" class="text-center py-3 text-light">No transactions found.</td>
+                                    <td colspan="7" class="text-center py-3 text-light">No transactions found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -59,10 +59,10 @@
                 </div>
             </div>
         </div>
-        <div class="mt-3">
-            {{ $combined->links('pagination::bootstrap-5') }}
-        </div>
 
+        <div class="mt-3">
+            {{ $paginated->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 </div>
 @endsection
