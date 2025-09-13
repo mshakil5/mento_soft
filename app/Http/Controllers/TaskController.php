@@ -180,6 +180,7 @@ class TaskController extends Controller
                 })
                 ->addColumn('action', function($row) {
                     $html = '
+                      <a href="'.route('tasks.show', $row->id).'" class="btn btn-sm btn-warning">Message</a>
                       <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
                       <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>
                       <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>

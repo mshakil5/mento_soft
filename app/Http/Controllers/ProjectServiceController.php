@@ -472,15 +472,19 @@ class ProjectServiceController extends Controller
                     </div>
                   </div>';
 
+                  $bills = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                      ->where('client_id', $row->client_id)
+                      ->where('client_project_id', $row->client_project_id)
+                      ->where('bill_paid', '!=', 1)
+                      ->where('amount', $row->amount)
+                      ->where('cycle_type', $row->cycle_type)
+                      ->where('is_auto', $row->is_auto)
+                      ->orderBy('start_date')
+                      ->get();
 
-                  if ($row->isPending()) {
-                      $isType1 = ($row->type == 1 || $row->type == 2);
-                      $buttonText = $isType1 ? 'Receive' : 'Receive';
-                      
+                  if ($bills->count() > 0) {
+                      $buttonText = 'Receive';
                       $btn .= '<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
-                      if (auth()->user()->can('edit service')) {
-                          $btn .= ' <button class="btn btn-sm btn-info edit" data-id="'.$row->parent_id.'">Edit</button>';
-                      }
                       $btn .= ' <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
 
                       // Modal
@@ -495,19 +499,8 @@ class ProjectServiceController extends Controller
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                               </div>
                               <div class="modal-body">';
-                      
-                      if ($isType1) {
-                          $bills = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
-                              ->where('client_id', $row->client_id)
-                              ->where('client_project_id', $row->client_project_id)
-                              // ->where('type', 1)
-                              ->where('bill_paid', '!=', 1)
-                              ->where('amount', $row->amount)
-                              ->where('cycle_type', $row->cycle_type)
-                              ->where('is_auto', $row->is_auto)
-                              ->orderBy('start_date')
-                              ->get();
-                          
+
+                      if ($bills->count() > 0) {
                           $btn .= '<div class="mb-3">
                                       <label>Select Month(s) <span class="text-danger">*</span></label>
                                       <select name="bill_ids[]" class="form-control bill-select select2" multiple required>';
@@ -518,17 +511,14 @@ class ProjectServiceController extends Controller
                                       ' ( £'.number_format($bill->amount, 0).' )</option>';
                           }
                           $btn .= '</select></div>';
-                          $btn .= '<div class="mb-3">
-                                      <label>Total Amount</label>
-                                      <input type="text" class="form-control total-amount" readonly>
-                                  </div>';
                       } else {
                           $btn .= '<input type="hidden" name="bill_ids[]" value="'.$row->id.'">';
-                          $btn .= '<div class="mb-3">
-                                      <label>Total Amount</label>
-                                      <input type="text" class="form-control total-amount" readonly value="£'.number_format($row->amount,2).'">
-                                  </div>';
                       }
+
+                      $btn .= '<div class="mb-3">
+                                  <label>Total Amount</label>
+                                  <input type="text" class="form-control total-amount" readonly>
+                              </div>';
 
                       $btn .= '<div class="mb-3">
                                   <label>Payment Date <span class="text-danger">*</span></label>
@@ -556,8 +546,11 @@ class ProjectServiceController extends Controller
                         </div>
                       </div>';
                   } else {
-                      $disabledText = $row->type == 1 ? 'Received' : 'Received';
-                      $btn .= '<button class="btn btn-sm btn-success" disabled>'.$disabledText.'</button>';
+                      $btn .= '<button class="btn btn-sm btn-success" disabled>Received</button>';
+                  }
+
+                  if (auth()->user()->can('edit service')) {
+                      $btn .= ' <button class="btn btn-sm btn-info edit mr-1" data-id="'.$row->parent_id.'">Edit</button>';
                   }
 
                   $serviceIds = $row->type == 1
