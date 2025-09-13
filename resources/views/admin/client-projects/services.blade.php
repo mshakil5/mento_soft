@@ -136,7 +136,7 @@
                               </div>
                                 <div class="col-md-6" id="service_renewal_date_div">
                                     <div class="form-group">
-                                        <label>Third Party Service Renewal Date <span class="text-danger">*</span></label>
+                                        <label>Third Party Service Renewal Date</label>
                                         <input type="date" class="form-control" id="service_renewal_date" name="service_renewal_date">
                                     </div>
                                 </div>
@@ -407,9 +407,17 @@
 
       // Status toggle
       $(document).on('change', '.toggle-status', function() {
-          var detail_id = $(this).data('id');
-          var status = $(this).prop('checked') ? 1 : 0;
+          var checkbox = $(this);
+          var detail_id = checkbox.data('id');
+          var status = checkbox.prop('checked') ? 1 : 0;
           var toggleUrl = "/admin/client-project-service-detail/" + detail_id + "/toggle-status";
+
+          var confirmed = confirm("Are you sure you want to change the status?");
+          
+          if (!confirmed) {
+              checkbox.prop('checked', !checkbox.prop('checked'));
+              return;
+          }
 
           $.ajax({
               url: toggleUrl,
@@ -425,6 +433,7 @@
               error: function(xhr) {
                   console.error(xhr.responseText);
                   error('Failed to update status');
+                  checkbox.prop('checked', !checkbox.prop('checked'));
               }
           });
       });

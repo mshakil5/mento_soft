@@ -66,6 +66,7 @@ class HomeController extends Controller
             ->where('type', 2) // only third party
             ->where('bill_paid', 0)
             ->whereBetween('start_date', [$nextMonthStart, $nextMonthEnd])
+            ->orWhereBetween('service_renewal_date', [$nextMonthStart, $nextMonthEnd])
             ->count();
 
         // Next 2 month
@@ -76,6 +77,7 @@ class HomeController extends Controller
             ->where('type', 2) // only third party
             ->where('bill_paid', 0)
             ->whereBetween('start_date', [$next2MonthStart, $next2MonthEnd])
+            ->orWhereBetween('service_renewal_date', [$next2MonthStart, $next2MonthEnd])
             ->count();
 
         // Next 3 month
@@ -86,6 +88,7 @@ class HomeController extends Controller
             ->where('type', 2) // only third party
             ->where('bill_paid', 0)
             ->whereBetween('start_date', [$next3MonthStart, $next3MonthEnd])
+            ->orWhereBetween('service_renewal_date', [$next3MonthStart, $next3MonthEnd])
             ->count();
 
         return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'pendingInvoices', 'todoTasks', 'inProgressTasks', 'doneTasks', 'doneNotConfirmedTasks', 'servicesNeedToBeRenewed', 'currentMonthCount', 'nextMonthCount', 'next2MonthCount', 'next3MonthCount'));

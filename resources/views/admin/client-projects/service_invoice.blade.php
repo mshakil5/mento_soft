@@ -75,12 +75,12 @@
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
-                        <th class="text-center">Project</th>
-                        <th class="text-center">Description</th>
-                        <th class="text-center">Qty</th>
+                        <th class="text-center">Service</th>
+                        <th class="text-center">Period</th>
+                        {{-- <th class="text-center">Qty</th>
                         <th class="text-center">Price</th>
-                        <th class="text-center">VAT %</th>
-                        <th class="text-right">Total (Excl VAT)</th>
+                        <th class="text-center">VAT %</th> --}}
+                        <th class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,11 +94,11 @@
                         @endphp
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
-                            <td class="text-center">{{ $service->serviceType->name }}</td>
+                            <td class="text-center">{{ $service->project?->title }}{{ $service->serviceType->name }}</td>
                             <td class="text-center">{{ $dateRange }}</td>
-                            <td class="text-center">1</td>
+                            {{-- <td class="text-center">1</td>
                             <td class="text-center">£{{ number_format($service->amount, 2) }}</td>
-                            <td class="text-center">0%</td>
+                            <td class="text-center">0%</td> --}}
                             <td class="text-right">£{{ number_format($service->amount, 2) }}</td>
                         </tr>
                     @endforeach
@@ -114,6 +114,10 @@
                             <tr>
                                 <td>Subtotal</td>
                                 <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td>VAT</td>
+                                <td class="text-right">£0.00</td>
                             </tr>
                             <tr>
                                 <td style="background:#f2f2f2"><b>Total</b></td>

@@ -1,7 +1,6 @@
 @extends('admin.master')
 
 @section('content')
-<!-- Main content -->
 <section class="content" id="newBtnSection">
     <div class="container-fluid">
         <div class="row">
@@ -77,11 +76,10 @@
 </section>
 
 <style>
-table.dataTable {
-    table-layout: fixed;
-    width: 100% !important;
-}
-
+    table.dataTable {
+        table-layout: fixed;
+        width: 100% !important;
+    }
 </style>
 
 @endsection
@@ -126,64 +124,6 @@ table.dataTable {
             progressTable.ajax.reload();
             doneTable.ajax.reload();
         }
-
-        function loadTaskMessages(taskId) {
-            $.ajax({
-                url: '/admin/tasks/' + taskId + '/messages',
-                type: 'GET',
-                success: function(res) {
-                    $('#taskModalMessages-' + taskId).html(res.messagesHtml);
-                    $('#taskModalTimeline-' + taskId).html(res.timelineHtml);
-
-                    var chat = $('#taskModalMessages-' + taskId);
-                    chat.scrollTop(chat[0].scrollHeight);
-                },
-                error: function(xhr) {
-                    console.error("Error loading messages:", xhr.responseText);
-                }
-            });
-        }
-
-        $(document).on('click', '[data-toggle="modal"]', function() {
-            var targetModalId = $(this).data('target');
-
-            if (targetModalId.startsWith('#taskModal-')) {
-                var taskId = targetModalId.split('-')[1];
-                loadTaskMessages(taskId);
-            }
-        });
-
-        $(document).on('submit', '.taskMessageForm', function(e) {
-            e.preventDefault();
-
-            var form = $(this);
-            var taskId = form.data('task-id');
-            var message = form.find('input[name="message"]').val().trim();
-
-            if (!message) return;
-
-            $.ajax({
-                url: '/admin/tasks/' + taskId + '/messages',
-                type: 'POST',
-                data: { message: message, _token: csrfToken },
-                success: function(res) {
-                    form.find('input[name="message"]').val('');
-                    $('#taskModalMessages-' + taskId).html(res.html);
-
-                    var chat = $('#taskModalMessages-' + taskId);
-                    chat.scrollTop(chat[0].scrollHeight);
-                },
-                error: function(xhr) {
-                    console.error("Error sending message:", xhr.responseText);
-                }
-            });
-        });
-
-        $(document).on('hidden.bs.modal', '.task-modal', function () {
-            reloadAllTables();
-        });
-
-        setInterval(reloadAllTables, 60000);
 
     });
 </script>

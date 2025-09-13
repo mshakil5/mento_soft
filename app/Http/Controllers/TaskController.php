@@ -45,7 +45,7 @@ class TaskController extends Controller
             $query->orderBy('created_at', 'desc');
 
             return DataTables::of($query)
-                ->addColumn('task', function ($row) use ($userId) {
+                ->addColumn('task', function ($row) {
                     $taskText = $row->title;
 
                     $priorityClass = match($row->priority) {
@@ -58,7 +58,9 @@ class TaskController extends Controller
                     $projectTitle = $row->clientProject->title ?? '';
                     $unreadCount = $row->unread_messages_count;
 
-                    $html = '<div data-toggle="modal" data-target="#taskModal-'.$row->id.'" style="cursor:pointer;">';
+                    $taskUrl = route('tasks.show', $row->id);
+
+                    $html = '<a href="' . $taskUrl . '" class="d-block" style="text-decoration:none; color:inherit;">';
                     $html .= '<div class="d-flex flex-column">';
 
                     $html .= '<div class="d-flex justify-content-between align-items-start mb-2">';
@@ -68,6 +70,9 @@ class TaskController extends Controller
                     if ($unreadCount > 0) {
                         $html .= '<span class="badge badge-warning mr-2">' . $unreadCount . '</span>';
                     }
+
+                    $html .= '<a href="' . route('client-projects-task.edit-page', $row->id) . '" class="text-secondary mr-1" title="Edit Task">';
+                    $html .= '<i class="fas fa-edit"></i></a>';
 
                     if (is_null($row->employee_id)) {
                         $html .= '<i class="fas fa-user-slash text-danger mr-2" title="Unassigned"></i>';
@@ -81,9 +86,7 @@ class TaskController extends Controller
 
                     $html .= '<div class="align-self-end text-muted small">' . $projectTitle . '</div>';
                     $html .= '</div>';
-                    $html .= '</div>';
-
-                    $html .= view('admin.client-projects.partials.task_list-modal', ['row' => $row])->render();
+                    $html .= '</a>';
 
                     return $html;
                 })
@@ -220,29 +223,6 @@ class TaskController extends Controller
         return view('admin.client-projects.all_tasks', compact('employees', 'projects'));
     }
 
-    public function messages(ProjectTask $task)
-    {
-        $userId = auth()->id();
-
-        $messages = $task->messages()->with('sender:id,name')->orderBy('created_at','asc')->get();
-        foreach ($messages as $message) {
-            if (!$message->views()->where('user_id', $userId)->exists()) {
-                $message->views()->create(['user_id' => $userId]);
-            }
-        }
-        
-        $messagesHtml = view('admin.client-projects.partials.task_messages', compact('messages'))->render();
-
-        $task->load(['activities.causer']);
-        
-        $timelineHtml = view('admin.client-projects.partials.task_timeline', compact('task'))->render();
-
-        return response()->json([
-            'messagesHtml' => $messagesHtml,
-            'timelineHtml' => $timelineHtml,
-        ]);
-    }
-
     public function store(Request $request, ProjectTask $task)
     {
         $request->validate([
@@ -258,5 +238,15 @@ class TaskController extends Controller
         $html = view('admin.client-projects.partials.task_messages', compact('messages'))->render();
 
         return response()->json(['html' => $html]);
+    }
+
+    public function show(ProjectTask $task)
+    {
+        $task->load([
+            'messages.sender:id,name',
+            'activities'
+        ]);
+
+        return view('admin.client-projects.task_details', compact('task'));
     }
 }

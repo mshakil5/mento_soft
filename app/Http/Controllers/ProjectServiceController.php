@@ -240,7 +240,9 @@ class ProjectServiceController extends Controller
                         $start = Carbon::parse($row->start_date)->format('j F Y');
                         $end = Carbon::parse($row->end_date)->format('j F Y');
 
-                        $btn .= '<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#renewModal'.$row->id.'">
+                        $btnClass = ($row->cycle_type == 2 && now()->diffInMonths($row->end_date) <= 3) ? 'btn-danger' : 'btn-info';
+
+                        $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#renewModal'.$row->id.'">
                                     <i class="fas fa-sync"></i> Renew
                                 </button>';
 

@@ -129,7 +129,7 @@ class TransactionsController extends Controller
                         default      => '<span class="badge bg-secondary">' . $row->status . '</span>'
                     };
 
-                    $invoiceBadge = '<br><a href="' . route("transaction.invoice", $row->id) . '" class="badge bg-primary text-white mt-1" style="text-decoration:none;">Invoice</a>';
+                    $invoiceBadge = '<br><a href="' . route("transaction.invoice", $row->id) . '" target="_blank" class="badge bg-primary text-white mt-1" style="text-decoration:none;">Invoice</a>';
 
                     return $statusBadge . $invoiceBadge;
                 })

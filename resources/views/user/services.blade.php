@@ -165,11 +165,11 @@
                                                     @endif
   
                                                     @if($bill->renewal)
-                                                        <br>
+                                                        {{-- <br>
                                                         <small class="text-info fst-italic">
                                                             Renewed: {{ \Carbon\Carbon::parse($bill->renewal->date)->format('j F Y') }}
                                                             {{ $bill->renewal->note ? '- ' . $bill->renewal->note : '' }}
-                                                        </small>
+                                                        </small> --}}
                                                     @endif
                                                 </td>
                                                 <td>

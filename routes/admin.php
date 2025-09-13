@@ -242,6 +242,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/tasks/{task}/messages', [TaskController::class, 'messages'])->name('tasks.messages');
 
     Route::post('/tasks/{task}/messages', [TaskController::class, 'store'])->name('tasks.messages.store');
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
 
     // Project Updates
     Route::get('/client-projects/{project}/updates', [ProjectRecentUpdateController::class, 'index'])->name('client-projects.updates');
