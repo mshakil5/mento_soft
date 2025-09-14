@@ -156,21 +156,32 @@
                                                 <td>£{{ number_format($bill->amount, 0) }}</td>
                                                 <td>{{ $method }}</td>
                                                 <td>
-                                                    @if($status === 'Paid')
-                                                        <span class="badge bg-success">{{ $status }}</span>
-                                                    @elseif($status === 'Overdue')
-                                                        <span class="badge bg-danger">{{ $status }}</span>
-                                                    @else
-                                                        <span class="badge bg-warning text-dark">{{ $status }}</span>
-                                                    @endif
-  
-                                                    @if($bill->renewal)
-                                                        {{-- <br>
-                                                        <small class="text-info fst-italic">
-                                                            Renewed: {{ \Carbon\Carbon::parse($bill->renewal->date)->format('j F Y') }}
-                                                            {{ $bill->renewal->note ? '- ' . $bill->renewal->note : '' }}
-                                                        </small> --}}
-                                                    @endif
+                                                  @php
+                                                      if ($bill->bill_paid) {
+                                                          $status = 'Paid';
+                                                          $badgeClass = 'bg-success';
+                                                      } else {
+                                                          $start = \Carbon\Carbon::parse($bill->start_date);
+
+                                                          if ($start < now()) {
+                                                              $status = 'Overdue';
+                                                              $badgeClass = 'bg-danger';
+                                                          } elseif ($bill->cycle_type == 2 && now()->diffInMonths($start) <= 3) {
+                                                              $status = 'Due';
+                                                              $badgeClass = 'bg-warning text-dark';
+                                                          } elseif ($bill->cycle_type == 1 && now()->diffInDays($start) <= 10) {
+                                                              $status = 'Due';
+                                                              $badgeClass = 'bg-warning text-dark';
+                                                          } else {
+                                                              $status = '';
+                                                              $badgeClass = '';
+                                                          }
+                                                      }
+                                                  @endphp
+
+                                                  @if($status)
+                                                      <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                                                  @endif
                                                 </td>
                                                 <td>
                                                   <a href="{{ route('invoice.download', $bill->id) }}" class="btn btn-sm btn-secondary" target="_blank">

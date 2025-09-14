@@ -46,7 +46,6 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TransactionsController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
-// Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin', 'role:admin']], function () {
 
     Route::get('/toggle-sidebar', [HomeController::class, 'toggleSidebar'])->name('toggle.sidebar');
 

@@ -40,7 +40,7 @@
                                 <th class="text-light">Due Date</th>
                                 <th class="text-light">Status</th>
                                 <th class="text-light">Budget(£)</th>
-                                <th class="text-light">Due(£)</th>
+                                <th class="text-light text-center">Due(£)</th>
                                 <th class="text-light">Action</th>
                             </tr>
                         </thead>
@@ -62,7 +62,17 @@
                                         </span>
                                     </td>
                                     <td class="text-light">£{{ number_format($project->amount, 0) }}</td>
-                                    <td class="text-light">£0</td>
+                                    @php
+                                        $balance = $project->amount - $project->totalReceived;
+                                    @endphp
+
+                                    <td class="text-light text-center">
+                                        £{{ number_format($balance, 0) }}
+                                        @if($balance < 0)
+                                          <br>
+                                          <span class="badge bg-success">Overpaid £{{ number_format(abs($balance), 0) }}</span>
+                                        @endif
+                                    </td>
                                     <td class="text-light">
                                       <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#projectModal-{{ $project->id }}">
                                           View

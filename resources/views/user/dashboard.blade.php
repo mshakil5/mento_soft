@@ -36,17 +36,27 @@
                           </p>
                       @endif
                   </div>
-                  @if ($outstandingAmount > 0)
                   <div class="row mt-3">
+                      @if ($projectDueAmountToPay > 0 || $outstandingAmount > 0)
                       <h2 class="card-title">Due Amount</h2>
+                      @if ($outstandingAmount > 0)
                       <p class="card-text">
-                          Due amount to pay:         
+                          Service due amount to pay:         
                           <a href="{{ route('user.services', ['bill_paid' => 0]) }}" class="text-light">
                               £{{ number_format($outstandingAmount, 0) }}
                           </a>
                       </p>
+                      @endif
+                      @if ($projectDueAmountToPay > 0)
+                      <p class="card-text">
+                          Project due amount to pay:         
+                          <a href="{{ route('user.transactions', ['status' => 'Due']) }}" class="text-light">
+                              £{{ number_format($projectDueAmountToPay, 0) }}
+                          </a>
+                      </p>
+                      @endif
+                      @endif
                   </div>
-                  @endif
                 </div>
             </div>
         </div>

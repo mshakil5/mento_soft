@@ -14,6 +14,10 @@
             margin: 0;
             padding: 20px;
         }
+        p {
+            margin: 0;
+            padding: 0;
+        }
         .invoice-body {
             max-width: 794px;
             margin: 0 auto;
@@ -32,7 +36,6 @@
 <body>
     <section class="invoice">
         <div class="invoice-body">
-            {{-- Header --}}
             <br>
             <br>
             <table>
@@ -48,9 +51,8 @@
 
             <br><br>
 
-            {{-- Bill To + Invoice Date --}}
             @php
-                $client = $services->first()->client; // all services belong to same client
+                $client = $services->first()->client;
             @endphp
             <table>
                 <tr>
@@ -70,17 +72,13 @@
 
             <br>
 
-            {{-- Service Table --}}
             <table class="table">
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">Service</th>
                         <th class="text-center">Period</th>
-                        {{-- <th class="text-center">Qty</th>
-                        <th class="text-center">Price</th>
-                        <th class="text-center">VAT %</th> --}}
-                        <th class="text-right">Amount</th>
+                        <th class="text-center">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,18 +92,16 @@
                         @endphp
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
-                            <td class="text-center">{{ $service->project?->title }}{{ $service->serviceType->name }}</td>
+                            <td class="text-center">
+                                <strong>{{ $service->project?->title }}</strong> {{ $service->serviceType->name }}
+                            </td>
                             <td class="text-center">{{ $dateRange }}</td>
-                            {{-- <td class="text-center">1</td>
                             <td class="text-center">£{{ number_format($service->amount, 2) }}</td>
-                            <td class="text-center">0%</td> --}}
-                            <td class="text-right">£{{ number_format($service->amount, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
 
-            {{-- Totals --}}
             <table style="margin-top:20px;">
                 <tr>
                     <td style="width:70%"></td>
@@ -128,7 +124,6 @@
                 </tr>
             </table>
 
-            {{-- Notes --}}
             @if ($services->first()->note)
                 <div style="margin-top:30px;">
                     <p style="font-weight:bold;">Notes:</p>
@@ -136,7 +131,6 @@
                 </div>
             @endif
 
-            {{-- Footer --}}
             <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
                         max-width: 794px; width: 100%; padding: 10px 20px;
                         border-top: 1px solid #ddd; background: white;">

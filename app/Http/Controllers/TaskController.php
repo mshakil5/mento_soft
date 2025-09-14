@@ -243,6 +243,19 @@ class TaskController extends Controller
 
     public function show(ProjectTask $task)
     {
+        $userId = auth()->id();
+
+        $messages = $task->messages()
+            ->with('sender:id,name')
+            ->orderBy('created_at','asc')
+            ->get();
+
+        foreach ($messages as $message) {
+            if (!$message->views()->where('user_id', $userId)->exists()) {
+                $message->views()->create(['user_id' => $userId]);
+            }
+        }
+
         $task->load([
             'messages.sender:id,name',
             'activities'

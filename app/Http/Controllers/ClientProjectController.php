@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Invoice;
+use App\Models\InvoiceDetail;
 
 class ClientProjectController extends Controller
 {
@@ -72,10 +73,9 @@ class ClientProjectController extends Controller
                             $q->where('client_project_id', $row->id);
                         })->sum('amount');
 
-                    $invoiceSum = Invoice::where('status', 1)
-                        ->whereHas('details', function($q) use ($row) {
-                            $q->where('client_project_id', $row->id);
-                        })->sum('subtotal');
+                    $invoiceSum = InvoiceDetail::whereHas('invoice', fn($q) => $q->where('status', 2))
+                        ->where('client_project_id', $row->id)
+                        ->sum('total_inc_vat');
 
                     $totalReceived = $serviceTxnsSum + $invoiceSum;
 

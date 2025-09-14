@@ -79,25 +79,25 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
+        $perPage = 10;
+
         $projects = ClientProject::with([
-            'tasks' => function($q) {
-                $q->where('allow_client', 1)
-                  ->latest()
-                  ->with('employee');
-            },
-            'recentUpdates' => function($q) {
-                $q->latest();
-            },
-            'services' => function($q) use ($user) {
-                $q->where('bill_paid', 1)
-                  ->where('client_id', $user->client->id);
-            }
+            'tasks' => fn($q) => $q->where('allow_client', 1)->latest()->with('employee'),
+            'recentUpdates' => fn($q) => $q->latest(),
+            'services' => fn($q) => $q->where('bill_paid', 1)->where('client_id', $user->client->id),
+            'invoiceDetails.invoice' => fn($q) => $q->where('status', 2)
         ])
         ->where('client_id', $user->client->id)
         ->latest()
-        ->paginate(10);
-        // ->get();
-        // dd($projects);
+        ->paginate($perPage);
+
+        $projects->getCollection()->transform(function ($project) {
+            $project->totalReceived = $project->invoiceDetails
+                ->filter(fn($detail) => $detail->invoice && $detail->invoice->status == 2)
+                ->sum('total_inc_vat');
+
+            return $project;
+        });
 
         return view('user.projects', compact('projects'));
     }
@@ -216,11 +216,22 @@ class UserController extends Controller
             $paymentDate = $row->transaction_type === 'Received' ? Carbon::parse($row->date)->format('d-m-Y') : '-';
             $method = $row->transaction_type === 'Received' ? $row->payment_type : '-';
 
-            $status = 'Due';
             if ($row->transaction_type === 'Received') {
                 $status = 'Received';
-            } elseif ($row->transaction_type === 'Due' && Carbon::parse($row->date)->startOfDay() < Carbon::today()) {
-                $status = 'Overdue';
+            } elseif ($isInvoice) {
+                $status = Carbon::parse($row->date)->startOfDay() < Carbon::today() ? 'Overdue' : 'Due';
+            } else {
+                $serviceStart = Carbon::parse($row->projectServiceDetail->start_date);
+                if ($row->projectServiceDetail->cycle_type == 2) {
+                    $status = ($serviceStart < now() || now()->diffInMonths($serviceStart) <= 3) ? 'Due' : '-';
+                } elseif ($row->projectServiceDetail->cycle_type == 1) {
+                    $status = ($serviceStart < now() || now()->diffInDays($serviceStart) <= 10) ? 'Due' : '-';
+                } else {
+                    $status = '-';
+                }
+                if ($serviceStart < now()) {
+                    $status = 'Overdue';
+                }
             }
 
             return [

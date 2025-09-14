@@ -240,8 +240,8 @@ class ProjectServiceController extends Controller
                         $start = Carbon::parse($row->start_date)->format('j F Y');
                         $end = Carbon::parse($row->end_date)->format('j F Y');
 
-                        $btnClass = ($row->cycle_type == 2 && now()->diffInMonths($row->end_date) <= 3) ? 'btn-danger' : 'btn-info';
- 
+                        $btnClass = ($row->cycle_type == 2 && ($row->start_date < now() || now()->diffInMonths($row->start_date) <= 3)) ? 'btn-danger' : 'btn-info';
+
                         $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#renewModal'.$row->id.'">
                                     <i class="fas fa-sync"></i> Renew
                                 </button>';
@@ -259,7 +259,7 @@ class ProjectServiceController extends Controller
                                 </div>
                                 <div class="modal-body">
                                   <div class="mb-3">
-                                    <label>Renewal Date '.$row->id.'</label>
+                                    <label>Renewal Date</label>
                                     <input type="date" class="form-control" name="renewal_date" value="'.now()->format('Y-m-d').'" required>
                                   </div>
                                   <div class="mb-3">
@@ -484,7 +484,9 @@ class ProjectServiceController extends Controller
 
                   if ($bills->count() > 0) {
                       $buttonText = 'Receive';
-                      $btn .= '<button class="btn btn-sm '.((now()->between(Carbon::parse($row->start_date)->subDays(10), Carbon::parse($row->start_date))) ? 'btn-danger' : 'btn-success').'" data-toggle="modal" data-target="#receiveModal'.$row->id.'">'.$buttonText.'</button>';
+                      $btnClass = ($row->start_date < now() || now()->diffInDays($row->start_date) <= 10) ? 'btn-danger' : 'btn-success';
+
+                      $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#receiveModal'.$row->id.'"> '.$buttonText.' </button>';
                       $btn .= ' <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
 
                       // Modal
