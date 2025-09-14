@@ -77,9 +77,6 @@
                                 @if ($invoice->client->business_name) 
                                 <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $invoice->client->business_name }}</p>
                                 @endif
-                                @if ($invoice->client->name) 
-                                <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $invoice->client->name }}</p>
-                                @endif
                                 @if ($invoice->client->email) 
                                 <p style="font-size: 12px; margin: 5px;text-align: left; line-height: 10px;">{{ $invoice->client->email }}</p>
                                 @endif
@@ -110,24 +107,18 @@
                     <thead>
                         <tr>
                             <th style="border: 1px solid #dee2e6; text-align:center;">#</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Project</th>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Description</th>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Qty</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Price</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">VAT %</th>
-                            <th style="border: 1px solid #dee2e6; text-align:right;">Total (Excl VAT)</th>
+                            <th style="border: 1px solid #dee2e6; text-align:center;">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                       @foreach($invoice->details as $index => $item)
-                        <tr>
+                       <tr>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $index + 1 }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->project_name }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->description }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->qty }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ number_format($item->unit_price, 2) }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ number_format($item->vat_percent, 0) }}%</td>
-                          <td style="border: 1px solid #dee2e6; text-align:right;">{{ number_format($item->total_exc_vat, 2) }}</td>
                         </tr>
                       @endforeach
                     </tbody>
@@ -171,8 +162,7 @@
                 </table>
             </div>
             @if ($invoice->description)
-            <div style="margin-top: 30px;">
-                <p style="font-weight: bold; margin-bottom: 5px;">Notes:</p>
+            <div >
                 <p style="margin: 0;">{{ $invoice->description }}</p>
             </div>
             @endif

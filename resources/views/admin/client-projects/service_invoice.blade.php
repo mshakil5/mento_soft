@@ -125,8 +125,7 @@
             </table>
 
             @if ($services->first()->note)
-                <div style="margin-top:30px;">
-                    <p style="font-weight:bold;">Notes:</p>
+                <div>
                     <p>{{ $services->first()->note }}</p>
                 </div>
             @endif

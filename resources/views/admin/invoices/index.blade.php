@@ -111,17 +111,13 @@
                                             <table class="table table-bordered" id="invoiceItemsTable">
                                                 <thead>
                                                     <tr>
-                                                        <th>Project</th>
                                                         <th>Description</th>
                                                         <th width="10%">Qty</th>
                                                         <th width="15%">Price</th>
-                                                        <th width="10%">VAT %</th>
-                                                        <th width="15%">Total (Excl VAT)</th>
                                                         <th width="5%">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <!-- Items will be added here dynamically -->
                                                 </tbody>
                                             </table>
                                         </div>
@@ -133,7 +129,18 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Message on Invoice</label>
-                                        <textarea class="form-control" id="description" name="description" rows="5"></textarea>
+                                        <textarea class="form-control summernote" id="description" name="description" rows="5">
+                                          Account Details<br>
+                                          MR MD F A Bhuyain<br>
+                                          Sort code: 11-08-34<br>
+                                          A/C No: 00630751<br>
+                                          Halifax<br>
+                                          If you have any questions concerning this invoice please contact to,<br>
+                                          Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br>
+                                          <B>
+                                            THANK YOU FOR YOUR BUSINESS!
+                                          </B>
+                                        </textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -143,6 +150,12 @@
                                                 <label class="col-sm-6 col-form-label">Subtotal:</label>
                                                 <div class="col-sm-6">
                                                     <input type="text" class="form-control" id="subtotal" name="subtotal" readonly value="0.00">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-6 col-form-label">VAT %:</label>
+                                                <div class="col-sm-6">
+                                                    <input type="number" class="form-control" id="vat_percent" name="vat_percent" min="0" max="100" value="0">
                                                 </div>
                                             </div>
                                             <div class="form-group row">
@@ -246,7 +259,7 @@
           if (localStorage.getItem('autoclickNewBtn') === '1') {
               localStorage.removeItem('autoclickNewBtn');
               $.when(openNewForm()).done(function() {
-                  console.log('Form opened and clients loaded.');
+                  // console.log('Form opened and clients loaded.');
               });
           }
 
@@ -340,54 +353,10 @@
                 $.get(url + '/project-info/' + projectId, function(data) {
                     // This data can be used when adding to the table
                     $('#projectInfo').data('info', data);
-                    console.log(data);
+                    // console.log(data);
                 });
             }
         });
-        
-        // Add project to invoice items table
-        // $('#addProjectBtn').click(function() {
-        //     var projectId = $('#project_id').val();
-        //     var projectName = $('#project_id option:selected').text();
-            
-        //     if (!projectId) {
-        //         alert('Please select a project first');
-        //         return;
-        //     }
-            
-        //     // Check if project already exists in table
-        //     // var exists = false;
-        //     // $('#invoiceItemsTable tbody tr').each(function() {
-        //     //     if ($(this).data('project-id') == projectId) {
-        //     //         exists = true;
-        //     //         return false;
-        //     //     }
-        //     // });
-            
-        //     // if (exists) {
-        //     //     alert('This project is already added to the invoice');
-        //     //     return;
-        //     // }
-            
-        //     // Get project info (description from project if available)
-        //     var description = '';
-        //     if ($('#projectInfo').data('info')) {
-        //         description = $('#projectInfo').data('info').description || '';
-        //     }
-            
-        //     // Add row to table
-        //     addRowToInvoiceTable({
-        //         client_project_id: projectId,
-        //         project_name: projectName,
-        //         description: description,
-        //         qty: 1,
-        //         unit_price: 0,
-        //         vat_percent: 0
-        //     });
-            
-        //     // Reset project select
-        //     $('#project_id').val('').trigger('change');
-        // });
 
         $('#addProjectBtn').click(function() {
             var projectId = $('#project_id').val();
@@ -398,22 +367,37 @@
                 return;
             }
 
-            // Get project info (already stored in #projectInfo by the change event)
+            var hasOtherProject = $('#invoiceItemsTable tbody tr').filter(function() {
+                var pid = $(this).data('project-id');
+                return pid && pid != projectId;
+            }).length > 0;
+
+            if (hasOtherProject) {
+                alert('You can only add items from the same project in one invoice.');
+                return;
+            }
+
+            var hasCustom = $('#invoiceItemsTable tbody tr').filter(function() {
+                var pid = $(this).data('project-id');
+                return pid === null || pid === '';
+            }).length > 0;
+
+            if (hasCustom && !hasOtherProject) {
+                alert('Cannot add a real project when custom items already exist.');
+                return;
+            }
+
             var projectInfo = $('#projectInfo').data('info');
-
-            console.log(projectInfo);
-
             if (!projectInfo) {
                 alert('Project info not loaded yet. Please try again.');
                 return;
             }
 
-            // Loop through all dueServiceDetails and add them as rows
             if (projectInfo.dueServiceDetails && projectInfo.dueServiceDetails.length > 0) {
                 projectInfo.dueServiceDetails.forEach(function(service) {
                     addRowToInvoiceTable({
-                        id: service.id, // service id
-                        sdtl_id: service.id, // service id
+                        id: service.id,
+                        sdtl_id: service.id,
                         client_project_id: projectId,
                         project_name: projectName,
                         description: (service.start_date ? service.start_date.split(' ')[0] : projectInfo.description || service.note || ''),
@@ -423,24 +407,33 @@
                     });
                 });
             } else {
-                // If no due service details, just add project row with description
                 addRowToInvoiceTable({
                     client_project_id: projectId,
                     project_name: projectName,
-                    description: projectInfo.description || '',
+                    description: '',
                     qty: 1,
                     unit_price: 0,
                     vat_percent: 0
                 });
             }
 
-            // Reset project select
             $('#project_id').val('').trigger('change');
         });
 
-
-        // Add custom item to invoice items table
+        // Add custom item
         $('#addCustomItemBtn').click(function() {
+            // Check if any real project exists
+            var hasRealProject = $('#invoiceItemsTable tbody tr').filter(function() {
+                var pid = $(this).data('project-id');
+                return pid && pid != '';
+            }).length > 0;
+
+            if (hasRealProject) {
+                alert('Cannot add a custom item when a real project is already added.');
+                return;
+            }
+
+            // Add custom item
             addRowToInvoiceTable({
                 client_project_id: null,
                 project_name: '',
@@ -463,22 +456,15 @@
                     <input type="hidden" name="projects[${rowId}][id]" value="${data.id || ''}">
                     <input type="hidden" name="projects[${rowId}][sdtl_id]" value="${data.sdtl_id || ''}">
                     <td>
-                        <input type="text" class="form-control" name="projects[${rowId}][project_name]" value="${data.project_name || 'Custom Item'}" required>
-                    </td>
-                    <td>
-                        <textarea class="form-control" name="projects[${rowId}][description]">${data.description || ''}</textarea>
+                        <textarea class="form-control" name="projects[${rowId}][description]" required>
+                            ${(data.project_name ? data.project_name + ' - ' : '') + (data.description || '')}
+                        </textarea>
                     </td>
                     <td>
                         <input type="number" class="form-control qty" name="projects[${rowId}][qty]" min="1" value="${data.qty}" required>
                     </td>
                     <td>
                         <input type="number" class="form-control unit_price" name="projects[${rowId}][unit_price]" min="0" step="0.01" value="${data.unit_price}" required>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control vat_percent" name="projects[${rowId}][vat_percent]" min="0" max="100" value="${data.vat_percent}">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control total_exc_vat" value="${totalExcVat.toFixed(2)}" readonly>
                     </td>
                     <td>
                         <button type="button" class="btn btn-sm btn-danger removeRow"><i class="fas fa-trash"></i></button>
@@ -531,31 +517,29 @@
         });
         
         // Discount percent change
-        $('#discount_percent').change(function() {
+        $('#discount_percent, #vat_percent').on('input', function() {
             calculateTotals();
         });
         
         // Calculate all totals
         function calculateTotals() {
             var subtotal = 0;
-            var totalVat = 0;
-            
+
             $('#invoiceItemsTable tbody tr').each(function() {
                 var qty = parseFloat($(this).find('.qty').val()) || 0;
                 var unitPrice = parseFloat($(this).find('.unit_price').val()) || 0;
-                var vatPercent = parseFloat($(this).find('.vat_percent').val()) || 0;
-                
-                var rowTotalExcVat = qty * unitPrice;
-                var rowVat = rowTotalExcVat * (vatPercent / 100);
-                
-                subtotal += rowTotalExcVat;
-                totalVat += rowVat;
+
+                subtotal += qty * unitPrice;
             });
-            
+
+            var vatPercent = parseFloat($('#vat_percent').val()) || 0;
+            var totalVat = subtotal * (vatPercent / 100);
+
             var discountPercent = parseFloat($('#discount_percent').val()) || 0;
             var discountAmount = subtotal * (discountPercent / 100);
+
             var netAmount = (subtotal + totalVat) - discountAmount;
-            
+
             $('#subtotal').val(subtotal.toFixed(2));
             $('#vat_amount').val(totalVat.toFixed(2));
             $('#discount_amount').val(discountAmount.toFixed(2));
@@ -583,7 +567,7 @@
                         description: $(this).find('textarea[name*="[description]"]').val(),
                         qty: $(this).find('input[name*="[qty]"]').val(),
                         unit_price: $(this).find('input[name*="[unit_price]"]').val(),
-                        vat_percent: $(this).find('input[name*="[vat_percent]"]').val()
+                        // vat_percent: $(this).find('input[name*="[vat_percent]"]').val()
                     };
                     
                     if ($(this).find('input[name*="[id]"]').length) {

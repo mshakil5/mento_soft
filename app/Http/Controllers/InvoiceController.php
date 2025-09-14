@@ -50,7 +50,11 @@ class InvoiceController extends Controller
                 ->addIndexColumn()
                 ->addColumn('date', fn($row) => date('d-m-Y', strtotime($row->invoice_date)))
                 ->addColumn('client_name', fn($row) => $row->client->business_name ?? '')
-                ->addColumn('project', fn($row) => $row->details->pluck('project_name')->implode('<br>'))
+                ->addColumn('project', function($row) {
+                      return $row->details->map(function($detail) {
+                          return $detail->clientProject->title ?? 'Custom';
+                      })->implode('<br>');
+                  })
                 ->addColumn('status', function($row) {
                     $invoiceDate = Carbon::parse($row->invoice_date)->startOfDay();
                     $today = Carbon::today();
@@ -172,7 +176,7 @@ class InvoiceController extends Controller
             'description' => 'nullable|string',
             'projects' => 'required|array',
             'projects.*.client_project_id' => 'nullable|exists:client_projects,id',
-            'projects.*.project_name' => 'required|string',
+            // 'projects.*.project_name' => 'required|string',
             'projects.*.description' => 'nullable|string',
             'projects.*.qty' => 'required|numeric|min:1',
             'projects.*.unit_price' => 'required|numeric|min:0',
@@ -199,36 +203,28 @@ class InvoiceController extends Controller
             $invoice->save();
 
             $subtotal = 0;
-            $totalVat = 0;
 
             foreach ($request->projects as $project) {
                 $qty = $project['qty'];
                 $unitPrice = $project['unit_price'];
-                $vatPercent = $project['vat_percent'] ?? 0;
-                
                 $totalExcVat = $qty * $unitPrice;
-                $vatAmount = $totalExcVat * ($vatPercent / 100);
-                $totalIncVat = $totalExcVat + $vatAmount;
 
                 $detail = new InvoiceDetail();
                 $detail->invoice_id = $invoice->id;
                 $detail->client_project_id = !empty($project['client_project_id']) ? $project['client_project_id'] : null;
                 $detail->project_service_detail_id = !empty($project['sdtl_id']) ? $project['sdtl_id'] : null;
-                $detail->project_name = $project['project_name'];
+                $detail->project_name = $project['project_name'] ?? null;
                 $detail->description = $project['description'] ?? null;
                 $detail->qty = $qty;
                 $detail->unit_price = $unitPrice;
-                $detail->vat_percent = $vatPercent;
-                $detail->vat_amount = $vatAmount;
                 $detail->total_exc_vat = $totalExcVat;
-                $detail->total_inc_vat = $totalIncVat;
+                $detail->total_inc_vat = $totalExcVat;
                 $detail->save();
 
                 $subtotal += $totalExcVat;
-                $totalVat += $vatAmount;
-
             }
 
+            $totalVat = $subtotal * ($invoice->vat_percent / 100);
             $discountAmount = $subtotal * ($invoice->discount_percent / 100);
             $netWithoutVat = $subtotal - $discountAmount;
             $netAmount = ($subtotal + $totalVat) - $discountAmount;
@@ -243,6 +239,7 @@ class InvoiceController extends Controller
             $transaction->date = $invoice->invoice_date;
             $transaction->invoice_id = $invoice->id;
             $transaction->client_id = $invoice->client_id;
+            $transaction->client_project_id = !empty($request->projects[0]['client_project_id']) ? $request->projects[0]['client_project_id'] : null;
             $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Due';
             $transaction->payment_type = 'Bank';
@@ -346,7 +343,7 @@ class InvoiceController extends Controller
             'projects' => 'required|array',
             'projects.*.id' => 'nullable|exists:invoice_details,id',
             'projects.*.client_project_id' => 'nullable|exists:client_projects,id',
-            'projects.*.project_name' => 'required|string',
+            // 'projects.*.project_name' => 'required|string',
             'projects.*.description' => 'nullable|string',
             'projects.*.qty' => 'required|numeric|min:1',
             'projects.*.unit_price' => 'required|numeric|min:0',
@@ -376,16 +373,11 @@ class InvoiceController extends Controller
                 ->delete();
 
             $subtotal = 0;
-            $totalVat = 0;
 
             foreach ($request->projects as $project) {
                 $qty = $project['qty'];
                 $unitPrice = $project['unit_price'];
-                $vatPercent = $project['vat_percent'] ?? 0;
-                
                 $totalExcVat = $qty * $unitPrice;
-                $vatAmount = $totalExcVat * ($vatPercent / 100);
-                $totalIncVat = $totalExcVat + $vatAmount;
 
                 if (isset($project['id'])) {
                     $detail = InvoiceDetail::findOrFail($project['id']);
@@ -395,20 +387,18 @@ class InvoiceController extends Controller
                 }
 
                 $detail->client_project_id = !empty($project['client_project_id']) ? $project['client_project_id'] : null;
-                $detail->project_name = $project['project_name'];
+                $detail->project_name = $project['project_name'] ?? null;
                 $detail->description = $project['description'] ?? null;
                 $detail->qty = $qty;
                 $detail->unit_price = $unitPrice;
-                $detail->vat_percent = $vatPercent;
-                $detail->vat_amount = $vatAmount;
                 $detail->total_exc_vat = $totalExcVat;
-                $detail->total_inc_vat = $totalIncVat;
+                $detail->total_inc_vat = $totalExcVat;
                 $detail->save();
 
                 $subtotal += $totalExcVat;
-                $totalVat += $vatAmount;
             }
 
+            $totalVat = $subtotal * ($invoice->vat_percent / 100);
             $discountAmount = $subtotal * ($invoice->discount_percent / 100);
             $netWithoutVat = $subtotal - $discountAmount;
             $netAmount = ($subtotal + $totalVat) - $discountAmount;
@@ -423,6 +413,7 @@ class InvoiceController extends Controller
             if ($transaction) {
                 $transaction->date = $invoice->invoice_date;
                 $transaction->client_id = $invoice->client_id;
+                $transaction->client_project_id = !empty($request->projects[0]['client_project_id']) ? $request->projects[0]['client_project_id'] : null;
                 $transaction->description = $invoice->description;
                 $transaction->amount = $netWithoutVat;
                 $transaction->at_amount = $invoice->net_amount;
@@ -435,11 +426,6 @@ class InvoiceController extends Controller
 
             if ($request->send_email == 1) {
                 $this->sendInvoiceEmail($invoice);
-                DB::commit();
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Invoice updated and emailed successfully.'
-                ]);
             }
 
             DB::commit();
@@ -531,6 +517,7 @@ class InvoiceController extends Controller
         $transaction->date = date('Y-m-d');
         $transaction->invoice_id = $invoice->id;
         $transaction->client_id = $invoice->client_id;
+        $transaction->client_project_id = $prevTransaction->client_project_id ?? null;
         $transaction->table_type = 'Income';
         $transaction->transaction_type = 'Received';
         $transaction->payment_type = $request->payment_type;
