@@ -181,6 +181,30 @@ class UserController extends Controller
             ->where('client_id', $clientId)
             ->get();
 
+        $serviceReceivables = $serviceReceivables->filter(function($row) {
+            if (!$row->projectServiceDetail) return false;
+
+            $start = Carbon::parse($row->projectServiceDetail->start_date ?? now());
+
+            return match ($row->projectServiceDetail->cycle_type) {
+                2 => $start < now() || now()->diffInMonths($start) <= 3,
+                1 => $start < now() || now()->diffInDays($start) <= 10,
+                default => false,
+            };
+        });
+
+        $serviceReceived = $serviceReceived->filter(function($row) {
+            if (!$row->projectServiceDetail) return false;
+
+            $start = Carbon::parse($row->projectServiceDetail->start_date ?? now());
+
+            return match ($row->projectServiceDetail->cycle_type) {
+                2 => $start < now() || now()->diffInMonths($start) <= 3,
+                1 => $start < now() || now()->diffInDays($start) <= 10,
+                default => false,
+            };
+        });
+
         // Merge all
         $allTransactions = $invoiceReceivables
             ->merge($invoiceReceived)
@@ -241,7 +265,7 @@ class UserController extends Controller
                 'service'     => $service,
                 'duration'    => $duration,
                 'payment_date'=> $paymentDate,
-                'amount'      => '£' . number_format($row->amount, 0),
+                'amount'      => '£' . number_format($row->at_amount, 0),
                 'method'      => $method,
                 'status'      => $status,
                 'txn'         => $row->tran_id ?? '-',

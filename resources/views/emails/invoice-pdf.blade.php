@@ -118,7 +118,7 @@
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $index + 1 }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->description }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->qty }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ number_format($item->unit_price, 2) }}</td>
+                          <td style="border: 1px solid #dee2e6; text-align:center;">£{{ number_format($item->unit_price, 2) }}</td>
                         </tr>
                       @endforeach
                     </tbody>

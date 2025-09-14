@@ -104,7 +104,20 @@
 
             <table style="margin-top:20px;">
                 <tr>
-                    <td style="width:70%"></td>
+                    <td style="width:70%;">
+                      <div style="margin-top:20px;">
+                        Account Details<br>
+                        MR MD F A Bhuyain<br>
+                        Sort code: 11-08-34<br>
+                        A/C No: 00630751<br>
+                        Halifax<br>
+                        If you have any questions concerning this invoice please contact to,<br>
+                        Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br>
+                        <B>
+                          THANK YOU FOR YOUR BUSINESS!
+                        </B>
+                      </div>
+                    </td>
                     <td style="width:30%">
                         <table style="width:100%;">
                             <tr>
@@ -123,12 +136,6 @@
                     </td>
                 </tr>
             </table>
-
-            @if ($services->first()->note)
-                <div>
-                    <p>{{ $services->first()->note }}</p>
-                </div>
-            @endif
 
             <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
                         max-width: 794px; width: 100%; padding: 10px 20px;

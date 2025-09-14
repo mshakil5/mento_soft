@@ -74,17 +74,7 @@ class TransactionsController extends Controller
 
             if ($request->project_id) {
                 $allTransactions = $allTransactions->filter(function ($transaction) use ($request) {
-                    if (!empty($transaction->invoice)) {
-                        return $transaction->invoice->details->contains(function ($detail) use ($request) {
-                            return $detail->client_project_id == $request->project_id;
-                        });
-                    }
-
-                    if (!empty($transaction->projectServiceDetail)) {
-                        return $transaction->projectServiceDetail->client_project_id == $request->project_id;
-                    }
-
-                    return false;
+                    return $transaction->client_project_id == $request->project_id;
                 })->values();
             }
 
@@ -92,9 +82,7 @@ class TransactionsController extends Controller
                 $isInvoice = !empty($row->invoice);
                 $clientName = $isInvoice ? $row->invoice->client?->business_name ?? '-' : $row->projectServiceDetail?->client?->business_name ?? '-';
                 $invoiceNo = $isInvoice ? $row->invoice->invoice_number : '-';
-                $project = $isInvoice
-                    ? $row->invoice->details->pluck('project_name')->implode('<br>')
-                    : $row->projectServiceDetail?->project?->title ?? '-';
+                $project = $isInvoice ? $row->project?->title ?? 'Custom' : $row->projectServiceDetail?->project?->title ?? '-';
                 $service = $isInvoice ? '-' : $row->projectServiceDetail?->serviceType?->name ?? '-';
                 $duration = $isInvoice ? '-' 
                     : ($row->projectServiceDetail?->start_date && $row->projectServiceDetail?->end_date
@@ -126,7 +114,7 @@ class TransactionsController extends Controller
                     'service'     => $service,
                     'duration'    => $duration,
                     'payment_date'=> $paymentDate,
-                    'amount'      => '£' . number_format($row->amount, 0),
+                    'amount'      => '£' . number_format($row->at_amount, 0),
                     'method'      => $method,
                     'status'      => $statusBadge . $invoiceLink,
                     'txn'         => $row->tran_id ?? '-',

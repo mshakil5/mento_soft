@@ -64,4 +64,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(ProjectServiceDetail::class, 'project_service_detail_id');
     }
+
+    public function project()
+    {
+        return $this->belongsTo(ClientProject::class, 'client_project_id');
+    }
 }
