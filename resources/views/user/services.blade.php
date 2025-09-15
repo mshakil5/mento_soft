@@ -66,13 +66,24 @@
                                                 ->where('amount', $service->amount)
                                                 ->where('cycle_type', $service->cycle_type)
                                                 ->where('is_auto', $service->is_auto)
-                                                ->get();
+                                                ->get()
+                                                ->filter(function($row) {
+                                                    $start = \Carbon\Carbon::parse($row->start_date ?? now());
+                                                    return match($row->cycle_type) {
+                                                        1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
+                                                        2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
+                                                        default => false,
+                                                    };
+                                                });
 
                                             $totalAmount = $unpaidBills->sum('amount');
                                             $count = $unpaidBills->count();
                                             $cycleText = $service->cycle_type == 1 ? 'month' : 'year';
                                         @endphp
-                                        £{{ number_format($service->amount,0) }} x {{ $count }} {{ $cycleText }} = £{{ number_format($totalAmount,0) }}
+
+                                        @if($count > 0)
+                                            £{{ number_format($service->amount,0) }} x {{ $count }} {{ $cycleText }} = £{{ number_format($totalAmount,0) }}
+                                        @endif
                                     @else
                                         £{{ number_format($service->amount,0) }}
                                     @endif
@@ -112,7 +123,15 @@
                                         ->where('cycle_type', $service->cycle_type)
                                         ->where('is_auto', $service->is_auto)
                                         ->latest()
-                                        ->get();
+                                        ->get()
+                                        ->filter(function($row) {
+                                        $start = \Carbon\Carbon::parse($row->start_date ?? now());
+                                        return match($row->cycle_type) {
+                                            1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
+                                            2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
+                                            default => false,
+                                        };
+                                    });
                                 @endphp
                                 <table class="table table-bordered table-hover" style="font-size: 12px;">
                                     <thead>

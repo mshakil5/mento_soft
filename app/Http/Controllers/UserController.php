@@ -365,13 +365,25 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $clientId = $user->client->id;
-
+        $today = now();
         $projects = ClientProject::where('client_id', $clientId)->get();
 
         // Type 1: latest
         $latestType1Ids = ProjectServiceDetail::where('type', 1)
             ->where('client_id', $clientId)
             ->when($request->bill_paid !== null, fn($q) => $q->where('bill_paid', $request->bill_paid))
+                ->where(function($q) use ($today) {
+                    $q->where(function($q1) use ($today) {
+                        $q1->where('cycle_type', 1)
+                          ->where('end_date', '<=', $today)
+                          ->where('end_date', '>=', $today->copy()->subDays(10));
+                    })
+                    ->orWhere(function($q2) use ($today) {
+                        $q2->where('cycle_type', 2)
+                          ->where('end_date', '<=', $today)
+                          ->where('end_date', '>=', $today->copy()->subMonths(3));
+                    });
+                })
             ->selectRaw('MAX(id) as id')
             ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto')
             ->pluck('id')->toArray();
@@ -381,6 +393,18 @@ class UserController extends Controller
             ->where('client_id', $clientId)
             ->when($request->bill_paid !== null, fn($q) => $q->where('bill_paid', $request->bill_paid))
             // ->where('bill_paid', 0)
+                ->where(function($q) use ($today) {
+                    $q->where(function($q1) use ($today) {
+                        $q1->where('cycle_type', 1)
+                          ->where('end_date', '<=', $today)
+                          ->where('end_date', '>=', $today->copy()->subDays(10));
+                    })
+                    ->orWhere(function($q2) use ($today) {
+                        $q2->where('cycle_type', 2)
+                          ->where('end_date', '<=', $today)
+                          ->where('end_date', '>=', $today->copy()->subMonths(3));
+                    });
+                })
             ->selectRaw('MAX(id) as id')
             ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto')
             ->pluck('id')->toArray();
