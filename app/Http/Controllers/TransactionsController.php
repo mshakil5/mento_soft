@@ -60,6 +60,12 @@ class TransactionsController extends Controller
                 })->values();
             }
 
+            if ($request->client_filter_id) {
+                $allTransactions = $allTransactions->filter(function ($transaction) use ($request) {
+                    return $transaction->client_id == $request->client_filter_id;
+                })->values();
+            }
+
             if ($request->status == 'Due') {
                 $allTransactions = $allTransactions->filter(function ($transaction) {
                     return $transaction->transaction_type === 'Due';
@@ -75,6 +81,18 @@ class TransactionsController extends Controller
             if ($request->project_id) {
                 $allTransactions = $allTransactions->filter(function ($transaction) use ($request) {
                     return $transaction->client_project_id == $request->project_id;
+                })->values();
+            }
+
+            if ($request->project_filter_id) {
+                $allTransactions = $allTransactions->filter(function ($transaction) use ($request) {
+                    return $transaction->client_project_id == $request->project_filter_id;
+                })->values();
+            }
+
+            if ($request->service_filter_id) {
+                $allTransactions = $allTransactions->filter(function ($transaction) use ($request) {
+                    return $transaction->project_service_detail_id == $request->service_filter_id;
                 })->values();
             }
 
@@ -123,11 +141,15 @@ class TransactionsController extends Controller
             });
 
             return DataTables::of($data)
+                ->addIndexColumn()
                 ->rawColumns(['status', 'project'])
                 ->make(true);
         }
 
-        return view('admin.transactions.index');
+        $clients = Client::where('status', 1)->get();
+        $projects = ClientProject::whereNot('status', 3)->get();
+        $services = ProjectService::where('status', 1)->get();
+        return view('admin.transactions.index', compact('clients', 'projects', 'services'));
     }
 
     public function transactionInvoice($id)
