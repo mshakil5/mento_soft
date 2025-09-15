@@ -112,7 +112,7 @@
     </button>
     @endcan
 
-    <div id="accountingWrapper" style="display: none;">
+    <div id="accountingWrapper">
     <li class="nav-item">
         <a href="{{ route('employees.index') }}" class="nav-link {{ Route::is('employees.index') ? 'active' : '' }}">
             <i class="fas fa-users nav-icon"></i>
