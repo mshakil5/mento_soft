@@ -45,47 +45,40 @@
                             <tr>
                                 <td class="text-light">{{ $service->serviceType?->name ?? '-' }}</td>
                                 <td class="text-light">{{ $service->project?->title ?? '-' }}</td>
+                                @php
+                                    $unpaidBills = \App\Models\ProjectServiceDetail::where('project_service_id', $service->project_service_id)
+                                        ->where('client_id', $service->client_id)
+                                        ->where('client_project_id', $service->client_project_id)
+                                        ->where('bill_paid', '!=', 1)
+                                        ->where('amount', $service->amount)
+                                        ->where('cycle_type', $service->cycle_type)
+                                        ->where('is_auto', $service->is_auto)
+                                        ->get()
+                                        ->filter(function($row) {
+                                            $start = \Carbon\Carbon::parse($row->start_date ?? now());
+                                            return match($row->cycle_type) {
+                                                1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
+                                                2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
+                                                default => false,
+                                            };
+                                        });
+
+                                    $totalAmount = $unpaidBills->sum('amount');
+                                    $count = $unpaidBills->count();
+                                    $cycleText = $service->cycle_type == 1 ? 'month' : 'year';
+                                @endphp
+
                                 <td class="text-light">
-                                    @if($service->start_date)
-                                        @php
-                                            $date = \Carbon\Carbon::parse($service->start_date);
-                                        @endphp
-                                        {{ $date->format('d-m-Y') }}
+                                    @if($unpaidBills->isNotEmpty())
+                                        {{ \Carbon\Carbon::parse($unpaidBills->max(fn($b) => $b->start_date))->format('d-m-Y') }}
                                     @else
                                         -
                                     @endif
                                 </td>
 
                                 <td class="text-center text-light">
-                                    @if($service->type == 1 || $service->type == 2)
-                                        @php
-                                            $unpaidBills = \App\Models\ProjectServiceDetail::where('project_service_id', $service->project_service_id)
-                                                ->where('client_id', $service->client_id)
-                                                ->where('client_project_id', $service->client_project_id)
-                                                ->where('bill_paid', '!=', 1)
-                                                ->where('amount', $service->amount)
-                                                ->where('cycle_type', $service->cycle_type)
-                                                ->where('is_auto', $service->is_auto)
-                                                ->get()
-                                                ->filter(function($row) {
-                                                    $start = \Carbon\Carbon::parse($row->start_date ?? now());
-                                                    return match($row->cycle_type) {
-                                                        1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
-                                                        2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
-                                                        default => false,
-                                                    };
-                                                });
-
-                                            $totalAmount = $unpaidBills->sum('amount');
-                                            $count = $unpaidBills->count();
-                                            $cycleText = $service->cycle_type == 1 ? 'month' : 'year';
-                                        @endphp
-
-                                        @if($count > 0)
-                                            £{{ number_format($service->amount,0) }} x {{ $count }} {{ $cycleText }} = £{{ number_format($totalAmount,0) }}
-                                        @endif
-                                    @else
-                                        £{{ number_format($service->amount,0) }}
+                                    @if($count > 0)
+                                        £{{ number_format($service->amount,0) }} x {{ $count }} {{ $cycleText }} = £{{ number_format($totalAmount,0) }}
                                     @endif
                                 </td>
                                 <td class="text-center text-light">
