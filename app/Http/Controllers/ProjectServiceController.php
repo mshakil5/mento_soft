@@ -161,36 +161,25 @@ class ProjectServiceController extends Controller
                     }
                     return $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '';
                 })
-                ->addColumn('end_date', function ($row) {
+                ->addColumn('due_date', function ($row) {
                     if (!$row->start_date) {
                         return '';
                     }
 
-                    $date = Carbon::parse($row->start_date);
+                    $hasUnpaid = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                        ->where('client_id', $row->client_id)
+                        ->where('client_project_id', $row->client_project_id)
+                        ->where('amount', $row->amount)
+                        ->where('cycle_type', $row->cycle_type)
+                        ->where('is_auto', $row->is_auto)
+                        ->where('bill_paid', 0)
+                        ->exists();
 
-                    // if ($row->cycle_type == 1) {
-                    //     $date->addMonthNoOverflow();
-                    // } elseif ($row->cycle_type == 2) {
-                    //     $date->addYear();
-                    // } else {
-                    //     $date->addDay();
-                    // }
-
-                    return $date->format('d-m-Y');
-                })
-                ->addColumn('due_date', function ($row) {
-                    if ($row->bill_paid == 1) return '';
-                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
-                })
-                ->addColumn('next_renewal', function($row) {
-                    if ($row->is_auto == 1 && $row->next_start_date && $row->next_end_date) {
-                        $cycle = $row->cycle_type == 1 ? 'Monthly' : ($row->cycle_type == 2 ? 'Yearly' : '');
-                        return Carbon::parse($row->next_start_date)->format('d-m-Y') 
-                            . ' - ' 
-                            . Carbon::parse($row->next_end_date)->format('d-m-Y')
-                            . ($cycle ? " ({$cycle})" : '');
+                    if ($hasUnpaid) {
+                        return Carbon::parse($row->start_date)->format('d-m-Y');
+                    } else {
+                        return '';
                     }
-                    return '';
                 })
                 ->addColumn('service_type', function($row) {
                     $typeText = $row->type == 1 ? 'In House' : 'Third Party';
@@ -635,37 +624,42 @@ class ProjectServiceController extends Controller
     {
         $details = ProjectServiceDetail::where('status', 1)
             ->where(function($q) {
-                $q->where(function($t1) { // In-house
+                // In-house
+                $q->where(function($t1) {
                     $t1->where('type', 1)
-                    ->where('status', 1)
-                    ->where('next_created', 0);
+                      ->where('next_created', 0);
                 })
-                ->orWhere(function($t2) { // Third-party
+                // Third-party
+                ->orWhere(function($t2) {
                     $t2->where('type', 2)
-                    ->where('status', 1)
-                    ->where('bill_paid', 1)
-                    ->where('is_renewed', 1)
-                    ->where('next_created', 0);
+                      ->where('bill_paid', 1)
+                      ->where('is_renewed', 1)
+                      ->where('next_created', 0);
                 });
             })
-            ->where(function($q) {
-                $q->where(function($m) {
-                    $m->where('type', 1)
-                      ->where('next_start_date', '<=', now()->format('Y-m-d'));
-                })
-                ->orWhere(function($y) {
-                    $y->where('type', 2)
-                      ->where('next_start_date', '<=', '2050-12-31');
-                });
-            })
-            ->get();
+            ->get()
+            ->filter(function($detail) {
+                $end = Carbon::parse($detail->start_date ?? now());
+                return match($detail->cycle_type) {
+                    1 => $end->subWeeks(2)->lte(now()),   // monthly → 2 weeks before end
+                    2 => $end->subMonths(3)->lte(now()),  // yearly → 3 months before end
+                    default => false,
+                };
+            });
 
         foreach ($details as $detail) {
             $newDetail = $detail->replicate();
             $newDetail->parent_id = $detail->parent_id;
 
-            $startDate = Carbon::parse($detail->next_start_date)->format('Y-m-d');
-            $endDate = Carbon::parse($detail->next_end_date)->format('Y-m-d');
+            $newStart = Carbon::parse($detail->end_date)->addDay();
+            $newEnd = $detail->cycle_type === 1
+                ? $newStart->copy()->addMonthNoOverflow()->subDay()
+                : ($detail->cycle_type === 2
+                    ? $newStart->copy()->addYear()->subDay()
+                    : $detail->end_date);
+
+            $startDate = $newStart->format('Y-m-d');
+            $endDate   = $newEnd->format('Y-m-d');
 
             $dueDate = null;
             if ($detail->cycle_type == 1) {
@@ -683,16 +677,6 @@ class ProjectServiceController extends Controller
             $newDetail->last_auto_run = now();
             $newDetail->created_at = now();
             $newDetail->updated_at = now();
-
-            $nextStart = Carbon::parse($endDate)->addDay();
-            if ($detail->cycle_type === 1) {
-                $nextEnd = $nextStart->copy()->addMonthNoOverflow()->subDay();
-            } else {
-                $nextEnd = $nextStart->copy()->addYear()->subDay();
-            }
-
-            $newDetail->next_start_date = $nextStart->format('Y-m-d');
-            $newDetail->next_end_date = $nextEnd->format('Y-m-d');
             $newDetail->save();
 
             $detail->next_created = 1;
@@ -866,127 +850,72 @@ class ProjectServiceController extends Controller
         ], 201);
     }
 
-public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'service_type_id'       => 'required|exists:project_services,id',
-        'client_id'             => 'required|exists:clients,id',
-        'client_project_id'     => 'required|exists:client_projects,id',
-        'start_date'            => 'required|date',
-        'service_renewal_date'  => 'nullable|date',
-        'amount'                => 'required|numeric|min:0',
-        'note'                  => 'nullable|string',
-        'cycle_type'            => 'required|in:1,2', // 1=Monthly, 2=Yearly
-        'is_auto'               => 'nullable|boolean',
-        'type'                  => 'required|string'
-    ]);
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_type_id'       => 'required|exists:project_services,id',
+            'client_id'             => 'required|exists:clients,id',
+            'client_project_id'     => 'required|exists:client_projects,id',
+            'start_date'            => 'required|date',
+            'service_renewal_date'  => 'nullable|date',
+            'amount'                => 'required|numeric|min:0',
+            'note'                  => 'nullable|string',
+            'cycle_type'            => 'required|in:1,2', // 1=Monthly, 2=Yearly
+            'is_auto'               => 'nullable|boolean',
+            'type'                  => 'required|string'
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => 422,
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    $data = $validator->validated();
-    $isAuto = $request->boolean('is_auto');
-    $cycleType = $data['cycle_type'];
-    $service = ProjectService::findOrFail($data['service_type_id']);
-    $today = Carbon::today();
-
-    $startDate = Carbon::parse($data['start_date'])->startOfDay();
-
-    $createdDetails = [];
-    $parentId = null;
-
-    DB::transaction(function () use ($data, $isAuto, $cycleType, $service, $today, $startDate, $request, &$createdDetails, &$parentId) {
-
-        $currentStart = $startDate;
-
-        // ✅ CASE 1: Start date is in the future → only ONE record
-        if ($currentStart->greaterThan($today)) {
-            $currentEnd = $cycleType == 1
-                ? $currentStart->copy()->endOfMonth()
-                : $currentStart->copy()->addYear()->subDay();
-
-            $dueDate = $cycleType == 1
-                ? $currentEnd->copy()->subWeeks(2)
-                : $currentEnd->copy()->subMonths(3);
-
-            $detail = ProjectServiceDetail::create([
-                'project_service_id' => $data['service_type_id'],
-                'client_id'          => $data['client_id'],
-                'client_project_id'  => $data['client_project_id'],
-                'service_renewal_date'  => $data['service_renewal_date'],
-                'start_date'         => $currentStart,
-                'end_date'           => $currentEnd,
-                'due_date'           => $dueDate,
-                'amount'             => $data['amount'],
-                'note'               => $data['note'] ?? null,
-                'status'             => true,
-                'type'               => $data['type'],
-                'is_auto'            => $isAuto,
-                'cycle_type'         => $cycleType,
-                'created_by'         => auth()->id(),
-            ]);
-
-            $parentId = $detail->id;
-            $detail->update(['parent_id' => $parentId]);
-
-            Transaction::create([
-                'date'                      => $currentStart,
-                'project_service_detail_id' => $detail->id,
-                'client_id'                 => $data['client_id'],
-                'table_type'                => 'Income',
-                'transaction_type'          => 'Due',
-                'payment_type'              => 'Bank',
-                'description'               => $detail->note
-                    ?? "Due for {$service->name} from {$currentStart->toDateString()} to {$currentEnd->toDateString()}",
-                'amount'       => $detail->amount,
-                'at_amount'    => $detail->amount,
-                'created_by'   => auth()->id(),
-                'created_ip'   => $request->ip(),
-                'tran_id'      => 'AT' . now()->format('ymd') . str_pad(1, 4, '0', STR_PAD_LEFT)
-            ]);
-
-            $createdDetails[] = $detail;
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // ✅ CASE 2: Start date is today or past → generate all cycles up to today
-        else {
-            while ($currentStart->lessThanOrEqualTo($today)) {
+        $data = $validator->validated();
+        $isAuto = $request->boolean('is_auto');
+        $cycleType = (int) $data['cycle_type'];
+        $service = ProjectService::findOrFail($data['service_type_id']);
+        $today = Carbon::today();
+        $startDate = Carbon::parse($data['start_date'])->startOfDay();
 
-                $currentEnd = $cycleType == 1
-                    ? $currentStart->copy()->endOfMonth()
-                    : $currentStart->copy()->addYear()->subDay();
+        $createdDetails = [];
+        $parentId = null;
 
-                $dueDate = $cycleType == 1
+        DB::transaction(function () use ($data, $isAuto, $cycleType, $service, $today, $startDate, $request, &$createdDetails, &$parentId) {
+
+            $currentStart = $startDate;
+
+            if ($currentStart->greaterThan($today)) {
+                $currentEnd = $cycleType === 1
+                    ? $currentStart->copy()->addMonthNoOverflow()->subDay()   
+                    : $currentStart->copy()->addYear()->subDay();            
+
+                $dueDate = $cycleType === 1
                     ? $currentEnd->copy()->subWeeks(2)
                     : $currentEnd->copy()->subMonths(3);
 
                 $detail = ProjectServiceDetail::create([
-                    'project_service_id' => $data['service_type_id'],
-                    'client_id'          => $data['client_id'],
-                    'client_project_id'  => $data['client_project_id'],
-                    'service_renewal_date'  => $data['service_renewal_date'],
-                    'start_date'         => $currentStart,
-                    'end_date'           => $currentEnd,
-                    'due_date'           => $dueDate,
-                    'amount'             => $data['amount'],
-                    'note'               => $data['note'] ?? null,
-                    'status'             => true,
-                    'type'               => $data['type'],
-                    'is_auto'            => $isAuto,
-                    'cycle_type'         => $cycleType,
-                    'created_by'         => auth()->id(),
+                    'project_service_id'    => $data['service_type_id'],
+                    'client_id'             => $data['client_id'],
+                    'client_project_id'     => $data['client_project_id'],
+                    'service_renewal_date'  => $data['service_renewal_date'] ?? null,
+                    'start_date'            => $currentStart,
+                    'end_date'              => $currentEnd,
+                    'due_date'              => $dueDate,
+                    'amount'                => $data['amount'],
+                    'note'                  => $data['note'] ?? null,
+                    'status'                => true,
+                    'type'                  => $data['type'],
+                    'is_auto'               => $isAuto,
+                    'cycle_type'            => $cycleType,
+                    'created_by'            => auth()->id(),
                 ]);
 
-                if ($parentId === null) {
-                    $parentId = $detail->id;
-                }
+                $parentId = $detail->id;
                 $detail->update(['parent_id' => $parentId]);
 
-                Transaction::create([
+                $transaction = Transaction::create([
                     'date'                      => $currentStart,
                     'project_service_detail_id' => $detail->id,
                     'client_id'                 => $data['client_id'],
@@ -999,28 +928,87 @@ public function store(Request $request)
                     'at_amount'    => $detail->amount,
                     'created_by'   => auth()->id(),
                     'created_ip'   => $request->ip(),
-                    'tran_id'      => 'AT' . now()->format('ymd') . str_pad(1, 4, '0', STR_PAD_LEFT)
+                ]);
+
+                $transaction->update([
+                    'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
                 ]);
 
                 $createdDetails[] = $detail;
-
-                $currentStart = $cycleType == 1
-                    ? $currentStart->copy()->addMonthNoOverflow()->startOfMonth()
-                    : $currentStart->copy()->addYear()->startOfDay();
             }
-        }
-    });
 
-    return response()->json([
-        'status'  => 201,
-        'message' => 'Created successfully.',
-        'parent_id' => $parentId,
-        'count'   => count($createdDetails),
-        'data'    => $createdDetails
-    ], 201);
-}
+            else {
+                while ($currentStart->lessThanOrEqualTo($today)) {
 
+                    $currentEnd = $cycleType === 1
+                        ? $currentStart->copy()->addMonthNoOverflow()->subDay() 
+                        : $currentStart->copy()->addYear()->subDay();         
 
+                    $dueDate = $cycleType === 1
+                        ? $currentEnd->copy()->subWeeks(2)
+                        : $currentEnd->copy()->subMonths(3);
+
+                      $isLast = $currentEnd->greaterThanOrEqualTo($today);
+
+                    $detail = ProjectServiceDetail::create([
+                        'project_service_id'    => $data['service_type_id'],
+                        'client_id'             => $data['client_id'],
+                        'client_project_id'     => $data['client_project_id'],
+                        'service_renewal_date'  => $data['service_renewal_date'] ?? null,
+                        'start_date'            => $currentStart,
+                        'end_date'              => $currentEnd,
+                        'due_date'              => $dueDate,
+                        'amount'                => $data['amount'],
+                        'note'                  => $data['note'] ?? null,
+                        'status'                => true,
+                        'next_created' => $isLast ? 0 : 1,
+                        'type'                  => $data['type'],
+                        'is_auto'               => $isAuto,
+                        'cycle_type'            => $cycleType,
+                        'created_by'            => auth()->id(),
+                    ]);
+
+                    if ($parentId === null) {
+                        $parentId = $detail->id;
+                    }
+                    $detail->update(['parent_id' => $parentId]);
+
+                    $transaction = Transaction::create([
+                        'date'                      => $currentStart,
+                        'project_service_detail_id' => $detail->id,
+                        'client_id'                 => $data['client_id'],
+                        'table_type'                => 'Income',
+                        'transaction_type'          => 'Due',
+                        'payment_type'              => 'Bank',
+                        'description'               => $detail->note
+                            ?? "Due for {$service->name} from {$currentStart->toDateString()} to {$currentEnd->toDateString()}",
+                        'amount'       => $detail->amount,
+                        'at_amount'    => $detail->amount,
+                        'created_by'   => auth()->id(),
+                        'created_ip'   => $request->ip(),
+                    ]);
+
+                    $transaction->update([
+                        'tran_id' => 'AT' . now()->format('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT)
+                    ]);
+
+                    $createdDetails[] = $detail;
+
+                    $currentStart = $cycleType === 1
+                        ? $currentStart->copy()->addMonthNoOverflow()->startOfDay()
+                        : $currentStart->copy()->addYear()->startOfDay();
+                }
+            }
+        });
+
+        return response()->json([
+                'status'    => 201,
+                'message'   => 'Created successfully.',
+                'parent_id' => $parentId,
+                'count'     => count($createdDetails),
+                'data'      => $createdDetails
+        ], 201);
+    }
 
     public function edit(ProjectServiceDetail $service)
     {
@@ -1317,12 +1305,6 @@ public function store(Request $request)
         $newDetail->next_created = 0;
         $newDetail->bill_paid = 1;
         $newDetail->is_renewed = 0;
-
-        $nextStart = Carbon::parse($endDate)->addDay();
-        $nextEnd = $serviceDetail->cycle_type === 1 ? $nextStart->copy()->addMonthNoOverflow()->subDay(): $nextStart->copy()->addYear()->subDay();
-
-        $newDetail->next_start_date = $nextStart->format('Y-m-d');
-        $newDetail->next_end_date = $nextEnd->format('Y-m-d');
         $newDetail->save();
 
         $dueTransaction = new Transaction();
@@ -1399,8 +1381,6 @@ public function store(Request $request)
         $detail->start_date      = $startDate->format('Y-m-d');
         $detail->end_date        = $endDate->format('Y-m-d');
         $detail->due_date        = $dueDate->format('Y-m-d');
-        $detail->next_start_date = $nextStart->format('Y-m-d');
-        $detail->next_end_date   = $nextEnd->format('Y-m-d');
         $detail->amount          = $request->amount;
         $detail->note            = $request->note;
         $detail->save();

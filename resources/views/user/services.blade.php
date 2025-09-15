@@ -49,14 +49,6 @@
                                     @if($service->start_date)
                                         @php
                                             $date = \Carbon\Carbon::parse($service->start_date);
-
-                                            if ($service->cycle_type == 1) {
-                                                $date->addMonthNoOverflow();
-                                            } elseif ($service->cycle_type == 2) {
-                                                $date->addYear();
-                                            } else {
-                                                $date->addDay();
-                                            }
                                         @endphp
                                         {{ $date->format('d-m-Y') }}
                                     @else
@@ -65,17 +57,17 @@
                                 </td>
 
                                 <td class="text-center text-light">
-                                    @if($service->type == 1)
+                                    @if($service->type == 1 || $service->type == 2)
                                         @php
                                             $unpaidBills = \App\Models\ProjectServiceDetail::where('project_service_id', $service->project_service_id)
                                                 ->where('client_id', $service->client_id)
                                                 ->where('client_project_id', $service->client_project_id)
-                                                ->where('type', 1)
                                                 ->where('bill_paid', '!=', 1)
                                                 ->where('amount', $service->amount)
                                                 ->where('cycle_type', $service->cycle_type)
                                                 ->where('is_auto', $service->is_auto)
                                                 ->get();
+
                                             $totalAmount = $unpaidBills->sum('amount');
                                             $count = $unpaidBills->count();
                                             $cycleText = $service->cycle_type == 1 ? 'month' : 'year';

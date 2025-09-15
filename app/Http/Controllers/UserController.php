@@ -213,6 +213,14 @@ class UserController extends Controller
             ->sortByDesc('id')
             ->values();
 
+        if ($request->status === 'Due') {
+            $allTransactions = $allTransactions->filter(fn($t) => $t->transaction_type === 'Due')->values();
+        }
+
+        if ($request->type === 'Project') {
+            $allTransactions = $allTransactions->filter(fn($t) => empty($t->projectServiceDetail))->values();
+        }
+
         // Pagination manually
         $perPage = 10;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -229,9 +237,7 @@ class UserController extends Controller
             $isInvoice = !empty($row->invoice);
             $clientName = $isInvoice ? $row->invoice->client?->business_name ?? '-' : $row->projectServiceDetail?->client?->business_name ?? '-';
             $invoiceNo = $isInvoice ? $row->invoice->invoice_number : '-';
-            $project = $isInvoice
-                ? $row->invoice->details->pluck('project_name')->implode('<br>')
-                : $row->projectServiceDetail?->project?->title ?? '-';
+            $project = $isInvoice ? $row->project?->title ?? 'Custom' : $row->projectServiceDetail?->project?->title ?? '-';
             $service = $isInvoice ? '-' : $row->projectServiceDetail?->serviceType?->name ?? '-';
             $duration = $isInvoice ? '-' 
                 : ($row->projectServiceDetail?->start_date && $row->projectServiceDetail?->end_date
@@ -401,11 +407,18 @@ class UserController extends Controller
         $idsToDisplay = array_merge($latestType1Ids, $type2Ids);
 
         $services = ProjectServiceDetail::with(['serviceType','project','transaction'])
-            ->where('client_id', $clientId)
-            ->whereIn('id', $idsToDisplay)
-            ->when($request->project, fn($q,$p) => $q->where('client_project_id', $p))
-            ->latest()
-            ->get();
+                ->where('client_id', $clientId)
+                ->whereIn('id', $idsToDisplay)
+                ->when($request->project, fn($q,$p) => $q->where('client_project_id', $p))
+                ->get()
+                ->filter(function($row) {
+                    $start = Carbon::parse($row->start_date ?? now());
+                    return match($row->cycle_type) {
+                        1 => $start <= now() || now()->diffInDays($start) <= 10,
+                        2 => $start <= now() || now()->diffInMonths($start) <= 3,
+                        default => false,
+                    };
+                });
 
         return view('user.services', compact('services','projects'));
     }
