@@ -364,6 +364,7 @@ class ProjectServiceController extends Controller
                                 <th>Status</th>
                                 <th>Txn</th>
                                 <th>Note</th>
+                                <th>Action</th>
                               </tr>
                             </thead>
                             <tbody>';
@@ -450,6 +451,45 @@ class ProjectServiceController extends Controller
                               : '<span class="badge badge-warning">Due</span>';
                       }
 
+                      $action = '';
+                      if (!$bill->bill_paid) {
+                          $action = '<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editBill'.$bill->id.'">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                          <div class="modal fade" id="editBill'.$bill->id.'" tabindex="-1" role="dialog" aria-hidden="true">
+                              <div class="modal-dialog">
+                                  <form method="POST" action="'.route('project-service-row.update').'" class="edit-form">
+                                  '.csrf_field().'
+                                  <input type="hidden" name="service_id" value="'.$bill->id.'">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h5 class="modal-title">Edit Service</h5>
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <div class="mb-3">
+                                                  <label>Start Date <span class="text-danger">*</span></label>
+                                                  <input type="date" class="form-control" name="start_date" value="'.($bill->start_date ? \Carbon\Carbon::parse($bill->start_date)->format('Y-m-d') : '').'" required>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label>Amount <span class="text-danger">*</span></label>
+                                                  <input type="number" class="form-control" name="amount" value="'.$bill->amount.'" required>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label>Note</label>
+                                                  <textarea name="note" class="form-control">'.$bill->note.'</textarea>
+                                              </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                              <button type="submit" class="btn btn-success">Update</button>
+                                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                          </div>
+                                      </div>
+                                  </form>
+                              </div>
+                          </div>';
+                      }
+
                       $btn .= '<tr>
                                 <td class="d-none">'.$bill->id.'</td>
                                 <td>'.$bill->client?->name.'</td>
@@ -462,6 +502,7 @@ class ProjectServiceController extends Controller
                                 <td>'.$status.'</td>
                                 <td>'.$txn.'</td>
                                 <td>'.$note.'</td>
+                                <td>'.$action.'</td>
                               </tr>';
                   }
 
@@ -1322,4 +1363,58 @@ public function store(Request $request)
     {
         return response()->json($client->projects()->select('id', 'title')->get());
     }
+
+    public function updateRow(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:project_service_details,id',
+            'start_date' => 'required|date',
+            'amount'     => 'required|numeric|min:0',
+            'note'       => 'nullable|string',
+        ]);
+
+        $detail = ProjectServiceDetail::findOrFail($request->service_id);
+
+        if ($detail->bill_paid) {
+            return response()->json(['message' => 'Cannot update a paid bill!'], 422);
+        }
+
+        $startDate = Carbon::parse($request->start_date);
+
+        if ($detail->cycle_type == 1) { // monthly
+            $endDate = $startDate->copy()->addMonthNoOverflow()->subDay();
+            $dueDate = $endDate->copy()->subWeeks(2);
+        } else { // yearly
+            $endDate = $startDate->copy()->addYear()->subDay();
+            $dueDate = $endDate->copy()->subMonths(3);
+        }
+
+        $nextStart = $endDate->copy()->addDay();
+        if ($detail->cycle_type == 1) {
+            $nextEnd = $nextStart->copy()->addMonthNoOverflow()->subDay();
+        } else {
+            $nextEnd = $nextStart->copy()->addYear()->subDay();
+        }
+
+        $detail->start_date      = $startDate->format('Y-m-d');
+        $detail->end_date        = $endDate->format('Y-m-d');
+        $detail->due_date        = $dueDate->format('Y-m-d');
+        $detail->next_start_date = $nextStart->format('Y-m-d');
+        $detail->next_end_date   = $nextEnd->format('Y-m-d');
+        $detail->amount          = $request->amount;
+        $detail->note            = $request->note;
+        $detail->save();
+
+        $transaction = $detail->transaction()->where('transaction_type', 'Due')->first();
+        if ($transaction) {
+            $transaction->date        = $startDate->format('Y-m-d');
+            $transaction->amount      = $request->amount;
+            $transaction->at_amount   = $request->amount;
+            $transaction->description = $request->note ?? $transaction->description;
+            $transaction->save();
+        }
+
+        return response()->json(['message' => 'Service updated successfully!']);
+    }
+
 }

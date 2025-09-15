@@ -563,6 +563,37 @@
           });
       });
 
+      $(document).on('submit', '.edit-form', function(e) {
+          e.preventDefault();
+          if (!confirm('Are you sure to update this service?')) return;
+
+          let form = $(this);
+          let modal = form.closest('.modal');
+
+          $.ajax({
+              url: form.attr('action'),
+              method: 'POST',
+              data: form.serialize(),
+              success(res) {
+                  success(res.message ?? 'Service updated successfully!');
+
+                  modal.modal('hide');
+
+                  modal.on('hidden.bs.modal', function () {
+                      $('.modal-backdrop').remove();
+                      $('body').removeClass('modal-open');
+                      $('body').css('padding-right', '');
+                  });
+
+                  reloadTable();
+              },
+              error(xhr) {
+                  console.error(xhr.responseText);
+                  alert('Something went wrong while updating!');
+              }
+          });
+      });
+
       $(document).on('submit', '.advance-receive-form', function(e) {
           e.preventDefault();
 
