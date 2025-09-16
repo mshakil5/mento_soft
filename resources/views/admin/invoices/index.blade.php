@@ -15,8 +15,16 @@
             </div>
             @if (!(request()->status))
             <div class="col-4 my-3 d-flex">
+                <select id="clientFilter" class="form-control ml-2 select2">
+                    <option value="">Select Client</option>
+                    @foreach ($clients as $client)
+                      <option value="{{ $client->id }}">{{ $client->business_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-4 my-3 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
-                    <option value="">All</option>
+                    <option value="">Select Status</option>
                     <option value="due">Due</option>
                     <option value="received">Received</option>
                 </select>
@@ -134,7 +142,7 @@
                                           MR MD F A Bhuyain<br>
                                           Sort code: 11-08-34<br>
                                           A/C No: 00630751<br>
-                                          Halifax<br>
+                                          Halifax<br><br>
                                           If you have any questions concerning this invoice please contact to,<br>
                                           Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br>
                                           <B>
@@ -456,9 +464,7 @@
                     <input type="hidden" name="projects[${rowId}][id]" value="${data.id || ''}">
                     <input type="hidden" name="projects[${rowId}][sdtl_id]" value="${data.sdtl_id || ''}">
                     <td>
-                        <textarea class="form-control" name="projects[${rowId}][description]" required>
-                            ${(data.project_name ? data.project_name + ' - ' : '') + (data.description || '')}
-                        </textarea>
+                        <textarea class="form-control" name="projects[${rowId}][description]" required> ${(data.project_name ? data.project_name + ' - ' : '') + (data.description || '')} </textarea>
                     </td>
                     <td>
                         <input type="number" class="form-control qty" name="projects[${rowId}][qty]" min="1" value="${data.qty}" required>
@@ -784,6 +790,7 @@
                 type: "GET",
                 data: function (d) {
                     d.status_filter = $('#statusFilter').val();
+                    d.client_filter = $('#clientFilter').val();
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -810,7 +817,7 @@
           table.ajax.reload(null, false);
         }
 
-        $('#statusFilter').on('change', function() {
+        $('#statusFilter, #clientFilter').on('change', function() {
             table.ajax.reload();
         });
 

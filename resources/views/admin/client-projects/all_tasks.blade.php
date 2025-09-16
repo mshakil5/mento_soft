@@ -23,6 +23,14 @@
                 </select>
             </div>
             <div class="col-3 d-flex">
+                <select id="emplpyeeFilter" class="form-control ml-2 select2">
+                    <option value="">Select Emplpoyee</option>
+                    @foreach ($employees as $employee)
+                      <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-2 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
                     <option value="">Select Status</option>
                     <option value="1">To Do </option>
@@ -30,7 +38,7 @@
                     <option value="3">Done</option>
                 </select>
             </div>
-            <div class="col-3 d-flex">
+            <div class="col-2 d-flex">
                 <select id="priorityFilter" class="form-control ml-2 select2">
                     <option value="">Select Priority</option>
                     <option value="high">High</option>
@@ -142,6 +150,7 @@
                     d.project_id = $('#projectFilter').val();
                     d.status_filter = $('#statusFilter').val();
                     d.priority = $('#priorityFilter').val();
+                    d.employee_id = $('#emplpyeeFilter').val();
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -167,7 +176,7 @@
           table.ajax.reload(null, false);
         }
 
-        $('#projectFilter, #statusFilter, #priorityFilter').on('change', function() {
+        $('#projectFilter, #statusFilter, #priorityFilter, #emplpyeeFilter').on('change', function() {
             reloadTable();
         });
     });

@@ -42,6 +42,10 @@ class TaskController extends Controller
                 $query->where('client_project_id', $request->client_project_id);
             }
 
+            if ($request->employee_id) {
+                $query->where('employee_id', $request->employee_id);
+            }
+
             $query->orderBy('created_at', 'desc');
 
             return DataTables::of($query)
@@ -83,8 +87,7 @@ class TaskController extends Controller
                     $html .= '    <span class="' . $priorityClass . '">' . ucfirst($row->priority) . '</span>';
                     $html .= '  </div>';
                     $html .= '</div>';
-
-                    $html .= '<div class="align-self-end text-muted small">' . $projectTitle . '</div>';
+                    $html .= '<div class="align-self-end mt-1"><span class="badge badge-success">' . $projectTitle . '</span></div>';
                     $html .= '</div>';
                     $html .= '</a>';
 
@@ -95,12 +98,14 @@ class TaskController extends Controller
         }
 
         $clientProjects = ClientProject::select('id', 'title')->latest()->get();
-        return view('admin.client-projects.task_index', compact('clientProjects'));
+        $employees = User::where('user_type', 1)->latest()->get();
+        return view('admin.client-projects.task_index', compact('clientProjects', 'employees'));
     }
 
     public function allTasks(Request $request)
     {
         if ($request->ajax()) {
+
 
             $data = ProjectTask::with(['employee', 'clientProject'])->latest();
 
@@ -114,6 +119,10 @@ class TaskController extends Controller
 
             if ($request->project_id) {
                 $data->where('client_project_id', $request->project_id);
+            }
+
+            if ($request->employee_id) {
+                $data->where('employee_id', $request->employee_id);
             }
 
             if ($request->priority) {
@@ -219,7 +228,8 @@ class TaskController extends Controller
                 ->make(true);
         }
 
-        $employees = User::where('status', 1)->latest()->get();
+        $employees = User::where('user_type', 1)->latest()->get();
+
         $projects = ClientProject::select('id', 'title')->latest()->get();
         return view('admin.client-projects.all_tasks', compact('employees', 'projects'));
     }

@@ -13,9 +13,19 @@
                   <button type="button" class="btn btn-secondary my-3" id="newBtn">Add new</button>
                   @endcan
             </div>
+            @if(!(request()->client_id))
+            <div class="col-4 my-3 d-flex">
+                <select id="clientFilter" class="form-control ml-2 select2">
+                    <option value="">Select Client</option>
+                    @foreach ($clients as $client)
+                      <option value="{{ $client->id }}">{{ $client->business_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
             <div class="col-4 my-3 d-flex">
                 <select id="statusFilter" class="form-control ml-2 select2">
-                    <option value="">All</option>
+                    <option value="">Select Status</option>
                     <option value="1">Planned</option>
                     <option value="2">In Progress</option>
                     <option value="3">Blocked</option>
@@ -173,7 +183,7 @@
                                     <th>Project</th>
                                     <th>Client</th>
                                     <th>Start</th>
-                                    <th>Due</th>
+                                    {{-- <th>Due</th> --}}
                                     {{-- <th>Domain</th> --}}
                                     <th>Status</th>
                                     <th>Budget</th>
@@ -395,6 +405,7 @@
                 type: "GET",
                 data: function (d) {
                     d.status = $('#statusFilter').val();
+                    d.client_filter_id = $('#clientFilter').val();
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -407,7 +418,7 @@
                 {data: 'title', name: 'title'},
                 {data: 'client_name', name: 'client_name'},
                 {data: 'start_date', name: 'start_date'},
-                {data: 'due_date', name: 'due_date'},
+                // {data: 'due_date', name: 'due_date'},
                 // {data: 'domain', name: 'domain'},
                 {data: 'status', name: 'status', orderable: false},
                 {data: 'amount', name: 'amount'},
@@ -423,7 +434,7 @@
           table.ajax.reload(null, false);
         }
 
-        $('#statusFilter').on('change', function() {
+        $('#statusFilter, #clientFilter').on('change', function() {
             table.ajax.reload();
         });
 

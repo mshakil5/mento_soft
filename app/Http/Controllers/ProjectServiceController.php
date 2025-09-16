@@ -76,6 +76,10 @@ class ProjectServiceController extends Controller
                 $data = $data->where('client_project_id', $request->project_filter_id);
             }
 
+            if ($request->service_id) {
+                $data = $data->where('type', $request->service_id);
+            }
+
             if ($request->service_filter_type_id) {
                 $data = $data->where('project_service_id', $request->service_filter_type_id);
             }

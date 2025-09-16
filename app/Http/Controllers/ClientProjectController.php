@@ -37,6 +37,10 @@ class ClientProjectController extends Controller
                 $data->where('client_id', $request->client_id);
             }
 
+            if ($request->client_filter_id) {
+                $data->where('client_id', $request->client_filter_id);
+            }
+
             if ($request->status) {
                 $data->where('status', $request->status);
             }
@@ -140,7 +144,7 @@ class ClientProjectController extends Controller
                                     </a>';
                     }
 
-                    $buttons .= '<a href="#" class="dropdown-item delete" data-id="'.$row->id.'">
+                    $buttons .= '<a href="#" class="dropdown-item delete d-none" data-id="'.$row->id.'">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>';
 
@@ -173,7 +177,7 @@ class ClientProjectController extends Controller
                 ->make(true);
         }
 
-        $clients = Client::latest()->get();
+        $clients = Client::where('status', 1)->select('id', 'business_name')->latest()->get();
         $employees = User::where('status', 1)->where('user_type', 1)->select('id', 'name')->get();
         return view('admin.client-projects.index', compact('clients', 'employees'));
     }

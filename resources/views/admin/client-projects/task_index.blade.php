@@ -19,16 +19,24 @@
                   <a href="{{ route('tasks.all') }}" class="btn btn-secondary my-3">All Tasks</a>
                   @endcan
             </div>
+            <div class="col-3 my-3 d-flex">   
+                <input type="text" id="searchInput" placeholder="Search all tasks..." class="form-control">
+            </div>
             <div class="col-3 my-3 d-flex">
                 <select id="projectFilter" class="form-control ml-2 select2">
-                    <option value="">All</option>
+                    <option value="">Select Project</option>
                     @foreach ($clientProjects as $project)
                       <option value="{{ $project->id }}">{{ $project->title }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-3 my-3 d-flex">   
-                <input type="text" id="searchInput" placeholder="Search all tasks..." class="form-control">
+            <div class="col-3 my-3 d-flex">
+                <select id="emplpyeeFilter" class="form-control ml-2 select2">
+                    <option value="">Select Emplpoyee</option>
+                    @foreach ($employees as $employee)
+                      <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
     </div>
@@ -100,6 +108,7 @@
                         d.status = status;
                         d.search = $('#searchInput').val();
                         d.client_project_id = $('#projectFilter').val();
+                        d.employee_id = $('#emplpyeeFilter').val();
                     }
                 },
                 columns: [{ data: 'task', name: 'task' }],
@@ -117,7 +126,7 @@
         let progressTable = loadTable('progressTable', 2);
         let doneTable     = loadTable('doneTable', 3);
 
-        $('#searchInput, #projectFilter').on('keyup change', reloadAllTables);
+        $('#searchInput, #projectFilter, #emplpyeeFilter').on('keyup change', reloadAllTables);
 
         function reloadAllTables() {
             todoTable.ajax.reload();

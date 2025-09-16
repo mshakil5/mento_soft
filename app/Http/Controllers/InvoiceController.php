@@ -46,6 +46,10 @@ class InvoiceController extends Controller
                 $invoices = $invoices->reject->isPending();
             }
 
+            if ($request->client_filter) {
+                $invoices = $query->where('client_id', $request->client_filter);
+            }
+
             return DataTables::of($invoices)
                 ->addIndexColumn()
                 ->addColumn('date', fn($row) => date('d-m-Y', strtotime($row->invoice_date)))
@@ -146,7 +150,9 @@ class InvoiceController extends Controller
                 ->make(true);
         }
 
-        return view('admin.invoices.index');
+        $clients = Client::where('status', 1)->select('id', 'business_name')->latest()->get();
+
+        return view('admin.invoices.index', compact('clients'));
     }
 
     public function create()

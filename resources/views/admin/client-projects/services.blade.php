@@ -6,11 +6,11 @@
         <div class="row py-3">
             <div class="col-3">
               @can('add service')
-              <button type="button" class="btn btn-secondary mr-2" id="newBtn">Add Service</button>
+              <button type="button" class="btn btn-secondary mr-1" id="newBtn">Add Service</button>
               @endcan
               <a href="{{ route('service-type.index') }}" class="btn btn-secondary">Service List</a>
             </div>
-            <div class="col-1 d-flex">
+            <div class="col-1 d-none">
                 <input type="hidden" id="selectedClientId" value="">
                 <button id="sendMail" type="button" class="btn btn-success" style="display:none;">
                     Mail
@@ -25,12 +25,19 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-3 d-flex">
+            <div class="col-2 d-flex">
                 <select id="projectFilter" class="form-control ml-2 select2">
                     <option value="">Select Project</option>
                     @foreach ($projects as $project)
                       <option value="{{ $project->id }}">{{ $project->title }}</option>
                     @endforeach
+                </select>
+            </div>
+            <div class="col-2 d-flex">
+                <select id="serviceFilter" class="form-control ml-2 select2">
+                    <option value="">Select Type</option>
+                    <option value="1">In House Service</option>
+                    <option value="2">Third Party Service</option>
                 </select>
             </div>
             <div class="col-2 d-flex">
@@ -477,6 +484,7 @@
                   d.client_filter_id = $('#clientFilter').val();
                   d.project_filter_id = $('#projectFilter').val();
                   d.service_filter_type_id = $('#serviceTypeFilter').val();
+                  d.service_id = $('#serviceFilter').val();
               },
               error: function (xhr, status, error) {
                   console.error(xhr.responseText);
@@ -506,7 +514,7 @@
         table.ajax.reload(null, false);
       }
 
-      $('#clientFilter, #projectFilter, #serviceTypeFilter').on('change', function() {
+      $('#clientFilter, #projectFilter, #serviceTypeFilter, #serviceFilter').on('change', function() {
           reloadTable();
       });
 
