@@ -13,7 +13,7 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Role::with('permissions')->latest();
+            $data = Role::with('permissions');
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('permissions', function($row){

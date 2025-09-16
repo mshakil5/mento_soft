@@ -6,9 +6,11 @@
         <div class="card">
             <div class="card-header">
                 <h5>{{ $task->clientProject->title ?? '' }}</h5>
+                @can('edit tasks')
                 <a href="{{ route('client-projects-task.edit-page', $task->id) }}" class="ml-2 text-info" title="Edit Task">
                     <i class="fas fa-edit"></i>
                 </a>
+                @endcan
             </div>
 
             <div class="card-body">

@@ -75,8 +75,10 @@ class TaskController extends Controller
                         $html .= '<span class="badge badge-warning mr-2">' . $unreadCount . '</span>';
                     }
 
+                    if (auth()->user()->can('edit-task')) {
                     $html .= '<a href="' . route('client-projects-task.edit-page', $row->id) . '" class="text-secondary mr-1" title="Edit Task">';
                     $html .= '<i class="fas fa-edit"></i></a>';
+                    }
 
                     if (is_null($row->employee_id)) {
                         $html .= '<i class="fas fa-user-slash text-danger mr-2" title="Unassigned"></i>';
@@ -169,59 +171,70 @@ class TaskController extends Controller
 
                     $currentStatus = $statuses[$row->status] ?? 'Unknown';
 
-                    $html = '
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
-                            id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            '.$currentStatus.'
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">';
-
+                    if (auth()->user()->can('edit-task')) {
+                        $html = '
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+                                id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                '.$currentStatus.'
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">';
+                        
                         foreach ($statuses as $value => $label) {
                             $html .= '<a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="'.$value.'">'.$label.'</a>';
                         }
 
-                    $html .= '
-                        </div>
-                    </div>';
+                        $html .= '</div></div>';
+                    } else {
+                        $html = '<button class="btn btn-sm btn-secondary" disabled>'.$currentStatus.'</button>';
+                    }
 
                     return $html;
                 })
                 ->addColumn('action', function($row) {
                     $html = '
-                      <a href="'.route('tasks.show', $row->id).'" class="btn btn-sm btn-warning">Message</a>
-                      <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
-                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>
-                      <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>
+                        <a href="'.route('tasks.show', $row->id).'" class="btn btn-sm btn-warning">Message</a>
+                        <button type="button" class="btn btn-sm btn-info mr-1" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>';
 
-                      <div class="modal fade" id="taskModal'.$row->id.'" tabindex="-1">
+                    if (auth()->user()->can('edit-task')) {
+                        $html .= '<a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>';
+                    }
+
+                    $html .= '<button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
+
+                    $html .= '
+                    <div class="modal fade" id="taskModal'.$row->id.'" tabindex="-1">
                         <div class="modal-dialog modal-lg">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title">'.e($row->title ?? '').'</h5>
-                              <a href="'.route('client-projects-task.edit-page', $row->id).'" class="ml-2 text-info" title="Edit Task">
-                                  <i class="fas fa-edit"></i>
-                              </a>
-                              <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                              <div class="list-group-item mb-3">
-                                '.$row->task.'
-                                <div class="small text-muted mt-1">
-                                  <span><strong>Due:</strong> '.($row->due_date ? \Carbon\Carbon::parse($row->due_date)->format("d-m-Y") : "").'</span> &middot;
-                                  <span><strong>Status:</strong> '.([1=>"To Do",2=>"In Progress",3=>"Done"][$row->status] ?? "").'</span> &middot;
-                                  <span><strong>Priority:</strong> <span class="badge '.(['high'=>'bg-danger','medium'=>'bg-warning','low'=>'bg-info'][$row->priority] ?? 'bg-secondary').'">'.ucfirst($row->priority ?? "").'</span></span> &middot;
-                                  <span><strong>Assigned to:</strong> '.($row->employee->name ?? "Unassigned").'</span> &middot;
-                                  <span><strong>Created by:</strong> '.($row->creator->name ?? "-").'</span> &middot; 
-                                  '.($row->is_confirmed == 1 ? '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Confirmed</span>' : '').' &middot;
-                                  <span><strong>Project:</strong> '.($row->clientProject->title ?? "").'</span>
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">'.e($row->title ?? '').'</h5>';
+
+                    if (auth()->user()->can('edit-task')) {
+                        $html .= '<a href="'.route('client-projects-task.edit-page', $row->id).'" class="ml-2 text-info" title="Edit Task">
+                                    <i class="fas fa-edit"></i>
+                                  </a>';
+                    }
+
+                    $html .= '<button type="button" class="close" data-dismiss="modal">&times;</button>
                                 </div>
-                              </div>
+                                <div class="modal-body">
+                                    <div class="list-group-item mb-3">
+                                        '.$row->task.'
+                                        <div class="small text-muted mt-1">
+                                            <span><strong>Due:</strong> '.($row->due_date ? \Carbon\Carbon::parse($row->due_date)->format("d-m-Y") : "").'</span> &middot;
+                                            <span><strong>Status:</strong> '.([1=>"To Do",2=>"In Progress",3=>"Done"][$row->status] ?? "").'</span> &middot;
+                                            <span><strong>Priority:</strong> <span class="badge '.(['high'=>'bg-danger','medium'=>'bg-warning','low'=>'bg-info'][$row->priority] ?? 'bg-secondary').'">'.ucfirst($row->priority ?? "").'</span></span> &middot;
+                                            <span><strong>Assigned to:</strong> '.($row->employee->name ?? "Unassigned").'</span> &middot;
+                                            <span><strong>Created by:</strong> '.($row->creator->name ?? "-").'</span> &middot; 
+                                            '.($row->is_confirmed == 1 ? '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Confirmed</span>' : '').' &middot;
+                                            <span><strong>Project:</strong> '.($row->clientProject->title ?? "").'</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
                         </div>
-                      </div>
-                    ';
+                    </div>';
+
                     return $html;
                 })
                 ->rawColumns(['priority', 'status', 'action'])

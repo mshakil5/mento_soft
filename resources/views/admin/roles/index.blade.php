@@ -32,10 +32,14 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Permissions</label>
+                                <label>Permissions <span class="text-danger">*</span></label>
 
-                                <div class="mb-2">
-                                    <div class="icheck-primary">
+                                <div class="mb-2 row">
+                                     <div class="col-6">
+                                        <input type="text" id="permSearch" class="form-control form-control-sm" 
+                                            placeholder="Search permission..." style="width: 250px;">
+                                     </div>
+                                    <div class="icheck-primary col-6">
                                         <input type="checkbox" id="checkAll">
                                         <label for="checkAll"><strong>Check All Permissions</strong></label>
                                     </div>
@@ -109,6 +113,18 @@
 @section('script')
 <script>
 $(document).ready(function () {
+
+  $("#permSearch").on("keyup", function() {
+      let value = $(this).val().toLowerCase();
+      $("input[name='permissions[]']").each(function() {
+          let label = $(this).next("label").text().toLowerCase();
+          if (label.includes(value)) {
+              $(this).closest(".icheck-primary").parent().show();
+          } else {
+              $(this).closest(".icheck-primary").parent().hide();
+          }
+      });
+  });
 
   $("#checkAll").on("change", function() {
       $("input[name='permissions[]']").prop('checked', this.checked);
@@ -197,6 +213,10 @@ $(document).ready(function () {
         $("#addThisFormContainer").slideUp(200);
         $("#newBtn").slideDown(200);
         $("#cardTitle").text('Add New Role');
+        $("#permSearch").val('');
+        $("input[name='permissions[]']").each(function() {
+            $(this).closest(".icheck-primary").parent().show();
+        });
     }
 
     // Delete

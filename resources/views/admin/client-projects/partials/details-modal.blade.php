@@ -44,6 +44,7 @@
 
             <div class="col-6">
                 <h5>Linked Tasks
+                  @can('add task')
                   <button type="button" class="btn btn-sm btn-success float-right" 
                           data-toggle="modal" 
                           data-target="#tasksModal" 
@@ -51,6 +52,7 @@
                           onclick="openTaskModal({{ $row->id }})">
                       <i class="fas fa-plus"></i> Add New Task
                   </button>
+                  @endcan
                 </h5>
                 @if($row->tasks->count())
                     <div class="list-group">
@@ -102,12 +104,13 @@
                                         @endif
                                     </div>
                                 </div>
-
+                                @can('edit task')                
                                 <div>
                                     <a href="{{ route('client-projects-task.edit-page', $task->id) }}" class="text-info" title="Edit Task">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </div>
+                                 @endcan
                             </div>
                         @endforeach
                     </div>

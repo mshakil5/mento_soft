@@ -63,12 +63,14 @@
     </li>
     @endcanany
 
+    @can('transactions')
     <li class="nav-item">
         <a href="{{ route('transactions.index') }}" class="nav-link {{ request()->routeIs('transactions.index') ? 'active' : '' }}">
             <i class="fas fa-exchange-alt nav-icon"></i>
             <p>Transactions</p>
         </a>
     </li>
+    @endcan
 
     @can('reports')
     <li class="nav-item">
@@ -79,7 +81,9 @@
     </li>
     @endcan
 
+    @canany(['add client', 'add project', 'add invoice'])
     <li class="nav-header">QUICK ACTIONS</li>
+    @endcanany
 
     @can('add client')
     <button class="btn btn-success mb-2" data-toggle="modal" data-target="#quickClientModal">
@@ -106,7 +110,7 @@
         });
     </script>
 
-    @can('reports')
+    @can('accounting')
     <button id="toggleAccounting" class="btn btn-info my-2">
         Show Accounting
     </button>

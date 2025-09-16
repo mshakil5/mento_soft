@@ -42,6 +42,7 @@
     </div>
 </section>
 
+@can('tasks')
 <section class="content" id="contentContainer">
     <div class="container-fluid">
         <div class="row">
@@ -82,6 +83,7 @@
         </div>
     </div>
 </section>
+@endcan
 
 <style>
     table.dataTable {

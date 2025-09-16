@@ -77,39 +77,51 @@ class ProjectTaskController extends Controller
                     return $html;
                 })
                 ->addColumn('action', function($row) {
-                    $html = '
-                      <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
-                      <a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>
-                      <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>
 
-                      <div class="modal fade" id="taskModal'.$row->id.'" tabindex="-1">
-                        <div class="modal-dialog modal-lg">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title">'.e($row->title ?? '').'</h5>
-                              <a href="'.route('client-projects-task.edit-page', $row->id).'" class="ml-2 text-info" title="Edit Task">
-                                  <i class="fas fa-edit"></i>
-                              </a>
-                              <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                              <div class="list-group-item mb-3">
-                                '.$row->task.'
-                                <div class="small text-muted mt-1">
-                                  <span><strong>Due:</strong> '.($row->due_date ? \Carbon\Carbon::parse($row->due_date)->format("d-m-Y") : "").'</span> &middot;
-                                  <span><strong>Status:</strong> '.([1=>"To Do",2=>"In Progress",3=>"Done"][$row->status] ?? "").'</span> &middot;
-                                  <span><strong>Priority:</strong> <span class="badge '.(['high'=>'bg-danger','medium'=>'bg-warning','low'=>'bg-info'][$row->priority] ?? 'bg-secondary').'">'.ucfirst($row->priority ?? "").'</span></span> &middot;
-                                  <span><strong>Assigned to:</strong> '.($row->employee->name ?? "Unassigned").'</span> &middot;
-                                  <span><strong>Created by:</strong> '.($row->creator->name ?? "-").'</span> &middot; 
-                                  '.($row->is_confirmed == 1 ? '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Confirmed</span>' : '').' &middot;
-                                  <span><strong>Project:</strong> '.($row->clientProject->title ?? "").'</span>
+                $editBtn = '';
+                if (auth()->user()->can('edit-task')) {
+                    $editBtn = '<a href="'.route('client-projects-task.edit-page', $row->id).'" class="btn btn-sm btn-primary">Edit</a>';
+                }
+
+                $editLink = '';
+                if (auth()->user()->can('edit-task')) {
+                        $editLink = '<a href="'.route('client-projects-task.edit-page', $row->id).'" class="ml-2 text-info" title="Edit Task">
+                                        <i class="fas fa-edit"></i>
+                                    </a>';
+                    }
+
+                    $html = '
+                        <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#taskModal'.$row->id.'">View</button>
+                        '.$editBtn.'
+                        <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>
+
+                        <div class="modal fade" id="taskModal'.$row->id.'" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">'.e($row->title ?? '').'</h5>
+                                        '.$editLink.'
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="list-group-item mb-3">
+                                            '.$row->task.'
+                                            <div class="small text-muted mt-1">
+                                                <span><strong>Due:</strong> '.($row->due_date ? \Carbon\Carbon::parse($row->due_date)->format("d-m-Y") : "").'</span> &middot;
+                                                <span><strong>Status:</strong> '.([1=>"To Do",2=>"In Progress",3=>"Done"][$row->status] ?? "").'</span> &middot;
+                                                <span><strong>Priority:</strong> <span class="badge '.(['high'=>'bg-danger','medium'=>'bg-warning','low'=>'bg-info'][$row->priority] ?? 'bg-secondary').'">'.ucfirst($row->priority ?? "").'</span></span> &middot;
+                                                <span><strong>Assigned to:</strong> '.($row->employee->name ?? "Unassigned").'</span> &middot;
+                                                <span><strong>Created by:</strong> '.($row->creator->name ?? "-").'</span> &middot; 
+                                                '.($row->is_confirmed == 1 ? '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Confirmed</span>' : '').' &middot;
+                                                <span><strong>Project:</strong> '.($row->clientProject->title ?? "").'</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
                         </div>
-                      </div>
                     ';
+
                     return $html;
                 })
                 ->rawColumns(['priority', 'status', 'action'])

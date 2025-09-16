@@ -14,20 +14,25 @@
     </a>
     @endcan
 
+    @can('frontend-services')
     <li class="nav-item">
         <a href="{{ route('allservice') }}" class="nav-link {{ Route::is('allservice') ? 'active' : '' }}">
             <i class="nav-icon fas fa-briefcase"></i>
             <p>Services</p>
         </a>
     </li>
+    @endcan
 
+    @can('frontend-products')
     <li class="nav-item">
         <a href="{{ route('products.index') }}" class="nav-link {{ Route::is('products.*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-project-diagram"></i>
             <p>Products</p>
         </a>
     </li>
+    @endcan
 
+    @can('frontend-portfolio')
     <li class="nav-item dropdown {{ Route::is('project-types.index') || Route::is('projects.index') ? 'menu-open' : '' }}">
         <a href="#" class="nav-link dropdown-toggle {{ Route::is('project-types.index') || Route::is('projects.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-briefcase"></i>
@@ -50,7 +55,9 @@
             </li>
         </ul>
     </li>
+    @endcan
 
+    @can('frontend-messages')
     <li class="nav-item dropdown {{ Route::is('contacts.index') || Route::is('quotations.index') ? 'menu-open' : '' }}">
         <a href="#" class="nav-link dropdown-toggle {{ Route::is('contacts.index') || Route::is('quotations.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-envelope"></i>
@@ -73,7 +80,9 @@
             </li>
         </ul>
     </li>
+    @endcan
 
+    @can('frontend-settings')
     <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('permissions.index') ? 'menu-open' : '' }}">
         <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('permissions.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
@@ -162,6 +171,7 @@
             </li>
         </ul>
     </li>
+    @endcan
 
     <li class="nav-item" style="margin-top: 200px">
     </li>

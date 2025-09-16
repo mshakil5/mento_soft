@@ -68,6 +68,7 @@
     <a class="brand-link" style="cursor: pointer;">
       <img src="{{ asset('resources/admin/images/avatar5.png')}}" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-bold">{{Auth::user()->name}}</span>
+      <small class="font-weight-light">{{ Auth::user()->getRoleNames()->first() }}</small>
     </a>
 
     <div class="sidebar">
