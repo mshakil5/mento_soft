@@ -707,6 +707,29 @@
           });
       });
 
+
+    $(document).on('click', '.deleteBill', function() {
+        var billId = $(this).attr('id');
+        if (!confirm('Are you sure you want to delete this bill?')) return;
+
+        $.ajax({
+            url: '/admin/client-project-service-detail/' + billId,
+            method: 'DELETE',
+            data: {
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(res) {
+                success(res.message ?? 'Bill deleted successfully!');
+                // reloadTable();
+                window.location.reload();
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                error('Failed to delete bill');
+            }
+        });
+    });
+
   });
 </script>
 @endsection

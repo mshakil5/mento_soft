@@ -449,6 +449,9 @@ class ProjectServiceController extends Controller
                           $action = '<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editBill'.$bill->id.'">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button class="btn btn-sm btn-danger deleteBill"  id="'.$bill->id.'">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
                           <div class="modal fade" id="editBill'.$bill->id.'" tabindex="-1" role="dialog" aria-hidden="true">
                               <div class="modal-dialog">
                                   <form method="POST" action="'.route('project-service-row.update').'" class="edit-form">

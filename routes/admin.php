@@ -293,6 +293,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('project-services/invoice', [ProjectServiceController::class, 'invoice'])->name('project-services.invoice.show');
     Route::get('/project-services/send-multi-email', [ProjectServiceController::class, 'sendMultiEmail']);
+    // Route::delete('/client-project-service-detail-delete/{detail}', [ProjectServiceDetailController::class, 'destroy']);
 
     // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
