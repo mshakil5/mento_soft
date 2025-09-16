@@ -102,23 +102,24 @@ class HomeController extends Controller
     public function userHome()
     {   
         $user = auth()->user();
+        $today = now();
         $plannedprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 1)->count();
         $ongoingprojectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 2)->count();
         $doneProjectsCount = ClientProject::where('client_id', $user->client->id)->where('status', 4)->count();
         $onGoingTasksCount = ProjectTask::where('client_id', $user->client->id)->whereIn('status', [1, 2])->where('allow_client', 1)->count();
         $notConfirmedTasksCount = ProjectTask::where('client_id', $user->client->id)->where('status', 3)->where('is_confirmed', 0)->where('allow_client', 1)->count();
         $outstandingAmount = ProjectServiceDetail::where('client_id', $user->client->id)
-        ->where('bill_paid', 0)
-        ->get()
-        ->filter(function($row) {
-            $start = Carbon::parse($row->start_date ?? now());
-            return match($row->cycle_type) {
-                1 => $start <= now() || now()->diffInDays($start) <= 10,
-                2 => $start <= now() || now()->diffInMonths($start) <= 3,
-                default => false,
-            };
-        })
-        ->sum('amount');
+            ->where('bill_paid', 0)
+            ->get()
+            ->filter(function($row) use ($today) {
+                $start = Carbon::parse($row->start_date ?? $today);
+                return match($row->cycle_type) {
+                    1 => $start <= $today && $today->diffInDays($start) <= 10,
+                    2 => $start <= $today && $today->diffInMonths($start) <= 3,
+                    default => false,
+                };
+            })
+            ->sum('amount');
         $projectDueAmountToPay = Invoice::where('client_id', $user->client->id)->where('status', 1)->sum('net_amount');
         return view('user.dashboard', compact('ongoingprojectsCount', 'doneProjectsCount', 'plannedprojectsCount', 'onGoingTasksCount', 'notConfirmedTasksCount', 'outstandingAmount', 'projectDueAmountToPay'));
     }

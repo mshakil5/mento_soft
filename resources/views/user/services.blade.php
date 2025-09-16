@@ -48,6 +48,7 @@
                                 @php
                                     $unpaidBills = \App\Models\ProjectServiceDetail::where('project_service_id', $service->project_service_id)
                                         ->where('client_id', $service->client_id)
+                                        ->latest()
                                         ->where('client_project_id', $service->client_project_id)
                                         ->where('bill_paid', '!=', 1)
                                         ->where('amount', $service->amount)
@@ -109,27 +110,25 @@
                             <div class="modal-body">
                                 @php
                                     $bills = \App\Models\ProjectServiceDetail::with(['transaction'=>fn($q)=>$q->where('transaction_type','Received'),'client','serviceType','project'])
-                                        ->where('project_service_id', $service->project_service_id)
                                         ->where('client_id', $service->client_id)
                                         ->where('client_project_id', $service->client_project_id)
                                         ->where('amount', $service->amount)
                                         ->where('cycle_type', $service->cycle_type)
                                         ->where('is_auto', $service->is_auto)
-                                        ->latest()
+                                        ->orderByDesc('id')
                                         ->get()
                                         ->filter(function($row) {
-                                        $start = \Carbon\Carbon::parse($row->start_date ?? now());
-                                        return match($row->cycle_type) {
-                                            1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
-                                            2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
-                                            default => false,
-                                        };
-                                    });
+                                            $start = \Carbon\Carbon::parse($row->start_date ?? now());
+                                            return match($row->cycle_type) {
+                                                1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
+                                                2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
+                                                default => false,
+                                            };
+                                        });
                                 @endphp
                                 <table class="table table-bordered table-hover" style="font-size: 12px;">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>Service</th>
                                             <th>Duration</th>
                                             <th>Payment Date</th>
@@ -153,7 +152,6 @@
                                                 $status = $bill->bill_paid ? 'Paid' : ($bill->due_date && \Carbon\Carbon::parse($bill->due_date)->lt(now()) ? 'Overdue' : 'Due');
                                             @endphp
                                             <tr>
-                                                <td>{{ $index + 1 }}</td>
                                                 <td>{{ $bill->serviceType?->name }}</td>
                                                 <td>{{ $duration }}</td>
                                                 <td>{{ $paymentDate }}</td>
