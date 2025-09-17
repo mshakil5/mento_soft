@@ -33,8 +33,27 @@ class ProjectTaskController extends Controller
                 ->addColumn('employee_name', function($row) {
                     return $row->employee->name ?? '';
                 })
+                ->addColumn('created_date', function($row) {
+                    return '<span class="badge badge-info">' . \Carbon\Carbon::parse($row->created_at)->format('d-m-Y') . '</span>';
+                })
                 ->addColumn('due_date', function($row) {
-                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
+                    if (!$row->due_date) return '';
+
+                    $dueDate = Carbon::parse($row->due_date);
+
+                    if ($row->status == 3) {
+                        $badgeClass = 'badge badge-info';
+                    } else {
+                        if ($dueDate->isToday()) {
+                            $badgeClass = 'badge badge-warning';
+                        } elseif ($dueDate->isPast()) {
+                            $badgeClass = 'badge badge-danger';
+                        } else {
+                            $badgeClass = 'badge badge-info';
+                        }
+                    }
+
+                    return '<span class="'.$badgeClass.'">Due: '.$dueDate->format('d-m-Y').'</span>';
                 })
                 ->addColumn('priority', function($row) {
                     $badgeClass = [
@@ -124,7 +143,7 @@ class ProjectTaskController extends Controller
 
                     return $html;
                 })
-                ->rawColumns(['priority', 'status', 'action'])
+                ->rawColumns(['priority', 'status', 'action', 'due_date', 'created_date'])
                 ->make(true);
         }
 

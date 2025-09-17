@@ -64,6 +64,7 @@
                                     <th>Task</th>
                                     <th>Assigned To</th>
                                     <th>Priority</th>
+                                    <th>Created Date</th>
                                     <th>Due Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -163,6 +164,7 @@
                 {data: 'title', name: 'title'},
                 {data: 'employee_name', name: 'employee_name'},
                 {data: 'priority', name: 'priority', orderable: false, searchable: false},
+                {data: 'created_date', name: 'created_date'},
                 {data: 'due_date', name: 'due_date'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},

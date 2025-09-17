@@ -61,8 +61,25 @@ class TaskController extends Controller
 
                     $projectTitle = $row->clientProject->title ?? '';
                     $unreadCount = $row->unread_messages_count;
-
                     $taskUrl = route('tasks.show', $row->id);
+
+                    $dueBadge = '';
+                    if ($row->due_date) {
+                        $dueDate = Carbon::parse($row->due_date);
+
+                        if ($row->status == 3) {
+                            // Always info if done
+                            $dueBadge = '<span class="badge badge-info mr-2">Due: ' . $dueDate->format('d M Y') . '</span>';
+                        } else {
+                            if ($dueDate->isToday()) {
+                                $dueBadge = '<span class="badge badge-warning mr-2">Due: ' . $dueDate->format('d M Y') . '</span>';
+                            } elseif ($dueDate->isPast()) {
+                                $dueBadge = '<span class="badge badge-danger mr-2">Due: ' . $dueDate->format('d M Y') . '</span>';
+                            } else {
+                                $dueBadge = '<span class="badge badge-info mr-2">Due: ' . $dueDate->format('d M Y') . '</span>';
+                            }
+                        }
+                    }
 
                     $html = '<a href="' . $taskUrl . '" class="d-block" style="text-decoration:none; color:inherit;">';
                     $html .= '<div class="d-flex flex-column">';
@@ -76,8 +93,8 @@ class TaskController extends Controller
                     }
 
                     if (auth()->user()->can('edit-task')) {
-                    $html .= '<a href="' . route('client-projects-task.edit-page', $row->id) . '" class="text-secondary mr-1" title="Edit Task">';
-                    $html .= '<i class="fas fa-edit"></i></a>';
+                        $html .= '<a href="' . route('client-projects-task.edit-page', $row->id) . '" class="text-secondary mr-1" title="Edit Task">';
+                        $html .= '<i class="fas fa-edit"></i></a>';
                     }
 
                     if (is_null($row->employee_id)) {
@@ -89,7 +106,12 @@ class TaskController extends Controller
                     $html .= '    <span class="' . $priorityClass . '">' . ucfirst($row->priority) . '</span>';
                     $html .= '  </div>';
                     $html .= '</div>';
-                    $html .= '<div class="align-self-end mt-1"><span class="badge badge-success">' . $projectTitle . '</span></div>';
+
+                    $html .= '<div class="d-flex justify-content-between align-items-center mt-1">';
+                    $html .= '  <div>' . $dueBadge . '</div>';
+                    $html .= '  <div><span class="badge badge-success">' . $projectTitle . '</span></div>';
+                    $html .= '</div>';
+
                     $html .= '</div>';
                     $html .= '</a>';
 
@@ -146,8 +168,27 @@ class TaskController extends Controller
                 ->addColumn('project_title', function($row) {
                     return $row->clientProject->title ?? '';
                 })
+                ->addColumn('created_date', function($row) {
+                    return '<span class="badge badge-info">' . \Carbon\Carbon::parse($row->created_at)->format('d-m-Y') . '</span>';
+                })
                 ->addColumn('due_date', function($row) {
-                    return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
+                    if (!$row->due_date) return '';
+
+                    $dueDate = Carbon::parse($row->due_date);
+
+                    if ($row->status == 3) {
+                        $badgeClass = 'badge badge-info';
+                    } else {
+                        if ($dueDate->isToday()) {
+                            $badgeClass = 'badge badge-warning';
+                        } elseif ($dueDate->isPast()) {
+                            $badgeClass = 'badge badge-danger';
+                        } else {
+                            $badgeClass = 'badge badge-info';
+                        }
+                    }
+
+                    return '<span class="'.$badgeClass.'">Due: '.$dueDate->format('d-m-Y').'</span>';
                 })
                 ->addColumn('priority', function($row) {
                     $badgeClass = [
@@ -237,7 +278,7 @@ class TaskController extends Controller
 
                     return $html;
                 })
-                ->rawColumns(['priority', 'status', 'action'])
+                ->rawColumns(['priority', 'status', 'action', 'due_date', 'created_date'])
                 ->make(true);
         }
 
