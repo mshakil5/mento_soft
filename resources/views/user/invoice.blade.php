@@ -1,126 +1,170 @@
-@php
-    use Carbon\Carbon;
-    $totalAmount = $detail->amount ?? 0; // single service
-    $company = \App\Models\CompanyDetails::first();
-    $client = $detail->client ?? null;
-@endphp
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @php
+        use Carbon\Carbon;
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>{{ $company->company_name }} - Invoice</title>
     <style>
-        body { font-family: Arial, Helvetica; font-size: 12px; margin: 0; padding: 20px; }
-        .text-center { text-align: center; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 20px;
+        }
+        p {
+            margin: 0;
+            padding: 0;
+        }
+        .invoice-body {
+            max-width: 794px;
+            margin: 0 auto;
+        }
         .text-right { text-align: right; }
-        .invoice-body { max-width: 794px; margin: 0 auto; }
+        .text-center { text-align: center; }
         table { width: 100%; border-collapse: collapse; }
         .table td, .table th { padding: 8px; border: 1px solid #dee2e6; }
     </style>
 </head>
 <body>
-<section class="invoice">
-    <div class="invoice-body">
-        <table>
-            <tr>
-                <td style="width:50%;">
-                    <img src="{{ asset('images/company/' . $company->company_logo) }}" width="120px" />
-                </td>
-                <td style="width:50%; text-align: right;">
-                    <h1 style="font-size:30px; color:blue; margin:0;">INVOICE</h1>
-                    @if($detail->bill_paid == 1)
-                        <span style="display:inline-block; margin-top:5px; padding:5px 10px; background-color:green; color:white; font-weight:bold; border-radius:5px;">
-                            PAID
-                        </span>
-                    @endif
-                </td>
-            </tr>
-        </table>
-
-        <table>
-            <tr>
-                <td style="width:40%;">
-                    <h5>Bill To</h5>
-                    @if($client)
-                        <p>{{ $client->business_name }}</p>
-                        <p>{{ $client->name }}</p>
-                        <p>{{ $client->email }}</p>
-                        <p>{{ $client->phone }}</p>
-                        <p>{{ $client->address }}</p>
-                    @endif
-                </td>
-                <td style="width:30%;"></td>
-                <td style="width:30%; text-align:right;">
-                    <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
-                </td>
-            </tr>
-        </table>
-        <br>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Project</th>
-                    <th>Description</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>VAT %</th>
-                    <th>Total (Excl VAT)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="text-align:center;">1</td>
-                    <td style="text-align:center;">{{ $detail->serviceType->name ?? '-' }}</td>
-                    <td style="text-align:center;">
-                        {{ Carbon::parse($detail->start_date)->format('j F Y') ?? '-' }} - 
-                        {{ Carbon::parse($detail->end_date)->format('j F Y') ?? '-' }}
-                    </td>
-                    <td style="text-align:center;">1</td>
-                    <td style="text-align:center;">{{ number_format($detail->amount, 2) ?? '0.00' }}</td>
-                    <td style="text-align:center;">0%</td>
-                    <td style="text-align:right;">{{ number_format($detail->amount, 2) ?? '0.00' }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <table style="margin-top:20px;">
-            <tr>
-                <td style="width:60%">&nbsp;</td>
-                <td style="width:20%; text-align:right; background-color:#f2f2f2;">Total</td>
-                <td style="width:20%; text-align:right; background-color:#f2f2f2;">£{{ number_format($totalAmount, 2) }}</td>
-            </tr>
-        </table>
-
-        @if($client && $client->note)
-            <div style="margin-top:30px;">
-                <p style="font-weight:bold;">Notes:</p>
-                <p>{{ $client->note }}</p>
-            </div>
-        @endif
-
-        <div style="position: fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:794px; width:100%; padding:10px 20px; border-top:1px solid #ddd; background:white;">
+    <section class="invoice">
+        <div class="invoice-body">
+            <br>
+            <br>
             <table>
                 <tr>
                     <td style="width:50%; text-align:left;">
-                        <b>{{ $company->business_name ?: $company->company_name }}</b><br>
-                        Registration Number: {{ $company->company_reg_number ?? '' }}<br>
-                        Vat Number: {{ $company->vat_number ?? '' }}<br>
-                        {{ $company->address1 ?? '' }}
+                        @php
+                            $logoPath = public_path('images/company/' . $company->company_logo);
+                            $logoBase64 = '';
+
+                            if(file_exists($logoPath)) {
+                                $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                                $data = file_get_contents($logoPath);
+                                $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                            }
+                        @endphp
+                        <img src="{{ $logoBase64 }}" width="120px" />
                     </td>
                     <td style="width:50%; text-align:right;">
-                        {{ $company->phone1 ?? '' }} <br>
-                        {{ $company->email1 ?? '' }} <br>
-                        {{ $company->website ?? '' }} <br>
+                        <h1 style="font-size: 30px; color:blue; margin: 0;">INVOICE</h1>
                     </td>
                 </tr>
             </table>
+
+            <br><br>
+
+            @php
+                $client = $services->first()->client;
+            @endphp
+            <table>
+                <tr>
+                    <td style="width:60%; vertical-align: top;">
+                        <h3 style="margin-bottom: 2px;">Bill To</h3>
+                        @if ($client->business_name) <p>{{ $client->business_name }}</p> @endif
+                        @if ($client->email) <p>{{ $client->email }}</p> @endif
+                        @if ($client->phone) <p>{{ $client->phone }}</p> @endif
+                        @if ($client->address) <p>{{ $client->address }}</p> @endif
+                    </td>
+                    <td style="width:40%; text-align:right; vertical-align: top;">
+                        <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
+                        <p>
+                            Invoice #: MS{{ \Carbon\Carbon::parse($services->first()->startdate)->format('Ym') }}-{{ str_pad($services->first()->id, 2, '0', STR_PAD_LEFT) }}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <br>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Service</th>
+                        <th class="text-center">Period</th>
+                        <th class="text-center">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $subtotal = 0; @endphp
+                    @foreach ($services as $index => $service)
+                        @php 
+                            $subtotal += $service->amount; 
+                            $dateRange = $service->start_date && $service->end_date 
+                                ? Carbon::parse($service->start_date)->format('d M Y') . ' - ' . Carbon::parse($service->end_date)->format('d M Y') 
+                                : '';
+                        @endphp
+                        <tr>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">
+                                <strong>{{ $service->project?->title }}</strong> {{ $service->serviceType->name }}
+                            </td>
+                            <td class="text-center">{{ $dateRange }}</td>
+                            <td class="text-center">£{{ number_format($service->amount, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <table style="margin-top:20px;">
+                <tr>
+                    <td style="width:70%;">
+                      <div style="margin-top:20px;">
+                        Account Details<br>
+                        MR MD F A Bhuyain<br>
+                        Sort code: 11-08-34<br>
+                        A/C No: 00630751<br>
+                        Halifax<br>
+                        If you have any questions concerning this invoice please contact to,<br>
+                        Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br>
+                        <B>
+                          THANK YOU FOR YOUR BUSINESS!
+                        </B>
+                      </div>
+                    </td>
+                    <td style="width:30%">
+                        <table style="width:100%;">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td>VAT</td>
+                                <td class="text-right">£0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#f2f2f2"><b>Total</b></td>
+                                <td class="text-right" style="background:#f2f2f2"><b>£{{ number_format($subtotal, 2) }}</b></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+                        max-width: 794px; width: 100%; padding: 10px 20px;
+                        border-top: 1px solid #ddd; background: white;">
+                <table>
+                    <tr>
+                        <td style="width:50%; text-align:left;">
+                            <b>{{ $company->business_name ?: $company->company_name }}</b><br>
+                            Registration Number: {{ $company->company_reg_number ?? '' }}<br>
+                            Vat Number: {{ $company->vat_number ?? '' }}<br>
+                            {{ $company->address1 ?? '' }}
+                        </td>
+                        <td style="width:50%; text-align:right;">
+                            {{ $company->phone1 ?? '' }} <br>
+                            {{ $company->email1 ?? '' }} <br>
+                            {{ $company->website ?? '' }} <br>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+
 </body>
 </html>

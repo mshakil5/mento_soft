@@ -192,7 +192,7 @@ class ProjectServiceController extends Controller
                 ->addColumn('client_name', fn($row) => $row->client?->name)
                 ->addColumn('project_title', fn($row) => $row->project?->title)
                 ->addColumn('amount', function ($row) {
-                    if ($row->bill_paid == 1) return '';
+                    // if ($row->bill_paid == 1) return '';
                     if ($row->type == 1 || $row->type == 2) {
                         $totalAmount = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                             ->where('client_id', $row->client_id)
@@ -230,8 +230,16 @@ class ProjectServiceController extends Controller
                     $btn = '';
 
                     if ($row->type == 2 && $row->status == 1) {
-                        $start = Carbon::parse($row->start_date)->format('j F Y');
-                        $end = Carbon::parse($row->end_date)->format('j F Y');
+                        $startDate = Carbon::parse($row->start_date);
+                        $endDate = Carbon::parse($row->end_date);
+
+                        if ($row->cycle_type == 1) { // 1 month cycle
+                            $start = $startDate->copy()->addMonthNoOverflow()->format('j F Y');
+                            $end = $endDate->copy()->addMonthNoOverflow()->format('j F Y');
+                        } else { // 1 year cycle
+                            $start = $startDate->copy()->addYear()->format('j F Y');
+                            $end = $endDate->copy()->addYear()->format('j F Y');
+                        }
 
                         $btnClass = ($row->cycle_type == 2 && ($row->start_date < now() || now()->diffInMonths($row->start_date) <= 3)) ? 'btn-danger' : 'btn-info';
 
@@ -646,7 +654,7 @@ class ProjectServiceController extends Controller
             })
             ->get()
             ->filter(function($detail) {
-                $end = Carbon::parse($detail->start_date ?? now());
+                $end = Carbon::parse($detail->end_date ?? now());
                 return match($detail->cycle_type) {
                     1 => $end->subWeeks(2)->lte(now()),   // monthly → 2 weeks before end
                     2 => $end->subMonths(3)->lte(now()),  // yearly → 3 months before end
@@ -1236,7 +1244,7 @@ class ProjectServiceController extends Controller
                 $renewal->save();
             }
 
-            $serviceDetail->update(['is_renewed' => 1]);
+            $serviceDetail->update(['is_renewed' => 1, 'next_created' => 1]);
 
             $newDetail = ProjectServiceDetail::create([
                 'project_service_id' => $parentService->project_service_id,

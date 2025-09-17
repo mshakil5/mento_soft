@@ -49,6 +49,8 @@
 <body>
     <section class="invoice">
         <div class="invoice-body">
+            <br>
+            <br>
             <table>
                 <tbody>
                     <tr>
@@ -100,7 +102,13 @@
                                 @endif                              
                             </div>
                         </td>
-                        <td style="width:30%;"></td>
+                        <td style="width:30%; text-align: center; vertical-align: middle;">
+                            <div>
+                                <p style="font-size: 12px; margin: 5px; line-height: 10px; font-weight: bold;">
+                                    Bill For: {{ $invoice->invoice_for ?? '' }}
+                                </p>
+                            </div>
+                        </td>
                         <td style="width:30%;">
                             <div style="text-align: right;">
                                 <p style="font-size: 12px; margin: 5px;text-align: right;line-height: 10px;">Invoice No: {{ $invoice->invoice_number }}</p>
@@ -123,7 +131,7 @@
                     </thead>
                     <tbody>
                       @foreach($invoice->details as $index => $item)
-                       <tr>
+                        <tr>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $index + 1 }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->description }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">£{{ number_format($item->unit_price, 2) }}</td>
@@ -158,6 +166,14 @@
                             <td>VAT</td>
                             <td style="text-align:right">£{{ number_format($invoice->vat_amount, 2) }}</td>
                         </tr>
+                        @else
+                         <tr>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>VAT</td>
+                            <td style="text-align:right">£0.00</td>
+                        </tr>
                         @endif
                         <tr>
                             <td></td>
@@ -170,7 +186,7 @@
                 </table>
             </div>
             @if ($invoice->description)
-            <div >
+            <div>
                 <p style="margin: 0;">{!! $invoice->description !!}</p>
             </div>
             @endif

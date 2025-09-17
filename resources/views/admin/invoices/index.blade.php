@@ -57,10 +57,16 @@
                                         <input type="text" class="form-control" id="invoice_number" name="invoice_number" readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Due Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="invoice_date" name="invoice_date" required value="{{ date('Y-m-d') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Bill For <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="invoice_for" name="invoice_for" required value="">
                                     </div>
                                 </div>
                             </div>
@@ -69,7 +75,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>
-                                            Invoice To <span class="text-danger">*</span>
+                                            Bill To <span class="text-danger">*</span>
                                             <span class="badge bg-success" style="cursor: pointer;" data-toggle="modal" data-target="#newClientModal">
                                                 Add new
                                             </span>
@@ -150,14 +156,6 @@
                                           </B>
                                         </textarea>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Email Body</label>
-                                        <textarea class="form-control summernote" name="email_body">
-                                          <p>&nbsp;</p>
-                                          <p>&nbsp;</p>
-                                          {!! $mailBody->mail_footer ?? '' !!}
-                                        </textarea>
-                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="card">
@@ -199,6 +197,16 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                      <div class="form-group">
+                                        <label>Email Body</label>
+                                        <textarea class="form-control summernote" name="email_body">
+                                          <p>&nbsp;</p>
+                                          <p>&nbsp;</p>
+                                          {!! $mailBody->mail_footer ?? '' !!}
+                                        </textarea>
                                     </div>
                                 </div>
                             </div>
@@ -728,6 +736,7 @@
             pageTop();
             $("#codeid").val(data.id);
             $("#invoice_date").val(data.invoice_date);
+            $("#invoice_for").val(data.invoice_for);
             $("#description").val(data.description);
             $("#vat_percent").val(data.vat_percent);
             $("#discount_percent").val(data.discount_percent);

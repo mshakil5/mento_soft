@@ -57,9 +57,13 @@
                                         ->get()
                                         ->filter(function($row) {
                                             $start = \Carbon\Carbon::parse($row->start_date ?? now());
+
+                                            $today = now();
+                                            $adjustedToday = $today->copy();
+
                                             return match($row->cycle_type) {
-                                                1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
-                                                2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
+                                                1 => $start <= $adjustedToday->addDays(10),   // monthly: within 10 days
+                                                2 => $start <= $adjustedToday->addMonths(3),  // yearly: within 3 months
                                                 default => false,
                                             };
                                         });
@@ -135,7 +139,6 @@
                                             <th>Amount</th>
                                             <th>Method</th>
                                             <th>Status</th>
-                                            <th>Invoice</th>
                                             <th>Note</th>
                                         </tr>
                                     </thead>
@@ -182,13 +185,12 @@
                                                   @endphp
 
                                                   @if($status)
-                                                      <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                                                      <span class="badge {{ $badgeClass }}">{{ $status }}</span> <br>
+                                                      <a href="{{ route('invoice.download', $bill->id) }}" target="_blank" class="badge bg-info text-dark">
+                                                          Invoice
+                                                      </a>
                                                   @endif
                                                 </td>
-                                                <td>
-                                                  <a href="{{ route('invoice.download', $bill->id) }}" class="btn btn-sm btn-secondary" target="_blank">
-                                                      Download
-                                                  </a>
                                                 </td>
                                                 <td>{{ $note }}</td>
                                             </tr>

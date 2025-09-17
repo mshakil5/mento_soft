@@ -65,7 +65,9 @@
                     </td>
                     <td style="width:40%; text-align:right; vertical-align: top;">
                         <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
-                        <p>Invoice #: INV{{ str_pad($services->first()->id, 6, '0', STR_PAD_LEFT) }}</p>
+                        <p>
+                            Invoice #: MS{{ \Carbon\Carbon::parse($services->first()->startdate)->format('Ym') }}-{{ str_pad($services->first()->id, 2, '0', STR_PAD_LEFT) }}
+                        </p>
                     </td>
                 </tr>
             </table>

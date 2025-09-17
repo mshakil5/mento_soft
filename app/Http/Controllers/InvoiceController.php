@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use App\Mail\ClientEmail;
 use App\Models\ProjectServiceDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class InvoiceController extends Controller
 {
@@ -117,6 +118,10 @@ class InvoiceController extends Controller
                                         </div>
                                         <div class="modal-body">
                                             <div class="mb-3">
+                                                <label>Payment Date <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" name="date" value="'.now()->format('Y-m-d').'" required>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label>Payment Type <span class="text-danger">*</span></label>
                                                 <select name="payment_type" class="form-control" required>
                                                     <option value="Cash">Cash</option>
@@ -156,8 +161,18 @@ class InvoiceController extends Controller
     {
         $clients = Client::where('status', 1)->latest()->get();
 
+        $prefix = 'MS' . date('Ym');
+
         $latest = Invoice::orderBy('id', 'desc')->first();
-        $invoiceNumber = $latest ? ($latest->invoice_number + 1) : 1001;
+
+        if ($latest) {
+            $lastNumber = (int) Str::after($latest->invoice_number, '-');
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        $invoiceNumber = $prefix . '-' . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
 
         return response()->json([
             'clients' => $clients,
@@ -174,6 +189,7 @@ class InvoiceController extends Controller
         $validator = Validator::make($request->all(), [
             'client_id' => 'required|exists:clients,id',
             'invoice_date' => 'required|date',
+            'invoice_for' => 'required',
             'vat_percent' => 'nullable|numeric',
             'discount_percent' => 'nullable|numeric',
             'description' => 'nullable|string',
@@ -199,6 +215,7 @@ class InvoiceController extends Controller
             $invoice->invoice_number = $request->invoice_number;
             $invoice->client_id = $request->client_id;
             $invoice->invoice_date = $request->invoice_date;
+            $invoice->invoice_for = $request->invoice_for;
             $invoice->vat_percent = $request->vat_percent ?? 0;
             $invoice->discount_percent = $request->discount_percent ?? 0;
             $invoice->description = $request->description;
@@ -299,7 +316,7 @@ class InvoiceController extends Controller
         $attachmentPath = '/images/email-attachments/invoice_' . time() . '.pdf';
         $pdf->save(public_path($attachmentPath));
 
-        $emailBody = $request->email_body ?? $company->mail_footer ?? 'Thank you.';
+        $emailBody = $emailBody ?? $company->mail_footer ?? 'Thank you.';
 
         Mail::to($invoice->client->email)
             ->send(new ClientEmail($subject, $emailBody, [], $invoice));
@@ -344,6 +361,7 @@ class InvoiceController extends Controller
             'codeid' => 'required|exists:invoices,id',
             'client_id' => 'required|exists:clients,id',
             'invoice_date' => 'required|date',
+            'invoice_date' => 'required',
             'vat_percent' => 'nullable|numeric',
             'discount_percent' => 'nullable|numeric',
             'description' => 'nullable|string',
@@ -369,6 +387,7 @@ class InvoiceController extends Controller
             $invoice = Invoice::findOrFail($request->codeid);
             $invoice->client_id = $request->client_id;
             $invoice->invoice_date = $request->invoice_date;
+            $invoice->invoice_for = $request->invoice_for;
             $invoice->vat_percent = $request->vat_percent ?? 0;
             $invoice->discount_percent = $request->discount_percent ?? 0;
             $invoice->description = $request->description;
@@ -521,7 +540,7 @@ class InvoiceController extends Controller
     {
         $prevTransaction = Transaction::where('invoice_id', $invoice->id)->where('transaction_type', 'Due')->first();
         $transaction = new Transaction();
-        $transaction->date = date('Y-m-d');
+        $transaction->date = $request->date;
         $transaction->invoice_id = $invoice->id;
         $transaction->client_id = $invoice->client_id;
         $transaction->client_project_id = $prevTransaction->client_project_id ?? null;

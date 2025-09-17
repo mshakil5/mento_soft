@@ -365,34 +365,20 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $clientId = $user->client->id;
-        $today = now();
 
         $projects = ClientProject::where('client_id', $clientId)->get();
 
         $idsToDisplay = ProjectServiceDetail::where('client_id', $clientId)
             ->when($request->bill_paid !== null, fn($q) => $q->where('bill_paid', $request->bill_paid))
             ->selectRaw('MIN(id) as id')
-            ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','is_auto','bill_paid','type','is_renewed')
+            ->groupBy('project_service_id','client_id','client_project_id','amount','cycle_type','type')
             ->pluck('id')
             ->toArray();
 
         $services = ProjectServiceDetail::with(['serviceType','project','transaction'])
             ->whereIn('id', $idsToDisplay)
             ->when($request->project, fn($q,$p) => $q->where('client_project_id', $p))
-            ->get()
-            ->filter(function ($row) use ($today) {
-                if ($row->bill_paid == 1) {
-                    return true;
-                }
-
-                $start = Carbon::parse($row->start_date ?? $today);
-
-                return match ($row->cycle_type) {
-                    1 => $start <= $today && $today->diffInDays($start) <= 10,
-                    2 => $start <= $today && $today->diffInMonths($start) <= 3,
-                    default => false,
-                };
-            });
+            ->get();
 
         return view('user.services', compact('services','projects'));
     }
@@ -485,10 +471,12 @@ class UserController extends Controller
 
     public function downloadInvoice($id)
     {
-        $detail = ProjectServiceDetail::with(['serviceType', 'project', 'client'])->findOrFail($id);
+        $service = ProjectServiceDetail::with(['serviceType', 'project', 'client'])->findOrFail($id);
         $company = CompanyDetails::first();
-        $totalAmount = $detail->amount;
-        $pdf = Pdf::loadView('user.invoice', compact('detail', 'company', 'totalAmount'));
-        return $pdf->download("Invoice_{$detail->id}.pdf");
+            $pdf = Pdf::loadView('user.invoice', [
+                'services' => collect([$service]),
+                'company' => $company
+            ]);
+        return $pdf->download("Invoice_{$service->id}.pdf");
     }
 }

@@ -112,11 +112,14 @@ class HomeController extends Controller
         $outstandingAmount = ProjectServiceDetail::where('client_id', $user->client->id)
             ->where('bill_paid', 0)
             ->get()
-            ->filter(function($row) use ($today) {
+            ->filter(function ($row) use ($today) {
                 $start = Carbon::parse($row->start_date ?? $today);
-                return match($row->cycle_type) {
-                    1 => $start <= $today && $today->diffInDays($start) <= 10,
-                    2 => $start <= $today && $today->diffInMonths($start) <= 3,
+
+                $adjustedToday = $today->copy();
+
+                return match ($row->cycle_type) {
+                    1 => $start <= $adjustedToday->addDays(10),
+                    2 => $start <= $adjustedToday->addMonths(3),
                     default => false,
                 };
             })
