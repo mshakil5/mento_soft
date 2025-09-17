@@ -19,6 +19,7 @@
             
             <form id="createThisForm">
               <input type="hidden" name="serviceIds" value='@json($serviceIds)' id="serviceIds">
+              <input type="hidden" name="invoiceId" value='{{ $invoice_id }}' id="invoiceId">
               @csrf
               <div class="card-body">
 
@@ -44,6 +45,9 @@
                         </textarea>
                       </div>
                     </div>
+                    {{-- @if($attachment )
+                        {!! $attachment !!}
+                    @endif --}}
                 </div>
 
               </div>
@@ -76,6 +80,7 @@
           var sendButton = $('#sendEmailButton');
           var loader = $('#loader');
           var serviceIds = $('#serviceIds').val();
+          var invoiceId = $('#invoiceId').val();
 
           if (!subject || !body) {
               error('Please fill in all fields.');
@@ -93,7 +98,8 @@
                   subject: subject,
                   body: body,
                   id: "{{ $client->id }}",
-                  serviceIds: serviceIds
+                  serviceIds: serviceIds,
+                  invoiceId: invoiceId
               },
               success: function(res) {
                   console.log(res);

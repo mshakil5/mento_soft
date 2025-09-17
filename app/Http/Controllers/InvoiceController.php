@@ -97,10 +97,7 @@ class InvoiceController extends Controller
                     }
 
                     if (auth()->user()->can('mail invoice') && $row->client->email) {
-                        $dropdown .= '<a href="#" class="dropdown-item send-email" 
-                                        data-id="'.$row->id.'" 
-                                        data-email="'.$row->client->email.'" 
-                                        title="Send Email">
+                        $dropdown .= '<a href="' . route('client.email', $row->client->id) . '?invoice_id=' . $row->id . '" class="dropdown-item" title="Send Email">
                                         <i class="fas fa-envelope"></i> Send Email
                                       </a>';
                     }
@@ -151,8 +148,8 @@ class InvoiceController extends Controller
         }
 
         $clients = Client::where('status', 1)->select('id', 'business_name')->latest()->get();
-
-        return view('admin.invoices.index', compact('clients'));
+        $mailBody = CompanyDetails::select('mail_footer')->first();
+        return view('admin.invoices.index', compact('clients','mailBody'));
     }
 
     public function create()
@@ -260,8 +257,10 @@ class InvoiceController extends Controller
             $transaction->tran_id = 'AT' . date('ymd') . str_pad($transaction->id, 4, '0', STR_PAD_LEFT);
             $transaction->save();
 
+            $emailBody = $request->email_body ?? '';
+
             if ($request->send_email == 1) {
-                $this->sendInvoiceEmail($invoice);
+                $this->sendInvoiceEmail($invoice, $emailBody);
                 DB::commit();
                 return response()->json([
                     'status' => 200,
@@ -286,7 +285,7 @@ class InvoiceController extends Controller
         }
     }
 
-    private function sendInvoiceEmail($invoice)
+    private function sendInvoiceEmail($invoice, $emailBody = null)
     {
         $subject = 'Invoice #' . $invoice->invoice_number;
 
@@ -300,14 +299,16 @@ class InvoiceController extends Controller
         $attachmentPath = '/images/email-attachments/invoice_' . time() . '.pdf';
         $pdf->save(public_path($attachmentPath));
 
+        $emailBody = $request->email_body ?? $company->mail_footer ?? 'Thank you.';
+
         Mail::to($invoice->client->email)
-            ->send(new ClientEmail($subject, null, [], $invoice));
+            ->send(new ClientEmail($subject, $emailBody, [], $invoice));
 
         ClientEmailLog::create([
             'client_id'       => $invoice->client_id,
             'recipient_email' => $invoice->client->email,
             'subject'         => $subject,
-            'message'         => $company->mail_footer ?? 'Thank you.',
+            'message'         => $emailBody,
             'attachment'      => $attachmentPath,
             'status'          => 1,
             'created_by'      => auth()->id(),

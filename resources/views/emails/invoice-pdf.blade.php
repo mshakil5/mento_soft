@@ -54,7 +54,17 @@
                     <tr>
                         <td style="width:50%;">
                             <div style="text-align: left;">
-                                <img src="{{ asset('images/company/' . $company->company_logo) }}" width="120px" style="display:inline-block;" />
+                                @php
+                                    $logoPath = public_path('images/company/' . $company->company_logo);
+                                    $logoBase64 = '';
+
+                                    if(file_exists($logoPath)) {
+                                        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                                        $data = file_get_contents($logoPath);
+                                        $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    }
+                                @endphp
+                                <img src="{{ $logoBase64 }}" width="120px" style="display:inline-block;" />
                             </div>
                         </td>
                         <td style="width:50%;">
@@ -108,7 +118,6 @@
                         <tr>
                             <th style="border: 1px solid #dee2e6; text-align:center;">#</th>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Description</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Qty</th>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Amount</th>
                         </tr>
                     </thead>
@@ -117,7 +126,6 @@
                        <tr>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $index + 1 }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->description }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->qty }}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">£{{ number_format($item->unit_price, 2) }}</td>
                         </tr>
                       @endforeach
@@ -163,7 +171,7 @@
             </div>
             @if ($invoice->description)
             <div >
-                <p style="margin: 0;">{{ $invoice->description }}</p>
+                <p style="margin: 0;">{!! $invoice->description !!}</p>
             </div>
             @endif
             <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 10px 20px; border-top: 1px solid #ddd; background: white;">

@@ -120,7 +120,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Description</th>
-                                                        <th width="10%">Qty</th>
+                                                        {{-- <th width="10%">Qty</th> --}}
                                                         <th width="15%">Price</th>
                                                         <th width="5%">Action</th>
                                                     </tr>
@@ -133,7 +133,7 @@
                                 </div>
                             </div>
                             
-                            <div class="row mt-3">
+                            <div class="row mt-1">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Message on Invoice</label>
@@ -148,6 +148,14 @@
                                           <B>
                                             THANK YOU FOR YOUR BUSINESS!
                                           </B>
+                                        </textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email Body</label>
+                                        <textarea class="form-control summernote" name="email_body">
+                                          <p>&nbsp;</p>
+                                          <p>&nbsp;</p>
+                                          {!! $mailBody->mail_footer ?? '' !!}
                                         </textarea>
                                     </div>
                                 </div>
@@ -466,7 +474,7 @@
                     <td>
                         <textarea class="form-control" name="projects[${rowId}][description]" required> ${(data.project_name ? data.project_name + ' - ' : '') + (data.description || '')} </textarea>
                     </td>
-                    <td>
+                    <td class="d-none">
                         <input type="number" class="form-control qty" name="projects[${rowId}][qty]" min="1" value="${data.qty}" required>
                     </td>
                     <td>

@@ -456,8 +456,15 @@ class ClientController extends Controller
     {
         $client = client::where('id', $id)->select('id', 'name','email')->first();
         $serviceIds = $request->query('service_ids') ? explode(',', $request->query('service_ids')) : [];
+        $invoice_id = $request->query('invoice_id') ?? null;
         $mailFooter = CompanyDetails::select('mail_footer')->first();
-        return view('admin.clients.email', compact('client', 'serviceIds', 'mailFooter' ));
+        $attachment = null;
+
+        // if ($request->query('invoice_id')) {
+        //     $invoice = Invoice::with(['client','details'])->findOrFail($request->query('invoice_id'));
+        //     $attachment = view('admin.invoices.show', compact('invoice'))->render();
+        // }
+        return view('admin.clients.email', compact('client', 'serviceIds', 'mailFooter', 'invoice_id', 'attachment'));
     }
 
     public function sendClientEmail(Request $request)
@@ -477,14 +484,19 @@ class ClientController extends Controller
 
         $client = Client::findOrFail($request->id);
         $serviceIds = $request->serviceIds ? json_decode($request->serviceIds, true) : [];
+        $invoiceId = $request->invoiceId ?? null;
 
-        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body, $serviceIds));
+        $invoice = null;
+        if ($request->invoiceId) {
+            $invoice = Invoice::with(['client', 'details'])->findOrFail($request->invoiceId);
+        }
+
+        Mail::to($client->email)->send(new ClientEmail($request->subject, $request->body, $serviceIds, $invoice));
 
         $attachmentPath = null;
-
+        $company = CompanyDetails::first();
         if (!empty($serviceIds)) {
             $services = ProjectServiceDetail::whereIn('id', $serviceIds)->get();
-            $company = CompanyDetails::first();
 
             $pdf = Pdf::loadView('emails.project-service-invoice', [
                 'services' => $services,
@@ -494,6 +506,19 @@ class ClientController extends Controller
             @mkdir(public_path('images/email-attachments'), 0755, true);
 
             $attachmentPath = '/images/email-attachments/service_invoice_' . time() . '.pdf';
+            $pdf->save(public_path($attachmentPath));
+        }
+
+        if ($invoiceId) {
+            $invoice = Invoice::with(['client', 'details'])->findOrFail($invoiceId);
+
+            $pdf = Pdf::loadView('emails.invoice-pdf', [
+                'invoice' => $invoice,
+                'company' => $company
+            ]);
+
+            @mkdir(public_path('images/email-attachments'), 0755, true);
+            $attachmentPath = '/images/email-attachments/invoice_' . time() . '.pdf';
             $pdf->save(public_path($attachmentPath));
         }
 

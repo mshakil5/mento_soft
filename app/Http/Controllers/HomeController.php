@@ -91,7 +91,8 @@ class HomeController extends Controller
             ->orWhereBetween('service_renewal_date', [$next3MonthStart, $next3MonthEnd])
             ->count();
 
-        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'pendingInvoices', 'todoTasks', 'inProgressTasks', 'doneTasks', 'doneNotConfirmedTasks', 'servicesNeedToBeRenewed', 'currentMonthCount', 'nextMonthCount', 'next2MonthCount', 'next3MonthCount'));
+        $newTaskCount = ProjectTask::where('status', 1)->where('employee_id', auth()->user()->id)->count();
+        return view('admin.dashboard', compact('totalClients', 'activeProjects', 'onGoingServices', 'pendingInvoices', 'todoTasks', 'inProgressTasks', 'doneTasks', 'doneNotConfirmedTasks', 'servicesNeedToBeRenewed', 'currentMonthCount', 'nextMonthCount', 'next2MonthCount', 'next3MonthCount', 'newTaskCount'));
     }
 
     public function managerHome()
