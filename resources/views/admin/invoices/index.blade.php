@@ -150,7 +150,7 @@
                                           A/C No: 00630751<br>
                                           Halifax<br><br>
                                           If you have any questions concerning this invoice please contact to,<br>
-                                          Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br>
+                                          Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br><br>
                                           <B>
                                             THANK YOU FOR YOUR BUSINESS!
                                           </B>
@@ -480,7 +480,7 @@
                     <input type="hidden" name="projects[${rowId}][id]" value="${data.id || ''}">
                     <input type="hidden" name="projects[${rowId}][sdtl_id]" value="${data.sdtl_id || ''}">
                     <td>
-                        <textarea class="form-control" name="projects[${rowId}][description]" required> ${(data.project_name ? data.project_name + ' - ' : '') + (data.description || '')} </textarea>
+                        <textarea class="form-control description" name="projects[${rowId}][description]" required> ${(data.project_name ? data.project_name + ' - ' : '') + (data.description || '')} </textarea>
                     </td>
                     <td class="d-none">
                         <input type="number" class="form-control qty" name="projects[${rowId}][qty]" min="1" value="${data.qty}" required>
@@ -493,8 +493,18 @@
                     </td>
                 </tr>
             `;
-            
+
             $('#invoiceItemsTable tbody').append(html);
+
+            $('#'+rowId+' .description').summernote({
+                height: 80,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']]
+                ]
+            });
             pageMiddle();
             calculateTotals();
         }

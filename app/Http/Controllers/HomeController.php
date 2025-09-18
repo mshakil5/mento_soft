@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\ProjectServiceDetail;
 use Illuminate\Http\Request;
 use App\Models\ProjectTask;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -150,7 +151,9 @@ class HomeController extends Controller
                 };
             })
             ->sum('amount');
-        $projectDueAmountToPay = Invoice::where('client_id', $user->client->id)->where('status', 1)->sum('net_amount');
+        $totalBudget = ClientProject::where('client_id', $user->client->id)->sum('amount');
+        $totalPaid = Transaction::where('client_id', $user->client->id)->whereNotNull('client_project_id')->where('transaction_type', 'Received')->sum('at_amount');
+        $projectDueAmountToPay = $totalBudget - $totalPaid;
         return view('user.dashboard', compact('ongoingprojectsCount', 'doneProjectsCount', 'plannedprojectsCount', 'onGoingTasksCount', 'notConfirmedTasksCount', 'outstandingAmount', 'projectDueAmountToPay'));
     }
 

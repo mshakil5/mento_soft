@@ -69,8 +69,8 @@
                         @if ($client->address) <p>{{ $client->address }}</p> @endif
                     </td>
                     <td style="width:40%; text-align:right; vertical-align: top;">
-                        <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
                         <p>Invoice #: INV{{ str_pad($services->first()->id, 6, '0', STR_PAD_LEFT) }}</p>
+                        <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
                     </td>
                 </tr>
             </table>
@@ -80,7 +80,6 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th class="text-center">#</th>
                         <th class="text-center">Service</th>
                         <th class="text-center">Period</th>
                         <th class="text-center">Amount</th>
@@ -96,7 +95,6 @@
                                 : '';
                         @endphp
                         <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
                             <td class="text-center">
                                 <strong>{{ $service->project?->title }}</strong> {{ $service->serviceType->name }}
                             </td>
@@ -110,18 +108,6 @@
             <table style="margin-top:20px;">
                 <tr>
                     <td style="width:70%;">
-                      <div style="margin-top:20px;">
-                        Account Details<br>
-                        MR MD F A Bhuyain<br>
-                        Sort code: 11-08-34<br>
-                        A/C No: 00630751<br>
-                        Halifax<br>
-                        If you have any questions concerning this invoice please contact to,<br>
-                        Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br>
-                        <B>
-                          THANK YOU FOR YOUR BUSINESS!
-                        </B>
-                      </div>
                     </td>
                     <td style="width:30%">
                         <table style="width:100%;">
@@ -134,13 +120,26 @@
                                 <td class="text-right">£0.00</td>
                             </tr>
                             <tr>
-                                <td style="background:#f2f2f2"><b>Total</b></td>
-                                <td class="text-right" style="background:#f2f2f2"><b>£{{ number_format($subtotal, 2) }}</b></td>
+                                <td><b>Total</b></td>
+                                <td class="text-right"><b>£{{ number_format($subtotal, 2) }}</b></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
             </table>
+
+              <div style="position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 0 20px; text-align:left;">
+                Account Details<br>
+                MR MD F A Bhuyain<br>
+                Sort code: 11-08-34<br>
+                A/C No: 00630751<br>
+                Halifax<br><br>
+                If you have any questions concerning this invoice please contact to,<br>
+                Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br><br>
+                <B>
+                  THANK YOU FOR YOUR BUSINESS!
+                </B>
+              </div>
 
             <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
                         max-width: 794px; width: 100%; padding: 10px 20px;

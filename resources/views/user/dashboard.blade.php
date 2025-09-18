@@ -50,7 +50,7 @@
                       @if ($projectDueAmountToPay > 0)
                       <p class="card-text">
                           Project due amount to pay:         
-                          <a href="{{ route('user.transactions', ['status' => 'Due', 'type' => 'Project']) }}" class="text-light">
+                          <a href="{{ route('user.projects', ['status' => 'Due']) }}" class="text-light">
                               £{{ number_format($projectDueAmountToPay, 0) }}
                           </a>
                       </p>

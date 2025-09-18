@@ -124,7 +124,6 @@
                 <table class="table" style="border: 1px solid #dee2e6;">
                     <thead>
                         <tr>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">#</th>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Description</th>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Amount</th>
                         </tr>
@@ -132,8 +131,7 @@
                     <tbody>
                       @foreach($invoice->details as $index => $item)
                         <tr>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ $index + 1 }}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">{{ $item->description }}</td>
+                          <td style="border: 1px solid #dee2e6; text-align:center;">{!! $item->description !!}</td>
                           <td style="border: 1px solid #dee2e6; text-align:center;">£{{ number_format($item->unit_price, 2) }}</td>
                         </tr>
                       @endforeach
@@ -179,17 +177,19 @@
                             <td></td>
                             <td></td>
                             <td>&nbsp;</td>
-                            <td style="background-color: #f2f2f2">Total</td>
-                            <td style="text-align:right; background-color: #f2f2f2">£{{ number_format($invoice->net_amount, 2) }}</td>
+                            <td><b>Total</b></td>
+                            <td style="text-align:right;"><b>£{{ number_format($invoice->net_amount, 2) }}</b></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
             @if ($invoice->description)
-            <div>
+            <div style="position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 0 20px; text-align:left;">
                 <p style="margin: 0;">{!! $invoice->description !!}</p>
             </div>
             @endif
+
             <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 10px 20px; border-top: 1px solid #ddd; background: white;">
 
                 <table>

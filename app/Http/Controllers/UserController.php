@@ -75,10 +75,9 @@ class UserController extends Controller
         return back()->with('success', 'Password changed successfully.');
     }
 
-    public function projects()
+    public function projects(Request $request)
     {
         $user = auth()->user();
-
         $perPage = 10;
 
         $projects = ClientProject::with([
@@ -92,12 +91,20 @@ class UserController extends Controller
         ->paginate($perPage);
 
         $projects->getCollection()->transform(function ($project) {
+            $project->totalBudget = $project->amount;
             $project->totalReceived = $project->invoiceDetails
                 ->filter(fn($detail) => $detail->invoice && $detail->invoice->status == 2)
                 ->sum('total_inc_vat');
+            $project->dueAmount = $project->totalBudget - $project->totalReceived;
 
             return $project;
         });
+
+        if ($request->status === 'Due') {
+            $projects->setCollection(
+                $projects->getCollection()->filter(fn($p) => $p->dueAmount > 0)
+            );
+        }
 
         return view('user.projects', compact('projects'));
     }
