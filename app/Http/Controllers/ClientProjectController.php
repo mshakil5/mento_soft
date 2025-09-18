@@ -26,7 +26,11 @@ class ClientProjectController extends Controller
                   },
                   'tasks' => function($query) {
                       $query->latest()->take(5)
-                      ->with(['employee', 'creator']);
+                      ->with(['employee', 'creator'])
+                      ->where(function($q) {
+                      $q->where('employee_id', auth()->id())
+                          ->orWhere('allow_employee', 1); 
+                      });
                   },
                   'services.serviceType'
               ])
@@ -44,10 +48,6 @@ class ClientProjectController extends Controller
             if ($request->status) {
                 $data->where('status', $request->status);
             }
-
-            // if ($request->project_status) {
-            //     $data->where('status', $request->project_status);
-            // }
 
             return DataTables::of($data)
                 ->addIndexColumn()

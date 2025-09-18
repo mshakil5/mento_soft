@@ -57,7 +57,7 @@
                                         <input type="date" class="form-control" id="due_date" name="due_date" value="{{ $task->due_date }}" required>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Status <span class="text-danger">*</span></label>
                                         <select class="form-control" id="status" name="status" required>
@@ -67,12 +67,19 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-group" style="margin-top: 9px; margin-left: 15px;"> 
-                                        <label>Client View</label><br>
-                                        <input type="checkbox" id="allow_client" name="allow_client" value="1" class="form-control-input"
-                                              {{ $task->allow_client ? 'checked' : '' }}>
+                                <div class="col-md-12 mt-1">
+                                  <div class="form-group">
+                                    <div class="d-flex ml-2">
+                                      <div class="form-check mr-5">
+                                        <input type="checkbox" id="allow_client" name="allow_client" value="1" class="form-check-input" {{ $task->allow_client ? 'checked' : '' }}>
+                                        <label class="form-check-label">Visible to Client</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input type="checkbox" id="allow_employee" name="allow_employee" value="1" class="form-check-input" {{ $task->allow_employee ? 'checked' : '' }}>
+                                        <label class="form-check-label">Visible to Other Employees</label>
+                                      </div>
                                     </div>
+                                  </div>
                                 </div>
 
                             </div>
@@ -108,6 +115,7 @@ $(document).ready(function() {
             due_date: $("#due_date").val(),
             status: $("#status").val(),
             allow_client: $("#allow_client").is(':checked') ? 1 : 0,
+            allow_employee: $("#allow_employee").is(':checked') ? 1 : 0,
             _token: "{{ csrf_token() }}"
         };
 

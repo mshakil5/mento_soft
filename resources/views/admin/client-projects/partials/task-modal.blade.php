@@ -45,7 +45,7 @@
           </div>
 
           <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="form-group">
                 <label>Priority <span class="text-danger">*</span></label>
                 <select class="form-control" name="priority" required>
@@ -55,7 +55,7 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="form-group">
                 <label>Due Date <span class="text-danger">*</span></label>
                 <input type="date" class="form-control" name="due_date" min="{{ date('Y-m-d') }}" required>
@@ -71,10 +71,18 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-2">
-              <div class="form-group" style="margin-top: 9px; margin-left: 15px;">
-                <label>Client View</label><br>
-                <input type="checkbox" name="allow_client" value="1" class="form-check-input">
+            <div class="col-md-12 mt-1">
+              <div class="form-group">
+                <div class="d-flex ml-2">
+                  <div class="form-check mr-5">
+                    <input type="checkbox" name="allow_client" value="1" class="form-check-input">
+                    <label class="form-check-label">Visible to Client</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" name="allow_employee" value="1" class="form-check-input" checked>
+                    <label class="form-check-label">Visible to Other Employees</label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

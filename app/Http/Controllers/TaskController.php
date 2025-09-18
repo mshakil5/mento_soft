@@ -22,7 +22,12 @@ class TaskController extends Controller
                 'clientProject:id,title',
                 'employee:id,name',
                 'creator:id,name',
-            ])->withCount(['messages as unread_messages_count' => function ($q) use ($userId) {
+            ])
+            ->where(function($q) use ($userId) {
+                $q->where('employee_id', $userId)
+                  ->orWhere('allow_employee', 1);
+            })
+            ->withCount(['messages as unread_messages_count' => function ($q) use ($userId) {
                 $q->where('user_id', '!=', $userId)
                   ->whereDoesntHave('views', fn($q) => $q->where('user_id', $userId));
             }]);
@@ -131,7 +136,12 @@ class TaskController extends Controller
         if ($request->ajax()) {
 
 
-            $data = ProjectTask::with(['employee', 'clientProject'])->latest();
+            $data = ProjectTask::with(['employee', 'clientProject'])
+                ->where(function($q) {
+                    $q->where('employee_id', auth()->id())
+                      ->orWhere('allow_employee', 1);
+                })
+                ->latest();
 
             if ($request->status) {
                 $data->where('status', $request->status);

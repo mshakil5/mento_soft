@@ -237,7 +237,7 @@
                                 <tr>
                                     <th>Invoice No</th>
                                     <th>Client</th>
-                                    <th>Project</th>
+                                    <th>Bill For</th>
                                     <th>Amount</th>
                                     <th>Due</th>
                                     <th>Status</th>
@@ -817,7 +817,8 @@
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'invoice_number', name: 'invoice_number', orderable: false},
                 {data: 'client_name', name: 'client_name'},
-                {data: 'project', name: 'project'},
+                {data: 'invoice_for', name: 'invoice_for'},
+                // {data: 'project', name: 'project'},
                 {data: 'net_amount', name: 'net_amount', render: function(data) {
                     return '£' + parseFloat(data).toFixed(0);
                 }},

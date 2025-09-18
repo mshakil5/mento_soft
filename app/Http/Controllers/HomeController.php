@@ -36,10 +36,36 @@ class HomeController extends Controller
         $onGoingServices = count($latestType1Ids) + count($latestType2Ids);
 
         $pendingInvoices = Invoice::where('status', 1)->sum('net_amount');
-        $todoTasks = ProjectTask::where('status', 1)->count();
-        $inProgressTasks = ProjectTask::where('status', 2)->count();
-        $doneNotConfirmedTasks = ProjectTask::where('status', 3)->where('is_confirmed', 0)->where('allow_client', 1)->count();
-        $doneTasks = ProjectTask::where('status', 3)->where('is_confirmed', 1)->count();
+        $todoTasks = ProjectTask::where('status', 1)
+          ->where(function($q) {
+              $q->where('employee_id', auth()->id())    // logged-in employee
+                ->orWhere('allow_employee', 1);        // or visible to other employees
+          })
+          ->count();
+        $inProgressTasks = ProjectTask::where('status', 2)
+            ->where(function($q) {
+                $q->where('employee_id', auth()->id())
+                  ->orWhere('allow_employee', 1);
+            })
+            ->count();
+
+        $doneNotConfirmedTasks = ProjectTask::where('status', 3)
+            ->where('is_confirmed', 0)
+            ->where(function($q) {
+                $q->where('employee_id', auth()->id())
+                  ->orWhere('allow_employee', 1);
+            })
+            ->where('allow_client', 1)
+            ->count();
+
+        $doneTasks = ProjectTask::where('status', 3)
+            ->where('is_confirmed', 1)
+            ->where(function($q) {
+                $q->where('employee_id', auth()->id())
+                  ->orWhere('allow_employee', 1);
+            })
+            ->count();
+
         $now = Carbon::now()->format('Y-m-d');
         $monthlyLimit = Carbon::now()->addDays(7)->format('Y-m-d');
         $yearlyLimit = Carbon::now()->addMonths(3)->format('Y-m-d');

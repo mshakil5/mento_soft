@@ -19,6 +19,10 @@ class ProjectTaskController extends Controller
 
             $data = ProjectTask::with(['employee'])
                 ->where('client_project_id', $project->id)
+                  ->where(function($q) {
+                  $q->where('employee_id', auth()->id())
+                        ->orWhere('allow_employee', 1);
+                  })
                 ->latest();
 
             if ($request->status) {
@@ -178,6 +182,7 @@ class ProjectTaskController extends Controller
             'due_date' => $request->due_date,
             'status' => $request->status,
             'allow_client'  => $request->input('allow_client', 0),
+            'allow_employee' => $request->input('allow_employee', 1),
             'created_by' => auth()->id(),
         ]);
 
@@ -228,6 +233,7 @@ class ProjectTaskController extends Controller
         $task->status = $request->status;
         $task->due_date = $request->due_date;
         $task->allow_client = $request->input('allow_client', 0);
+        $task->allow_employee = $request->input('allow_employee', 1);
         $task->updated_by = auth()->id();
 
         if ($task->save()) {

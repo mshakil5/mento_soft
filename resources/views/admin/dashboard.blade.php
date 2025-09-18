@@ -13,7 +13,7 @@
         <div class="info-box shadow-lg">
           <span class="info-box-icon bg-danger"><i class="far fa-clock"></i></span>
           <div class="info-box-content">
-            <span class="info-box-text">Your Next Task</span>
+            <span class="info-box-text">Your New Task</span>
             <span class="info-box-number">{{ number_format($newTaskCount, 0) }}</span>
           </div>
         </div>
