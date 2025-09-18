@@ -38,6 +38,10 @@
         <div class="invoice-body">
             <br>
             <br>
+            <br>
+            <br>
+            <br>
+            <br>
             <table>
                 <tr>
                     <td style="width:50%; text-align:left;">
@@ -49,6 +53,8 @@
                 </tr>
             </table>
 
+            <br><br>
+            <br><br>
             <br><br>
 
             @php

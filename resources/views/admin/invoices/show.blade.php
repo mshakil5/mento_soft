@@ -51,6 +51,10 @@
         <div class="invoice-body">
             <br>
             <br>
+            <br>
+            <br>
+            <br>
+            <br>
             <table>
                 <tbody>
                     <tr>
@@ -68,6 +72,8 @@
                 </tbody>
             </table>
 
+            <br><br>
+            <br><br>
             <br><br>
 
             <table>
