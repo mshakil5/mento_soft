@@ -120,8 +120,8 @@
                                 <td class="text-right">£0.00</td>
                             </tr>
                             <tr>
-                                <td><b>Total</b></td>
-                                <td class="text-right"><b>£{{ number_format($subtotal, 2) }}</b></td>
+                                <td>Total</td>
+                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
                             </tr>
                         </table>
                     </td>

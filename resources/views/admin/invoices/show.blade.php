@@ -167,8 +167,8 @@
                             <td></td>
                             <td></td>
                             <td>&nbsp;</td>
-                            <td><b>Total</b></td>
-                            <td style="text-align:right;"><b>£{{ number_format($invoice->net_amount, 2) }}</b></td>
+                            <td>Total</td>
+                            <td style="text-align:right;">£{{ number_format($invoice->net_amount, 2) }}</td>
                         </tr>
                     </tbody>
                 </table>
