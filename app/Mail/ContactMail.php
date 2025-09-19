@@ -27,7 +27,7 @@ class ContactMail extends Mailable
                         'last_name'  => $this->contact->last_name,
                         'email'      => $this->contact->email,
                         'phone'      => $this->contact->phone,
-                        'subject'    => $this->contact->subject ?? 'No Subject',
+                        'subject'    => $this->contact->subject ?? 'New query from website',
                         'message'    => $this->contact->message,
                         'product'    => $this->contact->product_id 
                                       ? \App\Models\Product::find($this->contact->product_id) 
