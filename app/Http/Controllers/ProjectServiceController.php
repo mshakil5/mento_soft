@@ -619,9 +619,13 @@ class ProjectServiceController extends Controller
                               <i class="fas fa-file-invoice-dollar"></i> Invoice
                           </a>';
                   $emailUrl = route('client.email', ['id' => $row->client_id]) . '?service_ids=' . implode(',', $serviceIds);
-                  $btn .= '<a href="'.$emailUrl.'" class="btn btn-sm btn-warning" title="Send Email">
+                  $btn .= '<a href="'.$emailUrl.'" class="btn btn-sm btn-warning mr-1" title="Send Email">
                               <i class="fas fa-envelope"></i>
                           </a>';
+
+                  $btn .= '<a href="'.route('service-invoices', ['id' => $row->parent_id]).'" class="btn btn-sm btn-secondary" title="Invoice">
+                      <i class="fas fa-file-invoice"></i>
+                  </a>';
 
                     return $btn;
                 })
@@ -1412,4 +1416,85 @@ class ProjectServiceController extends Controller
         return response()->json(['message' => 'Service updated successfully!']);
     }
 
+    public function serviceInvoices(Request $request, $rowId)
+    {
+        $row = ProjectServiceDetail::findOrFail($rowId);
+
+        $info = ($row->serviceType?->name ?? '-') 
+                . ' | ' . ($row->project?->title ?? '-') 
+                . ' | ' . ($row->client?->business_name ?? '-');
+
+          $receivedTransactions = Transaction::whereHas('service', function($q) use ($row) {
+                  $q->where('parent_id', $row->id)
+                    ->whereNull('invoice_number');
+              })
+              ->where('transaction_type', 'Received')
+              ->groupBy('date')
+              ->select('date')
+              ->get();
+
+        if ($request->ajax()) {
+            $bills = ProjectServiceDetail::with(['transaction' => fn($q) => $q->where('transaction_type', 'Received')])
+                ->where('project_service_id', $row->project_service_id)
+                ->where('client_id', $row->client_id)
+                ->where('client_project_id', $row->client_project_id)
+                ->where('amount', $row->amount)
+                ->where('cycle_type', $row->cycle_type)
+                ->where('is_auto', $row->is_auto)
+                ->orderBy('start_date')
+                ->whereNotNull('invoice_number')
+                ->get();
+
+            return DataTables::of($bills)
+                ->addIndexColumn()
+                ->addColumn('duration', function($bill) {
+                    if ($bill->start_date && $bill->end_date) {
+                        return Carbon::parse($bill->start_date)->format('d-m-Y') . ' to ' .
+                              Carbon::parse($bill->end_date)->format('d-m-Y');
+                    }
+                    return '-';
+                })
+                ->addColumn('amount', fn($bill) => '£'.number_format($bill->amount, 0))
+                ->addColumn('status', fn($bill) => $bill->bill_paid 
+                    ? '<span class="badge badge-success">Received</span>' 
+                    : '<span class="badge badge-warning">Due</span>')
+                ->addColumn('invoice', fn($bill) => $bill->invoice_number ?? '-')
+                ->addColumn('payment_date', fn($bill) => $bill->transaction?->count() ? Carbon::parse($bill->transaction->date)->format('d-m-Y') : '-')
+                ->addColumn('method', fn($bill) => $bill->transaction?->count() ? $bill->transaction->payment_type : '-')
+                ->addColumn('txn', fn($bill) => $bill->transaction?->count() ? $bill->transaction->tran_id : '-')
+                ->rawColumns(['status'])
+                ->make(true);
+        }
+
+        return view('admin.client-projects.project_service_invoices', compact('row', 'info', 'receivedTransactions'));
+    }
+
+    public function createServiceInvoice(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required',
+            'payment_date' => 'required|date',
+        ]);
+
+        $serviceId = $request->service_id;
+        $date = Carbon::parse($request->payment_date)->format('Y-m-d');
+
+        $invoiceNumber = 'MSS-' . mt_rand(100000, 999999);
+
+        $serviceDetailIds = ProjectServiceDetail::where('parent_id', $serviceId)
+            ->where('bill_paid', 1)
+            ->whereNull('invoice_number')
+            ->whereHas('transactions', function($q) use ($date) {
+                $q->where('transaction_type', 'Received')
+                  ->whereDate('date', $date);
+            })
+            ->pluck('id');
+
+        ProjectServiceDetail::whereIn('id', $serviceDetailIds)
+            ->where('bill_paid', 1)
+            ->whereNull('invoice_number')
+            ->update(['invoice_number' => $invoiceNumber]);
+
+        return response()->json(['message' => 'Invoice created successfully!', 'invoice_number' => $invoiceNumber]);
+    }
 }
