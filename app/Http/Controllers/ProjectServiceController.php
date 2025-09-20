@@ -597,7 +597,7 @@ class ProjectServiceController extends Controller
                   }
 
                   if (auth()->user()->can('edit service')) {
-                      $btn .= ' <button class="btn btn-sm btn-info edit mr-1" data-id="'.$row->parent_id.'">Edit</button>';
+                      $btn .= ' <button class="btn btn-sm btn-warning edit mr-1" data-id="'.$row->parent_id.'">Edit</button>';
                   }
 
                   $serviceIds = $row->type == 1

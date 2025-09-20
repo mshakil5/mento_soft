@@ -199,6 +199,19 @@
     </div>
 </section>
 
+<style>
+  #example1_wrapper .dt-buttons {
+      float: right;
+  }
+  #example1_wrapper .dt-buttons .btn + .btn {
+      margin-left: 2px;
+  }
+
+  #example1_filter {
+      float: left !important;
+  }
+</style>
+
 @endsection
 
 @section('script')
@@ -426,8 +439,23 @@
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],
             responsive: true,
-            lengthChange: false,
+            lengthChange: true,
+            pageLength: 10,
+            lengthMenu: [[10,25,50,100,-1],[10,25,50,100,"All"]],
             autoWidth: false,
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: 'Export Excel',
+                    exportOptions: { columns: [0,1,2,3,4,5] }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'Export PDF',
+                    exportOptions: { columns: [0,1,2,3,4,5] }
+                }
+            ]
         });
 
         function reloadTable() {

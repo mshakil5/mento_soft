@@ -132,23 +132,15 @@ class ClientController extends Controller
                                     View
                                 </a>';
 
-                    $buttons .= '<div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
-                            Actions
-                        </button>
-                        <div class="dropdown-menu">';
-
                     if (auth()->user()->can('edit client')) {
-                        $buttons .= '<a href="#" class="dropdown-item edit" data-id="'.$row->id.'">
+                        $buttons .= '<a href="#" class="btn btn-sm btn-warning edit" data-id="'.$row->id.'">
                                         <i class="fas fa-edit"></i> Edit
-                                    </a>';
+                                    </a> ';
                     }
 
-                    $buttons .= '<a href="#" class="dropdown-item delete d-none" data-id="'.$row->id.'">
+                    $buttons .= '<a href="#" class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>';
-
-                    $buttons .= '</div></div>';
 
                     if ($row->projects->count()) {
                         $buttons .= '<a href="'.route('client-projects.index', ['client_id' => $row->id]).'" class="btn btn-success btn-sm btn-block mb-1 d-none">

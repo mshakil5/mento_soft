@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\CompanyDetails;
 
 class QuotationMail extends Mailable
 {
@@ -23,20 +24,20 @@ class QuotationMail extends Mailable
 
     public function build()
     {
-        return $this->subject('New Quotation Message')
-                    ->markdown('emails.quotation')
+        return $this->subject('New Quotation')
+                    ->view('emails.quotation')
                     ->with([
                         'first_name' => $this->quotation->first_name,
                         'last_name'  => $this->quotation->last_name,
                         'email'      => $this->quotation->email,
                         'phone'      => $this->quotation->phone,
-                        'subject'    => $this->quotation->subject ?? 'New Quotation Message',
-                        'message'    => $this->quotation->message,
+                        'subjectText' => $this->quotation->subject ?? 'New Quotation Message',
                         'company'    => $this->quotation->company,
                         'website'    => $this->quotation->website,
-                        'dream_description'    => $this->quotation->dream_description,
-                        'timeline'    => $this->quotation->timeline,
-                        'additional_info'    => $this->quotation->additional_info,
+                        'dream_description' => $this->quotation->dream_description,
+                        'timeline'   => $this->quotation->timeline,
+                        'additional_info' => $this->quotation->additional_info,
+                        'mailFooter' => CompanyDetails::select('mail_footer')->first()->mail_footer ?? '',
                     ]);
     }
 }

@@ -31,7 +31,7 @@ class ClientEmail extends Mailable
     public function build()
     {
         $mail = $this->subject($this->subjectText)
-                     ->markdown('emails.client-email')
+                     ->view('emails.client-email')
                      ->with([
                          'subject' => $this->subjectText,
                          'body'    => $this->bodyText,

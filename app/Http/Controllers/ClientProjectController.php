@@ -132,23 +132,17 @@ class ClientProjectController extends Controller
                                     View
                                 </a>';
 
-                    $buttons .= '<div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
-                                        Actions
-                                    </button>
-                                    <div class="dropdown-menu">';
-
                     if (auth()->user()->can('edit project')) {
-                        $buttons .= '<a href="#" class="dropdown-item edit" data-id="'.$row->id.'">
+                        $buttons .= '<a href="#" class="btn btn-sm btn-warning edit" data-id="'.$row->id.'">
                                         <i class="fas fa-edit"></i> Edit
-                                    </a>';
+                                    </a> ';
                     }
 
-                    $buttons .= '<a href="#" class="dropdown-item delete d-none" data-id="'.$row->id.'">
+                    $buttons .= '<a href="#" class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>';
 
-                    $buttons .= '</div></div>'.$details;
+                    $buttons .= $details;
 
                     $groupedServices = $row->services->filter(fn($s) => $s->serviceType)->unique('project_service_id');
 

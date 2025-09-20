@@ -11,7 +11,6 @@ use Yajra\DataTables\Facades\DataTables;
 use Validator;
 use DB;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\InvoiceMail;
 use App\Models\Transaction;
 use App\Models\ClientEmailLog;
 use App\Models\CompanyDetails;
