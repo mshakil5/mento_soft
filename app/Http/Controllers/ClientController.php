@@ -316,7 +316,7 @@ class ClientController extends Controller
         if ($existingUser) {
             return response()->json([
                 'status' => 422,
-                'errors' => ['email' => 'This email is already registered as a client.']
+                'errors' => ['email' => ['This email is already registered as a client.']]
             ], 422);
         }
 
