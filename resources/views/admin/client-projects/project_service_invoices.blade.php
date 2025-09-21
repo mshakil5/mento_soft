@@ -3,7 +3,7 @@
 @section('content')
 <section class="content pt-3">
   
-    <a href="{{ url()->previous() }}" class="btn btn-secondary mb-3 ml-2">Back</a>
+    <a href="{{ route('project-services.index') }}" class="btn btn-secondary mb-3 ml-2">Back</a>
 
     @if ($receivedTransactions->count() > 0)
     <button type="button" class="btn btn-success ml-2 mb-3" data-toggle="modal" data-target="#createInvoiceModal">
@@ -49,13 +49,13 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Duration</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
+                                    {{-- <th>Txn</th> --}}
+                                    {{-- <th>Duration</th> --}}
+                                    {{-- <th>Status</th> --}}
                                     <th>Invoice</th>
                                     <th>Payment Date</th>
+                                    <th>Amount</th>
                                     <th>Method</th>
-                                    <th>Txn</th>
                                 </tr>
                             </thead>
                         </table>
@@ -75,14 +75,14 @@
         serverSide: true,
         ajax: "{{ route('service-invoices', $row->id) }}",
         columns: [
-            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-            {data: 'duration', name: 'duration', orderable: false, searchable: false},
-            {data: 'amount', name: 'amount'},
-            {data: 'status', name: 'status', orderable: false, searchable: false},
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false}, 
+            // {data: 'duration', name: 'duration', orderable: false, searchable: false},
             {data: 'invoice', name: 'invoice', orderable: false, searchable: false},
             {data: 'payment_date', name: 'payment_date', orderable: false, searchable: false},
+            {data: 'amount', name: 'amount'},
+            // {data: 'status', name: 'status', orderable: false, searchable: false},
             {data: 'method', name: 'method', orderable: false, searchable: false},
-            {data: 'txn', name: 'txn', orderable: false, searchable: false},
+            // {data: 'txn', name: 'txn', orderable: false, searchable: false},
         ]
     });
   });

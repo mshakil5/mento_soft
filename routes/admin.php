@@ -292,6 +292,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/project-service-details/{id}/receive', [ProjectServiceDetailController::class, 'receive'])->name('project-service-details.receive');
 
     Route::get('project-services/invoice', [ProjectServiceController::class, 'invoice'])->name('project-services.invoice.show');
+    Route::get('project-services/invoice/download', [ProjectServiceController::class, 'invoiceDownload'])->name('project-services.invoice.download');
     Route::get('/project-services/send-multi-email', [ProjectServiceController::class, 'sendMultiEmail']);
 
     Route::get('/service-invoices/{id}', [ProjectServiceController::class, 'serviceInvoices'])->name('service-invoices');

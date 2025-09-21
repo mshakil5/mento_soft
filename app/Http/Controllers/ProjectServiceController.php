@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Transaction;
 use App\Models\ClientProject;
+use PDF;
 use Mail;
 use Illuminate\Support\Facades\DB;
 use App\Models\CompanyDetails;
@@ -748,7 +749,47 @@ class ProjectServiceController extends Controller
 
         $company = CompanyDetails::first();
 
+        
+
         return view('admin.client-projects.service_invoice', compact('services', 'company'));
+    }
+
+    public function invoiceDownload(Request $request)
+    {
+        $invId = $request->query('invoice_number');
+
+        $services = ProjectServiceDetail::with(['serviceType', 'client'])
+            ->where('invoice_number', $invId)
+            ->get();
+
+        if ($services->isEmpty()) {
+            abort(404, 'Invoice not found.');
+        }
+
+        $company = CompanyDetails::first();
+        $logoPath = public_path('images/company/' . ($company->company_logo ?? ''));
+        if (file_exists($logoPath) && is_readable($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $company->logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        } else {
+            $company->logo_base64 = null;
+        }
+
+        $paidImagePath = public_path('paidbg.png');
+        if (file_exists($paidImagePath)) {
+            $paidImageData = base64_encode(file_get_contents($paidImagePath));
+            $paidImageBase64 = 'data:image/png;base64,' . $paidImageData;
+        } else {
+            $paidImageBase64 = null;
+        }
+
+        $pdf = PDF::setOptions([
+            'isHtml5ParserEnabled' => true,
+        ])->loadView('admin.client-projects.service_invoice_download', compact('services', 'company', 'paidImageBase64'));
+
+        $fileName = 'invoice_' . $invId . '.pdf';
+        return $pdf->download($fileName);
     }
 
     public function sendMultiEmail(Request $request)
@@ -1439,31 +1480,33 @@ class ProjectServiceController extends Controller
                 ->where('client_id', $row->client_id)
                 ->where('client_project_id', $row->client_project_id)
                 ->where('amount', $row->amount)
-                ->where('cycle_type', $row->cycle_type)
-                ->where('is_auto', $row->is_auto)
                 ->orderBy('start_date')
                 ->whereNotNull('invoice_number')
                 ->get();
 
-            return DataTables::of($bills)
+            // Group by invoice_number
+            $grouped = $bills->groupBy('invoice_number');
+
+            return DataTables::of($grouped->map(function ($items, $invoice) {
+                    $serviceIds = $items->pluck('id')->toArray();
+                    $invoiceUrl = route('project-services.invoice.download') . '?invoice_number=' . $invoice;
+
+                    return [
+                        'invoice'      => '<a href="'.$invoiceUrl.'" class="btn btn-sm btn-info mr-1" title="Invoice" target="_blank">
+                                            <i class="fas fa-file-invoice-dollar"></i> '.$invoice.'
+                                        </a>',
+                        'amount'       => '£'.number_format($items->sum('amount'), 0),
+                        'payment_date' => $items->first()->transaction
+                                            ? Carbon::parse($items->first()->transaction->date)->format('d-m-Y')
+                                            : '-',
+                        'method'       => $items->first()->transaction?->payment_type ?? '-',
+                    ];
+                }))
                 ->addIndexColumn()
-                ->addColumn('duration', function($bill) {
-                    if ($bill->start_date && $bill->end_date) {
-                        return Carbon::parse($bill->start_date)->format('d-m-Y') . ' to ' .
-                              Carbon::parse($bill->end_date)->format('d-m-Y');
-                    }
-                    return '-';
-                })
-                ->addColumn('amount', fn($bill) => '£'.number_format($bill->amount, 0))
-                ->addColumn('status', fn($bill) => $bill->bill_paid 
-                    ? '<span class="badge badge-success">Received</span>' 
-                    : '<span class="badge badge-warning">Due</span>')
-                ->addColumn('invoice', fn($bill) => $bill->invoice_number ?? '-')
-                ->addColumn('payment_date', fn($bill) => $bill->transaction?->count() ? Carbon::parse($bill->transaction->date)->format('d-m-Y') : '-')
-                ->addColumn('method', fn($bill) => $bill->transaction?->count() ? $bill->transaction->payment_type : '-')
-                ->addColumn('txn', fn($bill) => $bill->transaction?->count() ? $bill->transaction->tran_id : '-')
-                ->rawColumns(['status'])
+                ->rawColumns(['invoice'])
                 ->make(true);
+
+
         }
 
         return view('admin.client-projects.project_service_invoices', compact('row', 'info', 'receivedTransactions'));
