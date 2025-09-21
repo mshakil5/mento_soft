@@ -63,6 +63,7 @@
 
             @php
                 $client = $services->first()->client;
+                $transaction = $services->first()->receivedTransactions->first();
             @endphp
             <table>
                 <tr>
@@ -75,9 +76,9 @@
                     </td>
                     <td style="width:40%; text-align:right; vertical-align: top;">
                         <p>
-                            Invoice #: MS{{ \Carbon\Carbon::parse($services->first()->startdate)->format('Ym') }}-{{ str_pad($services->first()->id, 2, '0', STR_PAD_LEFT) }}
+                            Invoice #: {{ $invId}}
                         </p>
-                        <p>Date: {{ Carbon::now()->format('d/m/Y') }}</p>
+                        <p>Date: {{ $transaction->date ? Carbon::parse($transaction->date)->format('d/m/Y') : Carbon::now()->format('d/m/Y') }}</p>
                     </td>
                 </tr>
             </table>
@@ -106,7 +107,7 @@
                                 <strong>{{ $service->project?->title }}</strong> {{ $service->serviceType->name }}
                             </td>
                             <td class="text-center">{{ $dateRange }}</td>
-                            <td class="text-center">£{{ number_format($service->amount, 2) }}</td>
+                            <td class="text-right">£{{ number_format($service->amount, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

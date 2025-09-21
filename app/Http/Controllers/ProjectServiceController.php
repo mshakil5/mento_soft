@@ -758,9 +758,10 @@ class ProjectServiceController extends Controller
     {
         $invId = $request->query('invoice_number');
 
-        $services = ProjectServiceDetail::with(['serviceType', 'client'])
+        $services = ProjectServiceDetail::with(['serviceType', 'client','receivedTransactions'])
             ->where('invoice_number', $invId)
             ->get();
+
 
         if ($services->isEmpty()) {
             abort(404, 'Invoice not found.');
@@ -786,7 +787,7 @@ class ProjectServiceController extends Controller
 
         $pdf = PDF::setOptions([
             'isHtml5ParserEnabled' => true,
-        ])->loadView('admin.client-projects.service_invoice_download', compact('services', 'company', 'paidImageBase64'));
+        ])->loadView('admin.client-projects.service_invoice_download', compact('services', 'company', 'paidImageBase64','invId'));
 
         $fileName = 'invoice_' . $invId . '.pdf';
         return $pdf->download($fileName);

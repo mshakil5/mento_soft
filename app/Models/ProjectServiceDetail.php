@@ -70,4 +70,9 @@ class ProjectServiceDetail extends Model
     {
         return $this->hasOne(ServiceRenewal::class, 'project_service_detail_id')->latest();
     }
+
+    public function receivedTransactions()
+    {
+        return $this->transactions()->where('transaction_type', 'Received');
+    }
 }
