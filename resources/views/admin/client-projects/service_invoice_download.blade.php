@@ -121,15 +121,15 @@
                         <table style="width:100%;">
                             <tr>
                                 <td>Subtotal</td>
-                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($subtotal, 2) }}</td>
                             </tr>
                             <tr>
                                 <td>VAT</td>
-                                <td class="text-right">£0.00</td>
+                                <td class="text-right" style="padding-right: 8px;">£0.00</td>
                             </tr>
                             <tr>
                                 <td>Total</td>
-                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($subtotal, 2) }}</td>
                             </tr>
                         </table>
                     </td>
