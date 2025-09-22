@@ -1,5 +1,5 @@
 <div class="modal fade" id="detailsModal-{{ $row->id }}" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel-{{ $row->id }}" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title" id="detailsModalLabel-{{ $row->id }}">{{ $row->title }}</h2>
@@ -10,7 +10,7 @@
       <div class="modal-body">
         <div class="p-3 border rounded bg-light">
           <div class="row">
-            <div class="col-6">
+            <div class="col-12">
               <h5>Project Concept / Idea</h5>
               <p>{!! $row->description !!}</p>
 
@@ -19,11 +19,13 @@
               
               <h5 class="d-flex justify-content-between align-items-center">
                   Attachments
+                  @can('edit project')
                   <button type="button" class="btn btn-sm btn-success" 
                           data-toggle="modal" 
                           data-target="#quickAddUpdateModal-{{ $row->id }}">
                       <i class="fas fa-plus"></i> Add attachment
                   </button>
+                  @endcan
               </h5>
               @if($row->recentUpdates->count())
                   <div class="d-flex flex-wrap gap-2">
@@ -42,7 +44,7 @@
               @endif
             </div>
 
-            <div class="col-6">
+            <div class="col-6 d-none">
                 <h5>Linked Tasks
                   @can('add task')
                   <button type="button" class="btn btn-sm btn-success float-right" 

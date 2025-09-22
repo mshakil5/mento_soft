@@ -69,9 +69,17 @@ class ClientProjectController extends Controller
                     return $row->due_date ? Carbon::parse($row->due_date)->format('d-m-Y') : '';
                 })
                 ->addColumn('amount', function($row) {
-                    return '£' . number_format($row->amount, 0);
+                    if (auth()->user()->can('edit service')) {
+                        return '£' . number_format($row->amount, 0);
+                    }
+                    return '';
                 })
                 ->addColumn('received', function($row) {
+
+                    if (!auth()->user()->can('edit service')) {
+                        return '<span class="badge bg-secondary"></span>';
+                    }
+
                     $serviceTxnsSum = Transaction::where('transaction_type', 'Received')
                         ->whereHas('projectServiceDetail', function($q) use ($row) {
                             $q->where('client_project_id', $row->id);
@@ -101,22 +109,26 @@ class ClientProjectController extends Controller
                         3 => 'Blocked',
                         4 => 'Done',
                     ];
-                    
+
                     $currentStatus = $statuses[$row->status] ?? 'Unknown';
-                    
-                    return '
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            '.$currentStatus.'
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="1">Planned</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="2">In Progress</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Blocked</a>
-                            <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">Done</a>
+
+                    if (auth()->user()->can('edit project')) {
+                        return '
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="statusDropdown'.$row->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                '.$currentStatus.'
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="statusDropdown'.$row->id.'">
+                                <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="1">Planned</a>
+                                <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="2">In Progress</a>
+                                <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="3">Blocked</a>
+                                <a class="dropdown-item status-change" href="#" data-id="'.$row->id.'" data-status="4">Done</a>
+                            </div>
                         </div>
-                    </div>
-                    ';
+                        ';
+                    } else {
+                        return '<button class="btn btn-sm btn-secondary" disabled>'.$currentStatus.'</button>';
+                    }
                 })
                 ->addColumn('action', function($row) {
                     $percent = $row->completed_percentage;
@@ -144,6 +156,7 @@ class ClientProjectController extends Controller
 
                     $buttons .= $details;
 
+                    if (auth()->user()->can('edit service')) {
                     $groupedServices = $row->services->filter(fn($s) => $s->serviceType)->unique('project_service_id');
 
                     if ($groupedServices->count()) {
@@ -163,6 +176,7 @@ class ClientProjectController extends Controller
                         }
 
                         $buttons .= '</div></div>';
+                    }
                     }
 
                     return $buttons;
