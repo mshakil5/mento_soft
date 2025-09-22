@@ -114,7 +114,6 @@
     <button id="toggleAccounting" class="btn btn-info my-2">
         Show Accounting
     </button>
-    @endcan
 
     <div id="accountingWrapper">
     <li class="nav-item">
@@ -221,6 +220,7 @@
     </li>
 
     </div>
+    @endcan
 
     <li class="nav-item" style="margin-top: 200px">
     </li>
