@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale())}}">
 
 @php
-    $company = \App\Models\CompanyDetails::select('fav_icon', 'company_logo', 'footer_content', 'email1', 'phone1', 'address1', 'facebook', 'instagram', 'linkedin', 'business_name', 'company_reg_number', 'vat_number', 'whatsapp')->first();
+    $company = \App\Models\CompanyDetails::select('fav_icon', 'company_logo', 'footer_content', 'email1', 'phone1', 'address1', 'facebook', 'instagram', 'linkedin', 'business_name', 'company_reg_number', 'vat_number', 'whatsapp', 'google_site_verification')->first();
     $services = \App\Models\Service::where('status', 1)->orderByRaw('sl = 0, sl ASC')->orderBy('id', 'desc')->limit(6)->pluck('title');
 @endphp 
 
@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
+    <meta name="google-site-verification" content="{{ $company->google_site_verification ?? '' }}">
     {!! SEOMeta::generate() !!}
     {!! OpenGraph::generate() !!}
     {!! Twitter::generate() !!}
