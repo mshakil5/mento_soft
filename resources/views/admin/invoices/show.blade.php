@@ -121,14 +121,14 @@
                     <thead>
                         <tr>
                             <th style="border: 1px solid #dee2e6; text-align:center;">Description</th>
-                            <th style="border: 1px solid #dee2e6; text-align:center;">Amount</th>
+                            <th style="border: 1px solid #dee2e6; text-align:center; width:15%">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                       @foreach($invoice->details as $index => $item)
                         <tr>
                           <td style="border: 1px solid #dee2e6; text-align:center;">{!! $item->description !!}</td>
-                          <td style="border: 1px solid #dee2e6; text-align:center;">£{{ number_format($item->unit_price, 2) }}</td>
+                          <td style="border: 1px solid #dee2e6; text-align:right;">£{{ number_format($item->unit_price, 2) }}</td>
                         </tr>
                       @endforeach
                     </tbody>
@@ -141,7 +141,7 @@
                             <td style="width: 25%">&nbsp;</td>
                             <td style="width: 25%">&nbsp;</td>
                             <td>Subtotal</td>
-                            <td style="text-align:right">£{{ number_format($invoice->subtotal, 2) }}</td>
+                            <td style="text-align:right;padding-right: 8px;">£{{ number_format($invoice->subtotal, 2) }}</td>
                         </tr>
                         @if($invoice->discount_percent)
                         <tr>
@@ -149,7 +149,7 @@
                             <td style="width: 25%">&nbsp;</td>
                             <td style="width: 25%">&nbsp;</td>
                             <td>Discount ({{ $invoice->discount_percent }}%)</td>
-                            <td style="text-align:right">£{{ number_format($invoice->discount_amount, 2) }}</td>
+                            <td style="text-align:right;padding-right: 8px;">£{{ number_format($invoice->discount_amount, 2) }}</td>
                         </tr>
                         @endif
                         @if($invoice->vat_amount)
@@ -158,7 +158,7 @@
                             <td>&nbsp;</td>
                             <td>&nbsp;</td>
                             <td>VAT</td>
-                            <td style="text-align:right">£{{ number_format($invoice->vat_amount, 2) }}</td>
+                            <td style="text-align:right;padding-right: 8px;">£{{ number_format($invoice->vat_amount, 2) }}</td>
                         </tr>
                         @else
                          <tr>
@@ -166,7 +166,7 @@
                             <td>&nbsp;</td>
                             <td>&nbsp;</td>
                             <td>VAT</td>
-                            <td style="text-align:right">£0.00</td>
+                            <td style="text-align:right;padding-right: 8px;">£0.00</td>
                         </tr>
                         @endif
                         <tr>
@@ -174,11 +174,31 @@
                             <td></td>
                             <td>&nbsp;</td>
                             <td>Total</td>
-                            <td style="text-align:right;">£{{ number_format($invoice->net_amount, 2) }}</td>
+                            <td style="text-align:right;padding-right: 8px;">£{{ number_format($invoice->net_amount, 2) }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            
+            <br><br>
+            <br><br>
+            <br><br>
+
+            @if ($invoice->status == 2)
+            <table>
+                <tr>
+                    <td style="width:60%; vertical-align: top;">
+                    </td>
+                    <td style="width:40%; text-align:right; vertical-align: top;">
+                            <img src="{{ $paidImageBase64 }}" width="120px" />
+                    </td>
+                </tr>
+            </table>
+            @endif
+
+
+
             @if ($invoice->description)
             <div style="position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 0 20px; text-align:left;">
                 <p style="margin: 0;">{!! $invoice->description !!}</p>

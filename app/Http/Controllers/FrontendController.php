@@ -89,7 +89,6 @@ class FrontendController extends Controller
 
         foreach ($contactEmails as $contactEmail) {
             Mail::mailer('gmail')->to($contactEmail)
-              ->cc('info@mentosoftware.co.uk')
               ->send(new ContactMail($contact)
             );
         }
@@ -130,7 +129,6 @@ class FrontendController extends Controller
 
         foreach ($contactEmails as $contactEmail) {
             Mail::mailer('gmail')->to($contactEmail)
-              ->cc('info@mentosoftware.co.uk')
               ->send(new QuotationMail($quotation)
             );
         }
