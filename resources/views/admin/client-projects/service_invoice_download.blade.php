@@ -157,13 +157,9 @@
             <table>
                 <tr>
                     <td style="width:60%; vertical-align: top;">
-
-                        
-                        
                     </td>
                     <td style="width:40%; text-align:right; vertical-align: top;">
                             <img src="{{ $paidImageBase64 }}" width="120px" />
-                        
                     </td>
                 </tr>
             </table>

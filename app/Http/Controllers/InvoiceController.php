@@ -334,7 +334,17 @@ class InvoiceController extends Controller
     public function show($id)
     {
         $invoice = Invoice::with(['client', 'details'])->findOrFail($id);
-        return view('admin.invoices.show', compact('invoice'));
+
+        $paidImagePath = public_path('paidbg.png');
+        if (file_exists($paidImagePath)) {
+            $paidImageData = base64_encode(file_get_contents($paidImagePath));
+            $paidImageBase64 = 'data:image/png;base64,' . $paidImageData;
+        } else {
+            $paidImageBase64 = null;
+        }
+
+
+        return view('admin.invoices.show', compact('invoice','paidImageBase64'));
     }
 
     public function edit($id)
