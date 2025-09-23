@@ -36,14 +36,14 @@
     </li>
     @endcanany
 
-    @canany(['add project', 'edit project'])
+    @can('view project')
     <li class="nav-item">
         <a href="{{ route('client-projects.index') }}" class="nav-link {{ Route::is('client-projects.index') || Route::is('client-projects.tasks') || Route::is('client-projects.updates') || Route::is('client-projects.services') || Route::is('client-project-services.details') ? 'active' : '' }}">
             <i class="fas fa-project-diagram nav-icon"></i>
             <p>Projects</p>
         </a>
     </li>
-    @endcanany
+    @endcan
 
     @canany(['add service', 'receive service', 'edit service'])
     <li class="nav-item">
@@ -114,7 +114,6 @@
     <button id="toggleAccounting" class="btn btn-info my-2">
         Show Accounting
     </button>
-    @endcan
 
     <div id="accountingWrapper">
     <li class="nav-item">
@@ -221,6 +220,7 @@
     </li>
 
     </div>
+    @endcan
 
     <li class="nav-item" style="margin-top: 200px">
     </li>
