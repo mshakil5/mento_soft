@@ -107,7 +107,7 @@
                                 <strong>{{ $service->project?->title }}</strong> {{ $service->serviceType->name }}
                             </td>
                             <td class="text-center">{{ $dateRange }}</td>
-                            <td class="text-center">£{{ number_format($service->amount, 2) }}</td>
+                            <td class="text-right">£{{ number_format($service->amount, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -121,20 +121,37 @@
                         <table style="width:100%;">
                             <tr>
                                 <td>Subtotal</td>
-                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($subtotal, 2) }}</td>
                             </tr>
                             <tr>
                                 <td>VAT</td>
-                                <td class="text-right">£0.00</td>
+                                <td class="text-right" style="padding-right: 8px;">£0.00</td>
                             </tr>
                             <tr>
                                 <td>Total</td>
-                                <td class="text-right">£{{ number_format($subtotal, 2) }}</td>
+                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($subtotal, 2) }}</td>
                             </tr>
                         </table>
                     </td>
                 </tr>
             </table>
+
+
+            <br><br>
+            <br><br>
+            <br><br>
+
+            @if ($service->status == 2)
+            <table>
+                <tr>
+                    <td style="width:60%; vertical-align: top;">
+                    </td>
+                    <td style="width:40%; text-align:right; vertical-align: top;">
+                            <img src="{{ $paidImageBase64 }}" width="120px" />
+                    </td>
+                </tr>
+            </table>
+            @endif
 
             <div style="position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 0 20px; text-align:left;">
               Account Details<br>

@@ -479,10 +479,18 @@ class UserController extends Controller
     public function downloadInvoice($id)
     {
         $service = ProjectServiceDetail::with(['serviceType', 'project', 'client'])->findOrFail($id);
+        $paidImagePath = public_path('paidbg.png');
+        if (file_exists($paidImagePath)) {
+            $paidImageData = base64_encode(file_get_contents($paidImagePath));
+            $paidImageBase64 = 'data:image/png;base64,' . $paidImageData;
+        } else {
+            $paidImageBase64 = null;
+        }
         $company = CompanyDetails::first();
             $pdf = Pdf::loadView('user.invoice', [
                 'services' => collect([$service]),
-                'company' => $company
+                'company' => $company,
+                'paidImageBase64' => $paidImageBase64
             ]);
         return $pdf->download("Invoice_{$service->id}.pdf");
     }
