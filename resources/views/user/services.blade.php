@@ -53,7 +53,6 @@
                                         ->where('bill_paid', '!=', 1)
                                         ->where('amount', $service->amount)
                                         ->where('cycle_type', $service->cycle_type)
-                                        ->where('is_auto', $service->is_auto)
                                         ->get()
                                         ->filter(function($row) {
                                             $start = \Carbon\Carbon::parse($row->start_date ?? now());
@@ -113,19 +112,24 @@
                             </div>
                             <div class="modal-body">
                                 @php
-                                    $bills = \App\Models\ProjectServiceDetail::with(['transaction'=>fn($q)=>$q->where('transaction_type','Received'),'client','serviceType','project'])
+                                    $bills = \App\Models\ProjectServiceDetail::with(['transaction','client','serviceType','project'])
                                         ->where('client_id', $service->client_id)
+                                        ->where('project_service_id', $service->project_service_id)
                                         ->where('client_project_id', $service->client_project_id)
                                         ->where('amount', $service->amount)
                                         ->where('cycle_type', $service->cycle_type)
-                                        ->where('is_auto', $service->is_auto)
                                         ->orderByDesc('id')
                                         ->get()
+
                                         ->filter(function($row) {
                                             $start = \Carbon\Carbon::parse($row->start_date ?? now());
+
+                                            $today = now();
+                                            $adjustedToday = $today->copy();
+
                                             return match($row->cycle_type) {
-                                                1 => $start <= now() && now()->diffInDays($start) <= 10,   // monthly: within 10 days
-                                                2 => $start <= now() && now()->diffInMonths($start) <= 3,  // yearly: within 3 months
+                                                1 => $start <= $adjustedToday->addDays(10),   // monthly: within 10 days
+                                                2 => $start <= $adjustedToday->addMonths(3),  // yearly: within 3 months
                                                 default => false,
                                             };
                                         });

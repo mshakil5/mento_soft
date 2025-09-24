@@ -29,7 +29,8 @@ class ClientProjectController extends Controller
                       ->with(['employee', 'creator'])
                       ->where(function($q) {
                       $q->where('employee_id', auth()->id())
-                          ->orWhere('allow_employee', 1); 
+                          ->orWhere('allow_employee', 1)
+                          ->orWhere('created_by', auth()->id());
                       });
                   },
                   'services.serviceType'

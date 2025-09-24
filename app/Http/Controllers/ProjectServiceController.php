@@ -601,19 +601,17 @@ class ProjectServiceController extends Controller
                       $btn .= ' <button class="btn btn-sm btn-warning edit mr-1" data-id="'.$row->parent_id.'">Edit</button>';
                   }
 
-                  $serviceIds = $row->type == 1
-                    ? ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                  $serviceIds = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
                         ->where('client_id', $row->client_id)
                         ->where('client_project_id', $row->client_project_id)
-                        ->where('type', 1)
+                        ->where('type', $row->type)
                         ->where('bill_paid', '!=', 1)
                         ->where('amount', $row->amount)
                         ->where('cycle_type', $row->cycle_type)
                         ->where('is_auto', $row->is_auto)
                         ->orderBy('start_date')
                         ->pluck('id')
-                        ->toArray()
-                    : [$row->id];
+                        ->toArray();
 
                   $invoiceUrl = route('project-services.invoice.show') . '?service_ids=' . implode(',', $serviceIds);
                   $btn .= '<a href="'.$invoiceUrl.'" class="btn btn-sm btn-info mr-1" title="Invoice" target="_blank">
@@ -653,7 +651,7 @@ class ProjectServiceController extends Controller
                 ->orWhere(function($t2) {
                     $t2->where('type', 2)
                       ->where('bill_paid', 1)
-                      ->where('is_renewed', 1)
+                      // ->where('is_renewed', 1)
                       ->where('next_created', 0);
                 });
             })

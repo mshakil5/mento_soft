@@ -21,7 +21,8 @@ class ProjectTaskController extends Controller
                 ->where('client_project_id', $project->id)
                   ->where(function($q) {
                   $q->where('employee_id', auth()->id())
-                        ->orWhere('allow_employee', 1);
+                        ->orWhere('allow_employee', 1)
+                        ->orWhere('created_by', auth()->id());
                   })
                 ->latest();
 
