@@ -651,7 +651,7 @@ class ProjectServiceController extends Controller
                 ->orWhere(function($t2) {
                     $t2->where('type', 2)
                       ->where('bill_paid', 1)
-                      ->where('is_renewed', 1)
+                      // ->where('is_renewed', 1)
                       ->where('next_created', 0);
                 });
             })
