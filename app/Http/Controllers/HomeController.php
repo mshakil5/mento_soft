@@ -40,13 +40,15 @@ class HomeController extends Controller
         $todoTasks = ProjectTask::where('status', 1)
           ->where(function($q) {
               $q->where('employee_id', auth()->id())    // logged-in employee
-                ->orWhere('allow_employee', 1);        // or visible to other employees
+                ->orWhere('allow_employee', 1)        // or visible to other employees
+                ->orWhere('created_by', auth()->id()); // or created by logged-in employee
           })
           ->count();
         $inProgressTasks = ProjectTask::where('status', 2)
             ->where(function($q) {
                 $q->where('employee_id', auth()->id())
-                  ->orWhere('allow_employee', 1);
+                  ->orWhere('allow_employee', 1)
+                  ->orWhere('created_by', auth()->id());
             })
             ->count();
 
@@ -54,7 +56,8 @@ class HomeController extends Controller
             ->where('is_confirmed', 0)
             ->where(function($q) {
                 $q->where('employee_id', auth()->id())
-                  ->orWhere('allow_employee', 1);
+                  ->orWhere('allow_employee', 1)
+                  ->orWhere('created_by', auth()->id());
             })
             ->where('allow_client', 1)
             ->count();
@@ -63,7 +66,8 @@ class HomeController extends Controller
             ->where('is_confirmed', 1)
             ->where(function($q) {
                 $q->where('employee_id', auth()->id())
-                  ->orWhere('allow_employee', 1);
+                  ->orWhere('allow_employee', 1)
+                  ->orWhere('created_by', auth()->id());
             })
             ->count();
 
