@@ -51,6 +51,8 @@ $(document).ready(function () {
   $('.summernote').summernote({
     height: 200,
     resize: true,
+    dialogsInBody: true,
+    dialogsFade: false,
     fontNamesIgnoreCheck: ['Titillium Web'],
     fontNames: $.summernote.options.fontNames.concat(['Titillium Web']),
   });
