@@ -161,9 +161,9 @@
                                             <tr>
                                                 <td>{{ $bill->serviceType?->name }}</td>
                                                 <td>{{ $duration }}</td>
-                                                <td>{{ $paymentDate }}</td>
+                                                <td>{{ $bill->bill_paid ? $paymentDate : '-' }}</td>
                                                 <td>£{{ number_format($bill->amount, 0) }}</td>
-                                                <td>{{ $method }}</td>
+                                                <td>{{ $bill->bill_paid ? $method : '-' }}</td>
                                                 <td>
                                                   @php
                                                       if ($bill->bill_paid) {
