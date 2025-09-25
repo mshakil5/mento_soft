@@ -141,7 +141,7 @@
             <br><br>
             <br><br>
 
-            @if ($service->status == 2)
+            @if ($service->bill_paid == 1)
             <table>
                 <tr>
                     <td style="width:60%; vertical-align: top;">
