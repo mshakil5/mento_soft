@@ -59,6 +59,48 @@
     <script src="{{ asset('resources/frontend/js/counter.js') }}"></script>
     <script src="{{ asset('resources/frontend/js/app.js') }}"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if(session('success'))
+        <script>
+            $(function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: "{{ session('success') }}",
+                    confirmButtonColor: '#FF6D33'
+                });
+            });
+        </script>
+    @endif
+
+    @if(session('error'))
+        <script>
+            $(function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#FF6D33'
+                });
+            });
+        </script>
+    @endif
+
+    @if ($errors->any())
+        <script>
+            $(function () {
+                let errorMessages = `{!! implode('<br>', $errors->all()) !!}`;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: errorMessages,
+                    confirmButtonColor: '#FF6D33'
+                });
+            });
+        </script>
+    @endif
+
     @yield('script')
     
 </body>

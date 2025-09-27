@@ -31,12 +31,6 @@
                 </div>
             </div>
             <div class="col-lg-6 ">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
                 <form action="{{ route('contact.store') }}" method="POST" class="form-style fadeInUp">
                     @csrf
                     <div class="row">
@@ -104,27 +98,32 @@
     document.getElementById('captcha-question').innerText = `What is ${num1} + ${num2}? *`;
 
     const answerInput = document.getElementById('captcha-answer');
-    const submitBtn = document.getElementById('submit-btn');
-    const errorMsg = document.getElementById('captcha-error');
+    const submitBtn   = document.getElementById('submit-btn');
+    const errorMsg    = document.getElementById('captcha-error');
     const sendingText = document.getElementById('sending-text');
 
     answerInput.addEventListener('input', function () {
         const userAnswer = parseInt(this.value);
         if (userAnswer === correctAnswer) {
-            submitBtn.classList.remove('d-none');
             errorMsg.classList.add('d-none');
+        } else if (this.value !== '') {
+            errorMsg.classList.remove('d-none');
         } else {
-            submitBtn.classList.add('d-none');
-            if (this.value !== '') {
-                errorMsg.classList.remove('d-none');
-            } else {
-                errorMsg.classList.add('d-none');
-            }
+            errorMsg.classList.add('d-none');
         }
     });
 
     document.querySelector('form').addEventListener('submit', function (e) {
+        const userAnswer = parseInt(answerInput.value);
+        if (userAnswer !== correctAnswer) {
+            e.preventDefault();
+            errorMsg.classList.remove('d-none');
+            return false;
+        }
+
         submitBtn.classList.add('d-none');
         sendingText.classList.remove('d-none');
     });
+
+    submitBtn.classList.remove('d-none');
 </script>

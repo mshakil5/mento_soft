@@ -3,20 +3,6 @@
 @section('user-content')
 <div class="row px-2 justify-content-center">
     <div class="col-lg-12 text-light">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
         <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="form-style fadeInUp border-light">
             @csrf
             <div class="row">

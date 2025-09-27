@@ -28,10 +28,11 @@ class UserController extends Controller
         $request->validate([
             'business_name'   => 'required|string|max:255',
             'primary_contact' => 'required|string|max:255',
-            'phone1'          => 'required|string|max:20',
+            'phone1'          => ['required', 'regex:/^(?:\+44|0)(?:7\d{9}|1\d{9}|2\d{9}|3\d{9})$/'],
             'address'         => 'nullable|string|max:500',
-            'password'        => 'nullable|string|min:6|confirmed',
-        ]);
+          ], [
+              'phone1.regex' => 'The phone number format is invalid. Use +44XXXXXXXXX or 0XXXXXXXXX.',
+          ]);
 
         $user = auth()->user();
 

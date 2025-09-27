@@ -20,6 +20,7 @@ use OpenGraph;
 use Twitter;
 use App\Models\CompanyDetails;
 use App\Models\FaqQuestion;
+use Validator;
 
 class FrontendController extends Controller
 {
@@ -65,15 +66,23 @@ class FrontendController extends Controller
 
     public function storeContact(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|min:2|max:50',
             'last_name'  => 'required|string|min:2|max:50',
-            'email' => 'required|email|max:50',
-            'phone' => ['required', 'regex:/^(?:\+44|0)(?:7\d{9}|1\d{9}|2\d{9}|3\d{9})$/'],
-            'subject' => 'nullable|string|max:255',
-            'message' => 'required|string|max:2000',
+            'email'      => 'required|email|max:50',
             'product_id' => 'nullable|exists:products,id',
+            'phone'             => ['required', 'regex:/^(?:\+44|0)(?:7\d{9}|1\d{9}|2\d{9}|3\d{9})$/'],
+            'message'    => 'required|string|max:2000',
+        ], [
+            'phone.regex' => 'The phone number format is invalid. Use +44XXXXXXXXX or 0XXXXXXXXX.',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->withFragment('contact');
+        }
 
         $contact = new Contact();
         $contact->first_name = $request->input('first_name');
@@ -103,13 +112,15 @@ class FrontendController extends Controller
             'last_name'         => 'required|string|min:2|max:50',
             'email'             => 'required|email|max:50',
             'phone'             => ['required', 'regex:/^(?:\+44|0)(?:7\d{9}|1\d{9}|2\d{9}|3\d{9})$/'],
-            'company'           => 'required|string|max:50',
+            'company'           => 'nullable|string|max:50',
             'website'           => 'nullable|url|max:100',
-            'dream_description' => 'required|string|max:1000',
+            'dream_description' => 'nullable|string|max:1000',
             'timeline'          => 'nullable|string|max:255',
             'features'          => 'nullable|array',
             'features.*'        => 'string|max:100',
             'additional_info'   => 'nullable|string|max:2000',
+        ], [
+            'phone.regex' => 'The phone number format is invalid. Use +44XXXXXXXXX or 0XXXXXXXXX.',
         ]);
 
         $quotation = new Quotation();

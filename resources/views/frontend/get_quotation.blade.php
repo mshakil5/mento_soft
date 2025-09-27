@@ -12,12 +12,6 @@
     <div class="container">
         <div class="row mt-2">
             <div class="col-lg-8 mx-auto">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
                 <form action="{{ route('quotation.store') }}" method="POST" class="form-style fadeInUp">
                     @csrf
                     <div class="row">
@@ -38,7 +32,7 @@
                             @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-md-6 form-group">
-                            <input type="text" name="company" class="form-control" placeholder="Company/Business Name *" value="{{ old('company') }}" required maxlength="50">
+                            <input type="text" name="company" class="form-control" placeholder="Company/Business Name" value="{{ old('company') }}" maxlength="50">
                             @error('company') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-6 form-group">
@@ -46,7 +40,7 @@
                             @error('website') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-12 form-group">
-                            <textarea name="dream_description" class="form-control" rows="3" placeholder="Describe Your Dream Website *" required maxlength="1000">{{ old('dream_description') }}</textarea>
+                            <textarea name="dream_description" class="form-control" rows="3" placeholder="Describe Your Dream Website" maxlength="1000">{{ old('dream_description') }}</textarea>
                             @error('dream_description') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                         <div class="col-12 form-group">
@@ -79,13 +73,13 @@
                         <div class="col-md-6 form-group">
                             <label class="text-white" id="captcha-question">What is ...?</label>
                             <input type="number" name="captcha" class="form-control" id="captcha-answer" placeholder="Your answer" required>
-                            <small class="text-danger d-none" id="captcha-error">Incorrect answer. Please try again.</small>
+                            <div class="invalid-feedback">Incorrect answer. Please try again.</div>
                         </div>
 
                         <div class="col-12 form-group margin-b-none">
                             <button type="submit" id="submit-btn"
-                                class="mt-4 border-0 d-block rounded-3 w-100 fs-5 text-uppercase btn-theme d-none">
-                                Get Quotaion
+                                class="mt-4 border-0 d-block rounded-3 w-100 fs-5 text-uppercase btn-theme">
+                                Get Quotation
                             </button>
                             <div id="sending-text" class="text-white mt-3 fw-bold d-none">Sending...</div>
                         </div>
@@ -105,27 +99,28 @@
 
     const answerInput = document.getElementById('captcha-answer');
     const submitBtn = document.getElementById('submit-btn');
-    const errorMsg = document.getElementById('captcha-error');
     const sendingText = document.getElementById('sending-text');
 
     answerInput.addEventListener('input', function () {
         const userAnswer = parseInt(this.value);
         if (userAnswer === correctAnswer) {
-            submitBtn.classList.remove('d-none');
-            errorMsg.classList.add('d-none');
+            this.classList.remove('is-invalid');
+        } else if (this.value !== '') {
+            this.classList.add('is-invalid');
         } else {
-            submitBtn.classList.add('d-none');
-            if (this.value !== '') {
-                errorMsg.classList.remove('d-none');
-            } else {
-                errorMsg.classList.add('d-none');
-            }
+            this.classList.remove('is-invalid');
         }
     });
 
-    document.querySelector('form').addEventListener('submit', function () {
-        submitBtn.classList.add('d-none');
-        sendingText.classList.remove('d-none');
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const userAnswer = parseInt(answerInput.value);
+        if (userAnswer !== correctAnswer) {
+            e.preventDefault();
+            answerInput.classList.add('is-invalid');
+        } else {
+            submitBtn.disabled = true;
+            sendingText.classList.remove('d-none');
+        }
     });
 </script>
 @endsection

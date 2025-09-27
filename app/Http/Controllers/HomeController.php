@@ -59,7 +59,6 @@ class HomeController extends Controller
                   ->orWhere('allow_employee', 1)
                   ->orWhere('created_by', auth()->id());
             })
-            ->where('allow_client', 1)
             ->count();
 
         $doneTasks = ProjectTask::where('status', 3)
