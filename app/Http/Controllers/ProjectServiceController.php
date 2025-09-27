@@ -242,7 +242,10 @@ class ProjectServiceController extends Controller
                             $end = $endDate->copy()->addYear()->format('j F Y');
                         }
 
-                        $btnClass = ($row->cycle_type == 2 && ($row->start_date < now() || now()->diffInMonths($row->start_date) <= 3)) ? 'btn-danger' : 'btn-info';
+                        $btnClass = (
+                            ($row->cycle_type == 1 && now()->diffInDays(Carbon::parse($row->start_date), false) <= 10) ||
+                            ($row->cycle_type == 2 && (Carbon::parse($row->start_date) < now() || now()->diffInMonths(Carbon::parse($row->start_date)) <= 3))
+                        ) ? 'btn-danger' : 'btn-info';
 
                         $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#renewModal'.$row->id.'">
                                     <i class="fas fa-sync"></i> Renew
@@ -409,12 +412,13 @@ class ProjectServiceController extends Controller
                                             </small>';
                               } else {
                                 
-                                    $start = Carbon::parse($bill->start_date)->format('j F Y');
-                                    $end = Carbon::parse($bill->end_date)->format('j F Y');
+                                  $start = Carbon::parse($bill->start_date)->format('j F Y');
+                                  $end = Carbon::parse($bill->end_date)->format('j F Y');
                                   $status = '<span class="badge badge-success">Received</span>
-                                            <span class="badge badge-danger d-block">Needs Renewal</span> <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#renewModal'.$bill->id.'">
-                                    <i class="fas fa-sync"></i> Renew
-                                </button>
+                                            <span class="badge badge-danger d-none">Needs Renewal</span>
+                                             <button class="btn btn-sm btn-info d-none" data-toggle="modal" data-target="#renewModal'.$bill->id.'">
+                                                <i class="fas fa-sync"></i>
+                                            </button>
                                 <div class="modal fade" id="renewModal'.$bill->id.'" tabindex="-1" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <form method="POST" action="'.route('project-service.renew').'" class="renew-form">
@@ -530,7 +534,12 @@ class ProjectServiceController extends Controller
 
                   if ($bills->count() > 0) {
                       $buttonText = 'Receive';
-                      $btnClass = ($row->start_date < now() || now()->diffInDays($row->start_date) <= 10) ? 'btn-danger' : 'btn-success';
+
+                      $hasUrgentBill = $bills->contains(function ($bill) {
+                          return $bill->start_date < now() || now()->diffInDays($bill->start_date) <= 10;
+                      });
+
+                      $btnClass = $hasUrgentBill ? 'btn-danger' : 'btn-success';
 
                       $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#receiveModal'.$row->id.'"> '.$buttonText.' </button>';
                       $btn .= ' <button class="btn btn-sm btn-danger delete d-none" data-id="'.$row->id.'">Delete</button>';
@@ -613,10 +622,16 @@ class ProjectServiceController extends Controller
                         ->pluck('id')
                         ->toArray();
 
-                  $invoiceUrl = route('project-services.invoice.show') . '?service_ids=' . implode(',', $serviceIds);
-                  $btn .= '<a href="'.$invoiceUrl.'" class="btn btn-sm btn-info mr-1" title="Invoice" target="_blank">
-                              <i class="fas fa-file-invoice-dollar"></i> Invoice
-                          </a>';
+                  if (count($serviceIds) > 0) {
+                      $invoiceUrl = route('project-services.invoice.show') . '?service_ids=' . implode(',', $serviceIds);
+                      $btn .= '<a href="'.$invoiceUrl.'" class="btn btn-sm btn-info mr-1" title="Invoice" target="_blank">
+                                  <i class="fas fa-file-invoice-dollar"></i> Invoice
+                              </a>';
+                  } else {
+                      $btn .= '<button class="btn btn-sm btn-info mr-1" title="Invoice" disabled>
+                                  <i class="fas fa-file-invoice-dollar"></i> Invoice
+                              </button>';
+                  }
                   $emailUrl = route('client.email', ['id' => $row->client_id]) . '?service_ids=' . implode(',', $serviceIds);
                   $btn .= '<a href="'.$emailUrl.'" class="btn btn-sm btn-warning mr-1" title="Send Email">
                               <i class="fas fa-envelope"></i>
