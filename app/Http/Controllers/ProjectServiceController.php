@@ -166,6 +166,30 @@ class ProjectServiceController extends Controller
                     }
                     return $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '';
                 })
+                ->addColumn('first_start_date', function ($row) {
+                    $firstRecord = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                        ->where('client_id', $row->client_id)
+                        ->where('client_project_id', $row->client_project_id)
+                        ->where('amount', $row->amount)
+                        ->where('cycle_type', $row->cycle_type)
+                        ->where('is_auto', $row->is_auto)
+                        ->orderBy('id', 'asc')
+                        ->first(['start_date', 'service_renewal_date']);
+
+                    if (!$firstRecord) {
+                        return '';
+                    }
+
+                    $html = \Carbon\Carbon::parse($firstRecord->start_date)->format('d-m-Y');
+
+                    if ($firstRecord->service_renewal_date) {
+                        $html .= '<br><span style="font-size: 12px; font-weight: normal;">' .
+                                \Carbon\Carbon::parse($firstRecord->service_renewal_date)->format('d-m-Y') .
+                                '</span>';
+                    }
+
+                    return $html;
+                })
                 ->addColumn('due_date', function ($row) {
                     if (!$row->start_date) {
                         return '';
@@ -643,7 +667,7 @@ class ProjectServiceController extends Controller
 
                     return $btn;
                 })
-                ->rawColumns(['status', 'action', 'is_renewed', 'checkbox'])
+                ->rawColumns(['status', 'action', 'is_renewed', 'checkbox', 'first_start_date'])
                 ->make(true);
         }
 

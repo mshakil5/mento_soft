@@ -182,7 +182,10 @@
                                     <th>Service</th>
                                     <th>Project</th>
                                     <th>Client</th>
-                                    {{-- <th>Start</th> --}}
+                                    <th>
+                                      Start Date<br>
+                                      <span style="font-size: 12px; font-weight: normal;">3rd Party Date</span>
+                                    </th>
                                     {{-- <th>Deadline</th> --}}
                                     <th>Due Date</th>
                                     {{-- <th>Renewal</th> --}}
@@ -509,6 +512,7 @@
               {data: 'service_type', name: 'service_type'},
               {data: 'project_title', name: 'project_title'},
               {data: 'client_name', name: 'client_name'},
+              {data: 'first_start_date', name: 'first_start_date'},
               // {data: 'start_date', name: 'start_date'},
               // {data: 'end_date', name: 'end_date'},
               {data: 'due_date', name: 'due_date'},
