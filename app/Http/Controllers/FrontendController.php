@@ -174,7 +174,9 @@ class FrontendController extends Controller
             $products = $products->slice(0, $count - 1);
         }
 
-        $company = CompanyDetails::select('meta_title', 'meta_description', 'meta_keywords', 'meta_image')->first();
+        $company = CompanyDetails::select('meta_title', 'meta_description', 'meta_keywords', 'meta_image', 'company_name')->first();
+
+        $companyBusinessName = $company?->business_name ?? 'Mento Software';
 
         $this->seo(
             $company?->meta_title ?? '',
@@ -183,7 +185,7 @@ class FrontendController extends Controller
             $company?->meta_image ? asset('images/company/meta/' . $company->meta_image) : null
         );
 
-        return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'products'));
+        return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'products', 'companyBusinessName'));
     }
 
     public function portfolio()
