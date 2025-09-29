@@ -74,9 +74,13 @@
                                         <input type="checkbox" id="allow_client" name="allow_client" value="1" class="form-check-input" {{ $task->allow_client ? 'checked' : '' }}>
                                         <label class="form-check-label">Visible to Client</label>
                                       </div>
-                                      <div class="form-check">
+                                      <div class="form-check mr-5">
                                         <input type="checkbox" id="allow_employee" name="allow_employee" value="1" class="form-check-input" {{ $task->allow_employee ? 'checked' : '' }}>
                                         <label class="form-check-label">Visible to Other Employees</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input type="checkbox" id="is_confirmed" name="is_confirmed" value="1" class="form-check-input" {{ $task->is_confirmed ? 'checked' : '' }}>
+                                        <label class="form-check-label">Confirmed By Client</label>
                                       </div>
                                     </div>
                                   </div>
@@ -116,6 +120,7 @@ $(document).ready(function() {
             status: $("#status").val(),
             allow_client: $("#allow_client").is(':checked') ? 1 : 0,
             allow_employee: $("#allow_employee").is(':checked') ? 1 : 0,
+            is_confirmed: $("#is_confirmed").is(':checked') ? 1 : 0,
             _token: "{{ csrf_token() }}"
         };
 

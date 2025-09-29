@@ -235,6 +235,7 @@ class ProjectTaskController extends Controller
         $task->due_date = $request->due_date;
         $task->allow_client = $request->input('allow_client', 0);
         $task->allow_employee = $request->input('allow_employee', 1);
+        $task->is_confirmed = $request->input('is_confirmed', 0);
         $task->updated_by = auth()->id();
 
         if ($task->save()) {
