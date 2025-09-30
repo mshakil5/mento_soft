@@ -3,8 +3,8 @@
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-3 col-xl-3">
                 <p>
-                    <a class="navbar-brand" href="/">
-                        <img src="{{ isset($company->company_logo) ? asset('images/company/'.$company->company_logo) : '' }}" width="190px">
+                    <a class="navbar-brand" title="Go to {{ $company->business_name }} homepage" href="{{ route('homepage') }}">
+                        <img src="{{ isset($company->company_logo) ? asset('images/company/'.$company->company_logo) : '' }}" width="190px" alt="{{ $company->business_name ?? 'Company Logo' }}">
                     </a>
                 </p>
                 <small>{{ $company->footer_content }} </small>
@@ -69,21 +69,21 @@
                 <ul class="social_icon justify-content-center justify-conent-md-start">
                     @if(isset($company->facebook))
                     <li class="me-2">
-                        <a href="{{ $company->facebook }}" target="_blank" rel="noopener noreferrer">
+                        <a href="{{ $company->facebook }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                             <iconify-icon icon="devicon:facebook" width="48" height="48"></iconify-icon>
                         </a>
                     </li>
                     @endif
                     @if(isset($company->instagram))
                     <li class="me-2">
-                        <a href="{{ $company->instagram }}" target="_blank" rel="noopener noreferrer">
+                        <a href="{{ $company->instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                             <iconify-icon icon="skill-icons:instagram" width="48" height="48"></iconify-icon>
                         </a>
                     </li>
                     @endif
                     @if(isset($company->linkedin))
                     <li>
-                        <a href="{{ $company->linkedin }}" target="_blank" rel="noopener noreferrer">
+                        <a href="{{ $company->linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                             <iconify-icon icon="skill-icons:linkedin" width="48" height="48"></iconify-icon>
                         </a>
                     </li>

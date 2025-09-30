@@ -20,12 +20,11 @@
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/bootstrap-5.1.3min.css') }}">
     <link rel="stylesheet" href="{{ asset('resources/frontend/css/app.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('resources/frontend/css/slick.css') }}">
-    <link rel="stylesheet" href="{{ asset('resources/frontend/css/slick-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('resources/frontend/css/slick.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset('resources/frontend/css/slick-theme.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset('resources/frontend/css/animate.min.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset('resources/frontend/css/magnific-popup.css') }}" media="print" onload="this.media='all'">
 
-    <script src="{{ asset('resources/frontend/js/wow.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('resources/frontend/css/animate.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('resources/frontend/css/magnific-popup.css') }}">
 </head>
 
 <body onscroll="scroller()">
@@ -45,21 +44,42 @@
     @include('frontend.footer')
     <!-- Footer End -->
 
-    <script>
-        window.services = {!! json_encode($services) !!};
+    <script src="{{ asset('resources/frontend/js/jquery-3.7.1.min.js') }}" defer></script>
+
+    <script defer>
+        (function($){
+            const oldOn = $.fn.on;
+            $.fn.on = function(types, selector, data, fn) {
+                if (typeof types === "string") {
+                    const passiveEvents = ['touchstart','touchmove','wheel','mousewheel'];
+                    types.split(' ').forEach((type) => {
+                        if (passiveEvents.includes(type)) {
+                            if (typeof selector === 'function') {
+                                oldOn.call(this, type, { passive: true }, selector);
+                            } else if (typeof fn === 'function') {
+                                oldOn.call(this, type, selector, data, fn, { passive: true });
+                            }
+                        }
+                    });
+                }
+                return oldOn.apply(this, arguments);
+            };
+        })(jQuery);
     </script>
 
-    <script src="{{ asset('resources/frontend/js/bootstrap-5.bundle.min.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/iconify.min.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/jquery-3.7.1.min.js') }}"></script>
-    {{-- <script src="{{ asset('resources/frontend/js/jquery-3.0.min.js') }}"></script> --}}
-    <script src="{{ asset('resources/frontend/js/jquery.ripples.min.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/typed.min.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/slick.min.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/counter.js') }}"></script>
-    <script src="{{ asset('resources/frontend/js/app.js') }}"></script>
+    <script src="{{ asset('resources/frontend/js/bootstrap-5.bundle.min.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/jquery.ripples.min.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/typed.min.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/slick.min.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/counter.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/app.js') }}" defer></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('resources/frontend/js/iconify.min.js') }}" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" async></script>
+
+    <script defer>
+        window.services = {!! json_encode($services) !!};
+    </script>
 
     @if(session('success'))
         <script>

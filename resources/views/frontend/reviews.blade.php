@@ -18,7 +18,7 @@
                       <div class="p-3 fadeInUp wow">
                           <div class="blogBox">
                               <div class="content text-center text-light">
-                                  <img src="{{ $item->image && file_exists(public_path('images/client-reviews/' . $item->image)) ? asset('images/client-reviews/' . $item->image) : asset('/resources/frontend/images/' . ($item->title == 'Mr' ? 'man.png' : 'woman.png')) }}" class="rounded-circle mx-auto mb-3" width="90px">
+                                  <img src="{{ $item->image && file_exists(public_path('images/client-reviews/' . $item->image)) ? asset('images/client-reviews/' . $item->image) : asset('/resources/frontend/images/' . ($item->title == 'Mr' ? 'man.png' : 'woman.png')) }}" class="rounded-circle mx-auto mb-3" width="90px"  loading="lazy" alt="{{ $item->name ?? 'Client review' }}">
                                   
                                   <h5>{{ $item->name }}</h5>
 

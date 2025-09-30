@@ -9,18 +9,18 @@
     <div class="container-fluid px-0 h-100">
         <div class="h-100 hero-content">
             <div class="text-center mx-auto py-5">
-                <h2 class="text-uppercase title-font mb-4 wow zoomInDown">{{ $landingPage->short_title }} <span class="txt-ternary">{{ $companyBusinessName }}</span>
-                </h2>
-                <h1 class="fw-bold display-3 wow fadeIn" style="color: #963434;">{{ $landingPage->long_title }}
-                    <br>{{ $landingPage->short_description }}
+                <h1 class="text-uppercase title-font mb-4 wow zoomInDown">{{ $landingPage->short_title }} <span class="txt-ternary">{{ $companyBusinessName }}</span>
                 </h1>
+                <h2 class="fw-bold display-3 wow fadeIn" style="color: #963434;">{{ $landingPage->long_title }}
+                    <br>{{ $landingPage->short_description }}
+                </h2>
                 <p class="w-75 fs-3 text-center mx-auto wow fadeIn">
                     {!! $landingPage->long_description !!}
                 </p>
                 <div class="my-4">
-                    <h4 class="txt-bold title-font wow fadeIn"><span
+                    <h3 class="txt-bold title-font wow fadeIn"><span
                             class="typed txt-ternary fw-bold "> </span>
-                    </h4>
+                    </h3>
                 </div>
             </div>
         </div>
@@ -87,19 +87,19 @@
         <div class="row mt-5">
             <div class="inner text-center ">
                 <div class="items fadeInLeft wow">
-                    <img src="{{ asset('resources/frontend/images/ico1.svg') }}" alt="">
+                    <img src="{{ asset('resources/frontend/images/ico1.svg') }}" alt="Initiation icon" loading="lazy">
                     <h3 class="wow fadeInUp text-dark">Initiation</h3>
                 </div>
                 <div class="items fadeInLeft wow">
-                    <img src="{{ asset('resources/frontend/images/ico2.svg') }}" alt="">
+                    <img src="{{ asset('resources/frontend/images/ico2.svg') }}" alt="Discovery icon" loading="lazy">
                     <h3 class="wow fadeInUp text-dark">Discovery</h3>
                 </div>
                 <div class="items fadeInRight wow">
-                    <img src="{{ asset('resources/frontend/images/ico3.svg') }}" alt="">
+                    <img src="{{ asset('resources/frontend/images/ico3.svg') }}" alt="Development icon" loading="lazy">
                     <h3 class="wow fadeInUp text-dark">Development</h3>
                 </div>
                 <div class="items fadeInRight wow">
-                    <img src="{{ asset('resources/frontend/images/ico4.svg') }}" alt="">
+                    <img src="{{ asset('resources/frontend/images/ico4.svg') }}" alt="Support icon" loading="lazy">
                     <h3 class="wow fadeInUp text-dark">Support</h3>
                 </div>
             </div>

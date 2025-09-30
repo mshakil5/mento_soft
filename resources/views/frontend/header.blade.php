@@ -1,33 +1,9 @@
-<section class="top-bar  d-none d-md-block  ">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-8">
-                <ul>
-                    <li><iconify-icon icon="mdi-light:map-marker" width="24" height="24"></iconify-icon><a href="">
-                            24 Ince Way
-                            MK44NP - Milton Keynes</a></li>
-                    <li><iconify-icon icon="circum:mail" width="24" height="24"></iconify-icon><a
-                            href="">info@mentosoftware.co.uk</a></li>
-                    <li><iconify-icon icon="uit:clock" width="24" height="24"></iconify-icon><a href="">Mon - Fri:
-                            10am to 6pm</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-4 ">
-                <ul class="justify-content-end">
-                    <li><iconify-icon icon="lets-icons:phone-light" width="24" height="24"></iconify-icon><a
-                            href="">07745975978</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
 <section class="site-header" id="header">
     <div class="container">
         <div class="row">
             <nav class="navbar navbar-expand-lg py-0 px-3 ">
-                <a class="navbar-brand" href="/">
-                    <img src="{{ isset($company->company_logo) ? asset('images/company/'.$company->company_logo) : '' }}" width="200px"> 
+                <a class="navbar-brand" href="{{ route('homepage') }}" title="Go to {{ $company->business_name }} homepage">
+                    <img src="{{ isset($company->company_logo) ? asset('images/company/'.$company->company_logo) : '' }}" width="200px" alt="{{ $company->business_name ?? 'Company Logo' }}"> 
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"

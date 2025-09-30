@@ -1847,7 +1847,8 @@ section.default.contact-section .secTtile {
     bottom: -100%;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: #222539;
+    color: #ffffff;
     backdrop-filter: blur(10px);
     padding: 20px;
     box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.15);
@@ -1879,14 +1880,14 @@ section.default.contact-section .secTtile {
 
 .cookie-header h4 {
     margin: 0;
-    color: #222539;
+    color: #ffffff; 
     font-family: "titilliumweb";
     font-weight: bold;
 }
 
 .cookie-content p {
     margin: 0;
-    color: #545454;
+    color: #f0f0f0;
     line-height: 1.5;
 }
 
@@ -1907,7 +1908,7 @@ section.default.contact-section .secTtile {
 }
 
 .btn-cookie-accept:hover {
-    background: #222539;
+    background: #ff4500;
     transform: translateY(-2px);
 }
 
