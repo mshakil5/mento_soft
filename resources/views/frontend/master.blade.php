@@ -27,7 +27,7 @@
 
 </head>
 
-<body onscroll="scroller()">
+<body>
     <!-- Header Start -->
     @include('frontend.header')
     <!-- Header End -->
@@ -44,7 +44,7 @@
     @include('frontend.footer')
     <!-- Footer End -->
 
-    <script src="{{ asset('resources/frontend/js/jquery-3.7.1.min.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/jquery-3.7.1.min.js') }}"></script>
 
     <script defer>
         (function($){
@@ -72,6 +72,7 @@
     <script src="{{ asset('resources/frontend/js/typed.min.js') }}" defer></script>
     <script src="{{ asset('resources/frontend/js/slick.min.js') }}" defer></script>
     <script src="{{ asset('resources/frontend/js/counter.js') }}" defer></script>
+    <script src="{{ asset('resources/frontend/js/wow.min.js') }}" defer></script>
     <script src="{{ asset('resources/frontend/js/app.js') }}" defer></script>
 
     <script src="{{ asset('resources/frontend/js/iconify.min.js') }}" async></script>

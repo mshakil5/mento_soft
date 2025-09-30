@@ -3,6 +3,8 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 
+window.addEventListener('scroll', scroller);
+
 function scroller() {
 
   let p = window.pageYOffset;
