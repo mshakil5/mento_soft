@@ -266,11 +266,16 @@ class ProjectServiceController extends Controller
                             $end = $endDate->copy()->addYear()->format('j F Y');
                         }
 
-                        $btnClass = (
+                        if ($row->bill_paid == 1) {
+                            $btnClass = 'btn-info';
+                        } elseif (
                             ($row->cycle_type == 1 && now()->diffInDays(Carbon::parse($row->start_date), false) <= 10) ||
                             ($row->cycle_type == 2 && (Carbon::parse($row->start_date) < now() || now()->diffInMonths(Carbon::parse($row->start_date)) <= 3))
-                        ) ? 'btn-danger' : 'btn-info';
-
+                        ) {
+                            $btnClass = 'btn-danger';
+                        } else {
+                            $btnClass = 'btn-info';
+                        }
                         $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#renewModal'.$row->id.'">
                                     <i class="fas fa-sync"></i> Renew
                                 </button>';
@@ -431,8 +436,8 @@ class ProjectServiceController extends Controller
                               if ($bill->renewal) {
                                   $status = '<span class="badge badge-success">Received</span>
                                             <br>
-                                            <small class="text-info fst-italic d-block">
-                                                Renewed: ' . ($bill->renewal->note ?? 'no note found') .'
+                                            <small class="text-info fst-italic d-none">
+                                                Renewed: ' . ($bill->renewal->note ?? '') .'
                                             </small>';
                               } else {
                                 
