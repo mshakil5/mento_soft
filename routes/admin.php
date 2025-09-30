@@ -44,6 +44,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TransactionsController;
+use App\Http\Controllers\LedgerController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -389,6 +390,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('balance-sheet', [FinancialStatementController::class, 'balanceSheet'])->name('balance-sheet');
     Route::post('balance-sheet', [FinancialStatementController::class, 'balanceSheetReport'])->name('balance-sheet.report');
+
+    // ledger
+    Route::get('ledger-accounts', [LedgerController::class, 'showLedgerAccounts'])->name('admin.ledgeraccount');
+    Route::get('ledger/income-details/{id}', [LedgerController::class, 'income']);
+    Route::get('ledger/asset-details/{id}', [LedgerController::class, 'asset']);
+    Route::get('ledger/expense-details/{id}', [LedgerController::class, 'expense']);
+    Route::get('ledger/liability-details/{id}', [LedgerController::class, 'liability']);
+    Route::get('ledger/equity-details/{id}', [LedgerController::class, 'equity']);
 
     Route::get('/clean-db', [HomeController::class, 'cleanDB']);
 });

@@ -111,7 +111,8 @@ class ProjectServiceController extends Controller
                     $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
                     $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
 
-                    $data = $data->where('bill_paid', 0)
+                    $data = $data->where('status', 1)
+                        ->where('bill_paid', 0)
                         ->where(function($q) use ($currentMonthStart, $currentMonthEnd) {
                             $q->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
                               ->orWhere('start_date', '<', $currentMonthStart);
@@ -123,6 +124,7 @@ class ProjectServiceController extends Controller
                     $nextMonthEnd   = Carbon::now()->addMonth()->endOfMonth()->format('Y-m-d');
 
                     $data = $data->where('type', 2)
+                        ->where('status', 1)
                         ->where('bill_paid', 0)
                         ->whereBetween('start_date', [$nextMonthStart, $nextMonthEnd]);
                 }
@@ -132,6 +134,7 @@ class ProjectServiceController extends Controller
                     $next2MonthEnd   = Carbon::now()->addMonths(2)->endOfMonth()->format('Y-m-d');
 
                     $data = $data->where('type', 2)
+                        ->where('status', 1)
                         ->where('bill_paid', 0)
                         ->whereBetween('start_date', [$next2MonthStart, $next2MonthEnd]);
                 }
@@ -141,6 +144,7 @@ class ProjectServiceController extends Controller
                     $next3MonthEnd   = Carbon::now()->addMonths(3)->endOfMonth()->format('Y-m-d');
 
                     $data = $data->where('type', 2)
+                        ->where('status', 1)
                         ->where('bill_paid', 0)
                         ->whereBetween('start_date', [$next3MonthStart, $next3MonthEnd]);
                 }

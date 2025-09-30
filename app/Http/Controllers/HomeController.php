@@ -76,7 +76,6 @@ class HomeController extends Controller
         $servicesNeedToBeRenewed = ProjectServiceDetail::where('type', 2)->where('is_renewed', 0)->where('status', 1)->where('next_created', 0)->count();
 
         //Current Month
-        $today = Carbon::now()->format('Y-m-d');
         $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
         $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
 

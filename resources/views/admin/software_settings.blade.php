@@ -138,16 +138,16 @@
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('admin.expense') }}" class="nav-link {{ Route::is('admin.expense') ? 'active' : '' }}">
-            <i class="fas fa-money-bill-wave nav-icon"></i>
-            <p>Expense</p>
+        <a href="{{ route('admin.asset') }}" class="nav-link {{ Route::is('admin.asset') ? 'active' : '' }}">
+            <i class="fas fa-warehouse nav-icon"></i>
+            <p>Assets</p>
         </a>
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('admin.asset') }}" class="nav-link {{ Route::is('admin.asset') ? 'active' : '' }}">
-            <i class="fas fa-warehouse nav-icon"></i>
-            <p>Assets</p>
+        <a href="{{ route('admin.expense') }}" class="nav-link {{ Route::is('admin.expense') ? 'active' : '' }}">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <p>Expense</p>
         </a>
     </li>
 
@@ -172,6 +172,12 @@
         </a>
     </li>
 
+    <li class="nav-item">
+        <a href="{{ route('admin.ledgeraccount') }}" class="nav-link {{ Route::is('admin.ledgeraccount') ? 'active' : '' }}">
+            <i class="fas fa-book nav-icon"></i>
+            <p>Ledgers</p>
+        </a>
+    </li>
 
     <li class="nav-item dropdown {{ request()->routeIs('cashbook') || request()->routeIs('bankbook') ? 'menu-open' : '' }}">
         <a href="#" class="nav-link {{ request()->routeIs('cashbook') || request()->routeIs('bankbook') ? 'active' : '' }}">
