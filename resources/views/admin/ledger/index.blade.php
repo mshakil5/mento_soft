@@ -9,6 +9,11 @@
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title">Accounts</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <table class="table table-striped table-bordered">
@@ -66,6 +71,55 @@
                                                   {{ $equity->account_name }}
                                               </a>
                                           @endif  
+                                      @endforeach
+                                  </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="row justify-content-md-center">
+            <div class="col-md-10">
+                <div class="card card-secondary collapsed-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Clients & Employees</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Clients</th>
+                                    <th class="text-center">Employees</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <td>
+                                      @foreach($clients as $client)
+                                          <a href="{{ url('admin/ledger/client-details/' . $client->id) }}" 
+                                             class="btn btn-block btn-success btn-sm">
+                                              {{ $client->name }}
+                                          </a>
+                                      @endforeach
+                                  </td>
+                                  <td>
+                                      @foreach($employees as $employee)
+                                          <a href="{{ url('admin/ledger/employee-details/' . $employee->id) }}" 
+                                             class="btn btn-block btn-info btn-sm">
+                                              {{ $employee->name }}
+                                          </a>
                                       @endforeach
                                   </td>
                                 </tr>

@@ -46,29 +46,27 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($data as $index => $data)
+                                    @php $runningBalance = 0; @endphp
+                                    @foreach($data as $txn)
                                         <tr>
-                                            <td>{{ $data->tran_id }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($data->date)->format('d-m-Y') }}</td>
-                                            <td>{{ $data->description }}</td>
-                                            <td>{{ $data->payment_type }}</td>
-                                            <td>{{ $data->ref }}</td>
-                                            <td>{{ $data->transaction_type }}</td>
-                                            @if(in_array($data->transaction_type,  ['Refund']))
-                                            <td>{{ number_format($data->at_amount, 0) }}</td>
-                                            <td></td>
-                                            <td>{{ $balance }}</td>
-                                            @php
-                                                $balance = $balance + $data->at_amount;
-                                            @endphp
-                                            @elseif(in_array($data->transaction_type,  ['Current', 'Advance Adjust']))
-                                            <td></td>
-                                            <td>{{ number_format($data->at_amount, 0) }}</td>
-                                            <td>{{ $balance }}</td>
-                                            @php
-                                                $balance = $balance - $data->at_amount;
-                                            @endphp
+                                            <td>{{ $txn->tran_id }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($txn->date)->format('d-m-Y') }}</td>
+                                            <td>{{ $txn->description }}</td>
+                                            <td>{{ $txn->payment_type }}</td>
+                                            <td>{{ $txn->ref }}</td>
+                                            <td>{{ $txn->transaction_type }}</td>
+
+                                            @if(in_array($txn->transaction_type, ['Refund']))
+                                                <td>{{ number_format($txn->at_amount, 0) }}</td>
+                                                <td></td>
+                                                @php $runningBalance -= $txn->at_amount; @endphp
+                                            @elseif(in_array($txn->transaction_type, ['Current', 'Advance Adjust']))
+                                                <td></td>
+                                                <td>{{ number_format($txn->at_amount, 0) }}</td>
+                                                @php $runningBalance += $txn->at_amount; @endphp
                                             @endif
+
+                                            <td>{{ number_format($runningBalance, 0) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

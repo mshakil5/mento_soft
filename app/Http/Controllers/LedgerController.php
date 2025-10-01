@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
 use App\Models\Transaction;
 use App\Models\CompanyDetails;
+use App\Models\User;
+use App\Models\Client;
 
 class LedgerController extends Controller
 {
@@ -13,7 +15,9 @@ class LedgerController extends Controller
     {
         $chartOfAccounts = ChartOfAccount::select('id', 'account_head', 'account_name','status')->where('status', 1)
         ->get();
-        return view('admin.ledger.index', compact('chartOfAccounts'));
+        $employees = User::where('user_type', 1)->where('status', 1)->latest()->get();
+        $clients = Client::where('status', 1)->latest()->get();
+        return view('admin.ledger.index', compact('chartOfAccounts', 'employees', 'clients'));
     }
 
     public function income($id, Request $request)
@@ -68,6 +72,34 @@ class LedgerController extends Controller
         $accountName = ChartOfAccount::where('id', $id)->first()->account_name;
         $companyName = CompanyDetails::select('company_name')->first()->company_name;
         return view('admin.ledger.equity', compact('data', 'balance','accountName','companyName'));
+    }
+
+    public function client($id, Request $request)
+    {
+        $data = Transaction::where('client_id', $id)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $client = Client::find($id);
+        $clientName = $client?->name ?? 'Client Not Found';
+        $companyName = CompanyDetails::select('company_name')->first()->company_name ?? '';
+
+        return view('admin.ledger.client', compact('data', 'clientName', 'companyName'));
+    }
+
+    public function employee($id, Request $request)
+    {
+        $data = Transaction::where('employee_id', $id)
+            ->whereIn('transaction_type', ['Current', 'Prepaid', 'Due Adjust', 'Received', 'Payment'])
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $employee = User::find($id);
+        $employeeName = $employee?->name ?? 'Employee Not Found';
+
+        $companyName = CompanyDetails::select('company_name')->first()->company_name ?? '';
+
+        return view('admin.ledger.employee', compact('data', 'employeeName', 'companyName'));
     }
 
 }

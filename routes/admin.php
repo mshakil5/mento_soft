@@ -398,6 +398,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('ledger/expense-details/{id}', [LedgerController::class, 'expense']);
     Route::get('ledger/liability-details/{id}', [LedgerController::class, 'liability']);
     Route::get('ledger/equity-details/{id}', [LedgerController::class, 'equity']);
+    Route::get('ledger/client-details/{id}', [LedgerController::class, 'client']);
+    Route::get('ledger/employee-details/{id}', [LedgerController::class, 'employee']);
 
     Route::get('/clean-db', [HomeController::class, 'cleanDB']);
 });
