@@ -9,7 +9,7 @@
     <div class="container-fluid px-0 h-100">
         <div class="h-100 hero-content">
             <div class="text-center mx-auto py-5">
-                <h1 class="text-uppercase title-font mb-4 wow zoomInDown">{{ $landingPage->short_title }} <span class="txt-ternary">{{ $companyBusinessName }}</span>
+                <h1 class="text-uppercase title-font mb-4 wow zoomInDown mx-1">{{ $landingPage->short_title }} <span class="txt-ternary">{{ $companyBusinessName }}</span>
                 </h1>
                 <h2 class="fw-bold display-3 wow fadeIn" style="color: #963434;">{{ $landingPage->long_title }}
                     <br>{{ $landingPage->short_description }}

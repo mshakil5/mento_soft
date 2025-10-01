@@ -108,14 +108,14 @@ class ProjectServiceController extends Controller
                 $due = $request->due;
 
                 if ($due == 'current') {
-                    $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
-                    $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
+                    $today = Carbon::today()->format('Y-m-d');
+                    $next30Days = Carbon::today()->addDays(30)->format('Y-m-d');
 
                     $data = $data->where('status', 1)
                         ->where('bill_paid', 0)
-                        ->where(function($q) use ($currentMonthStart, $currentMonthEnd) {
-                            $q->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
-                              ->orWhere('start_date', '<', $currentMonthStart);
+                        ->where(function($q) use ($today, $next30Days) {
+                            $q->whereBetween('start_date', [$today, $next30Days]) // today + next 30 days
+                              ->orWhere('start_date', '<', $today); // all previous unpaid
                         });
                 }
 

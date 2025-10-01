@@ -76,14 +76,14 @@ class HomeController extends Controller
         $servicesNeedToBeRenewed = ProjectServiceDetail::where('type', 2)->where('is_renewed', 0)->where('status', 1)->where('next_created', 0)->count();
 
         //Current Month
-        $currentMonthStart = Carbon::now()->startOfMonth()->format('Y-m-d');
-        $currentMonthEnd   = Carbon::now()->endOfMonth()->format('Y-m-d');
+        $today = Carbon::today()->format('Y-m-d');
+        $next30Days = Carbon::today()->addDays(30)->format('Y-m-d');
 
         $currentMonthCount = ProjectServiceDetail::where('status', 1)
             ->where('bill_paid', 0)
-            ->where(function($q) use ($currentMonthStart, $currentMonthEnd) {
-                $q->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd]) // current month unpaid
-                  ->orWhere('start_date', '<', $currentMonthStart); // previous unpaid
+            ->where(function($q) use ($today, $next30Days) {
+                $q->whereBetween('start_date', [$today, $next30Days]) // today + next 30 days
+                  ->orWhere('start_date', '<', $today); // all previous unpaid
             })
             ->count();
 
