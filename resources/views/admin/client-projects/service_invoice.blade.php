@@ -132,10 +132,10 @@
             </table>
             <div style="position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); max-width: 794px; width: 100%; padding: 0 20px; text-align:left;">
               Account Details<br>
-              MR MD F A Bhuyain<br>
-              Sort code: 11-08-34<br>
-              A/C No: 00630751<br>
-              Halifax<br><br>
+              Acc name: 3N SOFT LIMITED<br>
+              A/C No: 71055836<br>
+              Sort code: 401800<br>
+              HSBC<br><br>
               If you have any questions concerning this invoice please contact to,<br>
               Fozla Bhuyain, Email: fozla.bhuyain@mentosoftware.co.uk<br><br>
               <B>
