@@ -754,6 +754,7 @@ class ProjectServiceController extends Controller
             $transaction->date = $startDate;
             $transaction->project_service_detail_id = $newDetail->id;
             $transaction->client_id = $newDetail->client_id;
+            $transaction->client_project_id = $newDetail->client_project_id;
             $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Due';
             $transaction->payment_type = 'Bank';
@@ -1025,6 +1026,7 @@ class ProjectServiceController extends Controller
                 $transaction = Transaction::create([
                     'date'                      => $currentStart,
                     'project_service_detail_id' => $detail->id,
+                    'client_project_id'         => $detail->client_project_id,
                     'client_id'                 => $data['client_id'],
                     'table_type'                => 'Income',
                     'transaction_type'          => 'Due',
@@ -1083,6 +1085,7 @@ class ProjectServiceController extends Controller
                     $transaction = Transaction::create([
                         'date'                      => $currentStart,
                         'project_service_detail_id' => $detail->id,
+                        'client_project_id'         => $detail->client_project_id,
                         'client_id'                 => $data['client_id'],
                         'table_type'                => 'Income',
                         'transaction_type'          => 'Due',
@@ -1177,6 +1180,7 @@ class ProjectServiceController extends Controller
               $transactions = Transaction::where('project_service_detail_id', $child->id)->get();
               foreach ($transactions as $transaction) {
                   $transaction->client_id = $request->client_id;
+                  $transaction->client_project_id = $request->client_project_id;
                   $transaction->description = $request->note ?? '';
                   $transaction->amount = $child->amount;
                   $transaction->at_amount = $child->amount;
@@ -1240,6 +1244,7 @@ class ProjectServiceController extends Controller
             $transaction->date = $paymentDate;
             $transaction->project_service_detail_id = $id;
             $transaction->client_id = $previousTransaction->client_id ?? $serviceDetail->client_id;
+            $transaction->client_project_id = $previousTransaction->client_project_id;
             $transaction->table_type = 'Income';
             $transaction->transaction_type = 'Received';
             $transaction->payment_type = $paymentType;
@@ -1359,6 +1364,7 @@ class ProjectServiceController extends Controller
                 'date'                      => $newStart,
                 'project_service_detail_id' => $newDetail->id,
                 'client_id'                 => $parentService->client_id,
+                'client_project_id'         => $parentService->client_project_id,
                 'table_type'                => 'Income',
                 'transaction_type'          => 'Due',
                 'payment_type'              => 'Bank',
@@ -1418,6 +1424,7 @@ class ProjectServiceController extends Controller
         $dueTransaction->date = $startDate;
         $dueTransaction->project_service_detail_id = $newDetail->id;
         $dueTransaction->client_id = $newDetail->client_id;
+        $dueTransaction->client_project_id = $newDetail->client_project_id;
         $dueTransaction->table_type = 'Income';
         $dueTransaction->transaction_type = 'Due';
         $dueTransaction->payment_type = 'Bank';
@@ -1433,6 +1440,7 @@ class ProjectServiceController extends Controller
         $receivedTransaction->date = $request->payment_date;
         $receivedTransaction->project_service_detail_id = $newDetail->id;
         $receivedTransaction->client_id = $serviceDetail->client_id;
+        $receivedTransaction->client_project_id = $serviceDetail->client_project_id;
         $receivedTransaction->table_type = 'Income';
         $receivedTransaction->transaction_type = 'Received';
         $receivedTransaction->payment_type = $request->payment_type;

@@ -8,6 +8,9 @@ use App\Models\Transaction;
 use App\Models\CompanyDetails;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\ProjectService;
+use App\Models\ClientProject;
+use App\Models\ProjectServiceDetail;
 
 class LedgerController extends Controller
 {
@@ -17,7 +20,13 @@ class LedgerController extends Controller
         ->get();
         $employees = User::where('user_type', 1)->where('status', 1)->latest()->get();
         $clients = Client::where('status', 1)->latest()->get();
-        return view('admin.ledger.index', compact('chartOfAccounts', 'employees', 'clients'));
+        $projects = ClientProject::latest()->get();
+        $services = Transaction::query()
+          ->whereNotNull('project_service_detail_id')
+          ->with(['projectServiceDetail.serviceType'])
+          ->get()
+          ->groupBy(fn($txn) => $txn->projectServiceDetail->serviceType->id ?? 0);
+        return view('admin.ledger.index', compact('chartOfAccounts', 'employees', 'clients', 'projects', 'services'));
     }
 
     public function income($id, Request $request)
@@ -100,6 +109,41 @@ class LedgerController extends Controller
         $companyName = CompanyDetails::select('company_name')->first()->company_name ?? '';
 
         return view('admin.ledger.employee', compact('data', 'employeeName', 'companyName'));
+    }
+
+    public function project($id, Request $request)
+    {
+        $data = Transaction::where('client_project_id', $id)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $project = ClientProject::find($id);
+        $projectName = $project?->title ?? 'Project Not Found';
+        $clientName = $project?->client?->name ?? 'Client Not Found';
+
+        $companyName = CompanyDetails::select('company_name')->first()->company_name ?? '';
+
+        return view('admin.ledger.project', compact('data', 'projectName', 'clientName', 'companyName'));
+    }
+
+    public function service($serviceId)
+    {
+        $transactions = Transaction::whereHas('projectServiceDetail', function($q) use ($serviceId) {
+            $q->where('project_service_id', $serviceId);
+        })
+        ->with(['projectServiceDetail.serviceType', 'projectServiceDetail.project', 'projectServiceDetail.client'])
+        ->orderBy('date', 'asc')
+        ->get();
+
+        $service = ProjectService::find($serviceId);
+        if (!$service) {
+            abort(404, 'Service not found');
+        }
+
+        $serviceName = $service->name ?? 'Service';
+        $companyName = CompanyDetails::select('company_name')->first()->company_name ?? '';
+
+        return view('admin.ledger.service', compact('transactions', 'serviceName', 'companyName'));
     }
 
 }

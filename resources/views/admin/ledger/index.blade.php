@@ -132,6 +132,56 @@
     </div>
 </section>
 
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="row justify-content-md-center">
+            <div class="col-md-10">
+                <div class="card card-secondary collapsed-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Projects & Services</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Projects</th>
+                                    <th class="text-center">Services</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <td>
+                                      @foreach($projects as $project)
+                                          <a href="{{ url('admin/ledger/project-details/' . $project->id) }}" 
+                                             class="btn btn-block btn-success btn-sm">
+                                              {{ $project->title }}
+                                          </a>
+                                      @endforeach
+                                  </td>
+                                  <td>
+                                      @foreach($services as $serviceId => $txns)
+                                          @php $service = $txns->first()->projectServiceDetail->serviceType; @endphp
+                                          <a href="{{ url('admin/ledger/service-details/' . $service->id) }}" 
+                                            class="btn btn-block btn-primary btn-sm">
+                                            {{ $service->name }}
+                                          </a>
+                                      @endforeach
+                                  </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 @endsection
 
 @section('script')
