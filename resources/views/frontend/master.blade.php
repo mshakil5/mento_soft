@@ -76,7 +76,7 @@
     <script src="{{ asset('resources/frontend/js/app.js') }}" defer></script>
 
     <script src="{{ asset('resources/frontend/js/iconify.min.js') }}" async></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script defer>
         window.services = {!! json_encode($services) !!};

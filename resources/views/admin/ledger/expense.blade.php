@@ -52,7 +52,7 @@
                                       <tr>
                                           <td>{{ $index + 1 }}</td>
                                           <td>{{ \Carbon\Carbon::parse($txn->date)->format('d-m-Y') }}</td>
-                                          <td>{{ $txn->description }}</td>
+                                          <td>{!! $txn->description !!}</td>
                                           <td>{{ $txn->payment_type }}</td>
                                           <td>{{ $txn->ref }}</td>
                                           <td>{{ $txn->transaction_type }}</td> 

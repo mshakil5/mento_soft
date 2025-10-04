@@ -46,6 +46,7 @@ class IncomeController extends Controller
                 ->editColumn('date', function ($transaction) {
                     return Carbon::parse($transaction->date)->format('d-m-Y');
                 })
+                ->rawColumns(['chart_of_account', 'ref', 'description'])
                 ->make(true);
         }
 

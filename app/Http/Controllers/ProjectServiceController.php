@@ -485,7 +485,7 @@ class ProjectServiceController extends Controller
                               $status = '<span class="badge badge-success">Received</span>';
                           }
                       } else {
-                          $status = ($bill->due_date && Carbon::parse($bill->due_date)->lt(Carbon::today()))
+                          $status = ($bill->start_date && Carbon::parse($bill->start_date)->lt(Carbon::today()))
                               ? '<span class="badge badge-danger">Overdue</span>'
                               : '<span class="badge badge-warning">Due</span>';
                       }
