@@ -374,6 +374,7 @@
       });
 
       function populateForm(data){
+          pageTop();
           $("#start_date").val(data.start_date.split(' ')[0]).prop('readonly', true);
           $("#cycle_type").val(data.cycle_type).prop('disabled', true);
 
@@ -529,6 +530,7 @@
           lengthMenu: [[10,25,50,100,-1],[10,25,50,100,"All"]],
           autoWidth: false,
           dom: 'Blfrtip',
+          searching: false,
           buttons: [
               {
                   extend: 'excel',
