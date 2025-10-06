@@ -607,6 +607,44 @@
           });
       });
 
+      $(document).on('change', '.renew-status', function() {
+          let checkbox = $(this);
+          let billId = checkbox.data('id');
+          let isChecked = checkbox.is(':checked');
+
+          if (!confirm('Are you sure to change renewal status?')) {
+              checkbox.prop('checked', !isChecked);
+              return;
+          }
+
+          $.ajax({
+              url: '/admin/project-service/renew-status',
+              method: 'POST',
+              data: {
+                  _token: '{{ csrf_token() }}',
+                  bill_id: billId,
+                  is_renewed: isChecked ? 1 : 0
+              },
+              success(res) {
+                  let statusText = isChecked ? 'Renewed' : 'Not Renewed';
+                  let textClass = isChecked ? 'text-success' : 'text-danger';
+                  $('.status-text-' + billId)
+                      .text(statusText)
+                      .removeClass('text-success text-danger')
+                      .addClass(textClass);
+                  success(res.message ?? 'Status updated successfully!');
+              },
+              error(xhr) {
+                  console.error(xhr.responseText);
+                  checkbox.prop('checked', !isChecked);
+              }
+          });
+      });
+
+      $(document).on('hidden.bs.modal', '.modal', function () {
+          reloadTable();
+      });
+
       $(document).on('submit', '.edit-form', function(e) {
           e.preventDefault();
           if (!confirm('Are you sure to update this service?')) return;

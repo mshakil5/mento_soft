@@ -270,7 +270,7 @@ class ProjectServiceController extends Controller
                             $end = $endDate->copy()->addYear()->format('j F Y');
                         }
 
-                        if ($row->bill_paid == 1) {
+                        if ($row->is_renewed == 1) {
                             $btnClass = 'btn-info';
                         } elseif (
                             ($row->cycle_type == 1 && now()->diffInDays(Carbon::parse($row->start_date), false) <= 10) ||
@@ -374,9 +374,30 @@ class ProjectServiceController extends Controller
                         </div>';
                     }
 
+                  $hasNotRenewed = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                      ->where('client_id', $row->client_id)
+                      ->where('client_project_id', $row->client_project_id)
+                      ->where('amount', $row->amount)
+                      ->where('cycle_type', $row->cycle_type)
+                      ->where('is_auto', $row->is_auto)
+                      ->where('type', $row->type)
+                      ->where('status', 1)
+                      ->where('is_renewed', 0)
+                      ->where('bill_paid', 1)
+                          ->where(function($q) use ($row) {
+        if($row->cycle_type == 1) {
+            $q->where('start_date', '<=', now()->addDays(10));
+        } elseif($row->cycle_type == 2) {
+            $q->where('start_date', '<=', now()->addMonths(3));
+        }
+    })
+                      ->exists();
+
+                  $btnClass = $hasNotRenewed ? 'btn-danger' : 'btn-secondary';
+                  $iconClass = $hasNotRenewed ? 'text-white' : 'text-light';
                   // service details
-                  $btn .= '<button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#billDetailsModal'.$row->id.'">
-                              <i class="fas fa-list"></i>
+                  $btn .= '<button class="btn btn-sm '.$btnClass.'" data-toggle="modal" data-target="#billDetailsModal'.$row->id.'">
+                              <i class="fas fa-list '.$iconClass.'"></i>
                           </button>';
 
                   $btn .= '
@@ -530,6 +551,17 @@ class ProjectServiceController extends Controller
                                   </form>
                               </div>
                           </div>';
+                      } else {
+                        $checked = ($bill->is_renewed == 1) ? 'checked' : '';
+                        $statusText = $bill->is_renewed == 1 
+                            ? '<span class="text-success">Renewed</span>' 
+                            : '<span class="text-danger">Not Renewed</span>';
+
+                        $action .= '
+                            <div class="icheck-primary d-inline ml-2">
+                                <input type="checkbox" class="renew-status" data-id="' . $bill->id . '" ' . $checked . '><br>
+                                <span class="ml-1 renew-text status-text-' . $bill->id . '">' . $statusText . '</span>
+                            </div>';
                       }
 
                       $btn .= '<tr>
@@ -699,7 +731,6 @@ class ProjectServiceController extends Controller
                 ->orWhere(function($t2) {
                     $t2->where('type', 2)
                       ->where('bill_paid', 1)
-                      // ->where('is_renewed', 1)
                       ->where('next_created', 0);
                 });
             })
@@ -1267,38 +1298,6 @@ class ProjectServiceController extends Controller
         return response()->json(['message' => 'Received successfully.']);
     }
 
-    public function renew2(Request $request)
-    {
-        $request->validate([
-            'service_id'    => 'required|exists:project_service_details,id',
-            'renewal_date'  => 'required|date',
-            'note'          => 'nullable|string',
-        ]);
-
-        
-
-        $serviceDetail = ProjectServiceDetail::findOrFail($request->service_id);
-        $parentService = ProjectServiceDetail::find($serviceDetail->parent_id);
-        // repeat based on $parentService last data. take necessary date from last dat and tak only amount from first data
-
-
-        $renewal = new ServiceRenewal();
-        $renewal->project_service_detail_id = $serviceDetail->id;
-        $renewal->date = $request->renewal_date;
-        $renewal->note = $request->note;
-        $renewal->status = 1;
-        $renewal->created_by = auth()->id();
-        if ($serviceDetail->is_renewed != 1) {
-        $renewal->save();
-        }
-
-
-        $serviceDetail->is_renewed = 1;
-        $serviceDetail->save();
-
-        return response()->json(['message' => 'Renewed successfully!']);
-    }
-
     public function renew(Request $request)
     {
         $request->validate([
@@ -1337,11 +1336,12 @@ class ProjectServiceController extends Controller
             $renewal->status = 1;
             $renewal->created_by = auth()->id();
 
-            if ($serviceDetail->is_renewed != 1) {
-                $renewal->save();
-            }
+            // if ($serviceDetail->is_renewed != 1) {
+            //     $renewal->save();
+            // }
 
-            $serviceDetail->update(['is_renewed' => 1, 'next_created' => 1]);
+            // $serviceDetail->update(['is_renewed' => 1, 'next_created' => 1]);
+            $serviceDetail->update(['next_created' => 1]);
 
             $newDetail = ProjectServiceDetail::create([
                 'project_service_id' => $parentService->project_service_id,
@@ -1510,6 +1510,23 @@ class ProjectServiceController extends Controller
         }
 
         return response()->json(['message' => 'Service updated successfully!']);
+    }
+
+    public function updateRenewStatus(Request $request)
+    {
+        $request->validate([
+            'bill_id' => 'required|exists:project_service_details,id',
+            'is_renewed' => 'required|boolean',
+        ]);
+
+        $bill = ProjectServiceDetail::findOrFail($request->bill_id);
+        $bill->is_renewed = $request->is_renewed;
+        $bill->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Renewed successfully!'
+        ]);
     }
 
     public function serviceInvoices(Request $request, $rowId)

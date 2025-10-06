@@ -281,6 +281,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/project-service/renew', [ProjectServiceController::class, 'renew'])->name('project-service.renew');
     Route::post('/project-service/advance-receive', [ProjectServiceController::class, 'advanceReceive'])->name('project-service.advance-receive');
 
+    
+    Route::post('/project-service/renew-status', [ProjectServiceController::class, 'updateRenewStatus']);
+
     Route::post('/project-service-row', [ProjectServiceController::class, 'updateRow'])->name('project-service-row.update');
 
     // Project Service Details
