@@ -106,15 +106,28 @@ class ClientProjectController extends Controller
                 })
 
                 ->addColumn('project_progress', function($row) {
+                    $totalModules = $row->modules()->count();
+                    $modulesUrl = route('client-projects.modules', $row->id);
+
+                    if ($totalModules == 0) {
+                        return '<a href="'.$modulesUrl.'" class="text-decoration-none text-success">
+                                    <small>No module yet! Add new</small>
+                                </a>';
+                    }
+
                     $percent = $row->progress ?? 0;
+                    $maxEndDate = $row->modules->max('estimated_end_date');
+                    $maxEndDateFormatted = $maxEndDate ? \Carbon\Carbon::parse($maxEndDate)->format('d M y') : '-';
+
+                    $endDateHtml = $percent < 100 ? '<br><small class="text-muted">End: '.$maxEndDateFormatted.'</small>' : '';
 
                     return '
                         <td class="project_progress">
-                            <a href="'.route('client-projects.modules', $row->id).'" class="text-decoration-none text-dark">
+                            <a href="'.$modulesUrl.'" class="text-decoration-none text-dark">
                                 <div class="progress progress-sm">
                                     <div class="progress-bar bg-success" role="progressbar" aria-valuenow="'.$percent.'" aria-valuemin="0" aria-valuemax="100" style="width: '.$percent.'%"></div>
                                 </div>
-                                <small>'.$percent.'% Completed</small>
+                                <small>'.$percent.'% Completed</small>'.$endDateHtml.'
                             </a>
                         </td>
                     ';
