@@ -45,6 +45,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\LedgerController;
+use App\Http\Controllers\ProjectModuleController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
 
@@ -234,6 +235,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/client-projects-task/{task}', [ProjectTaskController::class, 'update']);
     Route::delete('/client-projects-task/{task}', [ProjectTaskController::class, 'destroy']);
     Route::post('/client-projects-task/{task}/toggle-status', [ProjectTaskController::class, 'toggleStatus']);
+
+    // Project Modules
+    Route::get('/client-projects/{project}/modules', [ProjectModuleController::class, 'index'])->name('client-projects.modules');
+    Route::post('/client-projects/{project}/modules', [ProjectModuleController::class, 'store']);
+    Route::get('/client-projects-module/{module}/edit', [ProjectModuleController::class, 'edit']);
+    Route::post('/client-projects-module/{module}', [ProjectModuleController::class, 'update']);
+    Route::delete('/client-projects-module/{module}', [ProjectModuleController::class, 'destroy']);
+    Route::post('/client-projects-module/{module}/toggle-status', [ProjectModuleController::class, 'toggleStatus']);
 
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 

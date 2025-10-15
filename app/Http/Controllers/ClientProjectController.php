@@ -33,7 +33,8 @@ class ClientProjectController extends Controller
                           ->orWhere('created_by', auth()->id());
                       });
                   },
-                  'services.serviceType'
+                  'services.serviceType',
+                  'modules'
               ])
               ->withCount(['recentUpdates', 'tasks'])
               ->latest();
@@ -103,6 +104,22 @@ class ClientProjectController extends Controller
                 ->addColumn('client_name', function($row) {
                     return $row->client->business_name ?? '';
                 })
+
+                ->addColumn('project_progress', function($row) {
+                    $percent = $row->progress ?? 0;
+
+                    return '
+                        <td class="project_progress">
+                            <a href="'.route('client-projects.modules', $row->id).'" class="text-decoration-none text-dark">
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="'.$percent.'" aria-valuemin="0" aria-valuemax="100" style="width: '.$percent.'%"></div>
+                                </div>
+                                <small>'.$percent.'% Completed</small>
+                            </a>
+                        </td>
+                    ';
+                })
+
                 ->addColumn('status', function($row) {
                     $statuses = [
                         1 => 'Planned',
@@ -182,7 +199,7 @@ class ClientProjectController extends Controller
 
                     return $buttons;
                 })
-                ->rawColumns(['image', 'status', 'action', 'received'])
+                ->rawColumns(['image', 'status', 'action', 'received', 'project_progress'])
                 ->make(true);
         }
 

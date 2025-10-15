@@ -71,5 +71,20 @@ class ClientProject extends Model
         return $this->hasMany(ProjectServiceDetail::class, 'client_project_id')
                     ->with(['serviceType', 'client', 'project']);
     }
-    
+
+    public function modules()
+    {
+        return $this->hasMany(ProjectModule::class);
+    }
+
+    public function getProgressAttribute()
+    {
+        $total = $this->modules()->count();
+        if ($total == 0) return 0;
+
+        $done = $this->modules()->where('status', 3)->count(); // 3 = Done
+        $progress = ($done / $total) * 100;
+
+        return round($progress);
+    }
 }

@@ -188,6 +188,7 @@
                                     <th>Status</th>
                                     <th>Budget</th>
                                     <th>Received</th>
+                                    <th>Progress</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -436,6 +437,7 @@
                 {data: 'status', name: 'status', orderable: false},
                 {data: 'amount', name: 'amount'},
                 {data: 'received', name: 'received'},
+                {data: 'project_progress', name: 'project_progress'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ],
             responsive: true,
