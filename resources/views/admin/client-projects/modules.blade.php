@@ -47,13 +47,20 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>Status <span class="text-danger">*</span></label>
-                                <select class="form-control" id="status" name="status">
-                                    <option value="1">To Do</option>
-                                    <option value="2">In Progress</option>
-                                    <option value="3">Done</option>
-                                </select>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Deadline <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="deadline" name="deadline" required>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Status <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="status" name="status">
+                                        <option value="1">To Do</option>
+                                        <option value="2">In Progress</option>
+                                        <option value="3">Done</option>
+                                    </select>
+                                </div>
                             </div>
 
                         </form>
@@ -85,6 +92,7 @@
                                     <th>Description</th>
                                     <th>Start Date</th>
                                     <th>Estimated End Date</th>
+                                    <th>Deadline</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -127,6 +135,7 @@ $(document).ready(function () {
         form_data.append("description", $("#description").val());
         form_data.append("start_date", $("#start_date").val());
         form_data.append("estimated_end_date", $("#estimated_end_date").val());
+        form_data.append("deadline", $("#deadline").val());
         form_data.append("status", $("#status").val());
 
         if($(this).val() == 'Create') {
@@ -189,6 +198,7 @@ $(document).ready(function () {
             $("#description").val(d.description);
             $("#start_date").val(d.start_date);
             $("#estimated_end_date").val(d.estimated_end_date);
+            $("#deadline").val(d.deadline);
             $("#status").val(d.status);
             $("#codeid").val(d.id);
             $("#addBtn").val('Update').html('Update');
@@ -251,6 +261,7 @@ $(document).ready(function () {
             {data: 'description', name: 'description'},
             {data: 'start_date', name: 'start_date'},
             {data: 'end_date', name: 'end_date'},
+            {data: 'deadline', name: 'deadline'},
             {data: 'status', name: 'status', orderable:false, searchable:false},
             {data: 'action', name: 'action', orderable:false, searchable:false},
         ],

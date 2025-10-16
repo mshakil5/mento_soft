@@ -19,6 +19,22 @@ class ProjectModuleController extends Controller
                 ->addIndexColumn()
                 ->addColumn('start_date', fn($row) => $row->start_date ? Carbon::parse($row->start_date)->format('d-m-Y') : '')
                 ->addColumn('end_date', fn($row) => $row->estimated_end_date ? Carbon::parse($row->estimated_end_date)->format('d-m-Y') : '')
+                ->addColumn('deadline', function($row) {
+                    if (!$row->deadline) return '';
+
+                    $endDate = Carbon::parse($row->deadline);
+                    $today = Carbon::today();
+
+                    if ($row->status != 3) {
+                        if ($endDate->isSameDay($today)) {
+                            return '<span class="badge bg-warning text-dark">'.$endDate->format('d-m-Y').'</span>';
+                        } elseif ($endDate->lessThan($today)) {
+                            return '<span class="badge bg-danger">'.$endDate->format('d-m-Y').'</span>';
+                        }
+                    }
+
+                    return $endDate->format('d-m-Y');
+                })
                 ->addColumn('status', function($row){
                     $statuses = [1=>'To Do',2=>'In Progress',3=>'Done'];
                     $current = $statuses[$row->status] ?? 'Unknown';
@@ -34,7 +50,7 @@ class ProjectModuleController extends Controller
                     return '<button class="btn btn-sm btn-primary edit" data-id="'.$row->id.'">Edit</button>
                             <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>';
                 })
-                ->rawColumns(['status','action'])
+                ->rawColumns(['status','action','deadline'])
                 ->make(true);
         }
 
@@ -49,6 +65,7 @@ class ProjectModuleController extends Controller
             'status'=>'required|in:1,2,3',
             'start_date'=>'required|date',
             'estimated_end_date'=>'required|date|after_or_equal:start_date',
+            'deadline'=>'required|date|after_or_equal:start_date',
         ]);
 
         if($validator->fails()){
@@ -62,6 +79,7 @@ class ProjectModuleController extends Controller
             'status'=>$request->status,
             'start_date'=>$request->start_date,
             'estimated_end_date'=>$request->estimated_end_date,
+            'deadline'=>$request->deadline,
             'created_by'=>auth()->id()
         ]);
 
@@ -81,6 +99,7 @@ class ProjectModuleController extends Controller
             'status'=>'required|in:1,2,3',
             'start_date'=>'required|date',
             'estimated_end_date'=>'required|date|after_or_equal:start_date',
+            'deadline'=>'required|date|after_or_equal:start_date',
         ]);
 
         if($validator->fails()){
@@ -93,6 +112,7 @@ class ProjectModuleController extends Controller
             'status'=>$request->status,
             'start_date'=>$request->start_date,
             'estimated_end_date'=>$request->estimated_end_date,
+            'deadline'=>$request->deadline,
             'updated_by'=>auth()->id()
         ]);
 

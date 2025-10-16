@@ -208,12 +208,14 @@ class ProjectTaskController extends Controller
     public function editPage(ProjectTask $task)
     {
         $employees = User::where('status', 1)->where('user_type', 1)->select('id', 'name')->get();
-        return view('admin.client-projects.edit-task', compact('task', 'employees'));
+        $projects = ClientProject::select('id', 'title')->latest()->get();
+        return view('admin.client-projects.edit-task', compact('task', 'employees', 'projects'));
     }
 
     public function update(Request $request, ProjectTask $task)
     {
         $validator = Validator::make($request->all(), [
+            'client_project_id' => 'required|exists:client_projects,id',
             'task' => 'required|string',
             'employee_id' => 'required|exists:users,id',
             'priority' => 'required|in:high,medium,low',
@@ -228,6 +230,7 @@ class ProjectTaskController extends Controller
         }
 
         $task->title = $request->title;
+        $task->client_project_id = $request->client_project_id;
         $task->task = $request->task;
         $task->employee_id = $request->employee_id;
         $task->priority = $request->priority;

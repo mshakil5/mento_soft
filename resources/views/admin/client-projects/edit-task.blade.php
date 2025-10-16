@@ -7,16 +7,29 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title" id="cardTitle">Edit Task for {{ $task->clientProject->title ?? '' }}</h3>
+                        <h3 class="card-title" id="cardTitle">Edit Task for</h3>
                     </div>
                     <div class="card-body">
                         <form id="editThisForm">
                             @csrf
                             <input type="hidden" id="task_id" value="{{ $task->id }}">
-                            <input type="hidden" name="client_project_id" value="{{ $task->client_project_id }}">
                             
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Project <span class="text-danger">*</span></label>
+                                        <select class="form-control select2" id="client_project_id" name="client_project_id" required>
+                                            <option value="">Select Project</option>
+                                            @foreach($projects as $project)
+                                                <option value="{{ $project->id }}" {{ $task->client_project_id == $project->id ? 'selected' : '' }}>
+                                                    {{ $project->title }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Task <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="title" name="title" value="{{ $task->title }}" required>
@@ -112,6 +125,7 @@ $(document).ready(function() {
         e.preventDefault();
         let taskId = $("#task_id").val();
         let formData = {
+            client_project_id: $("#client_project_id").val(),
             title: $("#title").val(),
             task: $("#task").val(),
             employee_id: $("#employee_id").val(),

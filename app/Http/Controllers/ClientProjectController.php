@@ -105,32 +105,56 @@ class ClientProjectController extends Controller
                     return $row->client->business_name ?? '';
                 })
 
-                ->addColumn('project_progress', function($row) {
-                    $totalModules = $row->modules()->count();
-                    $modulesUrl = route('client-projects.modules', $row->id);
+                ->addColumn('project_progress', function ($row) {
+                  $totalModules = $row->modules()->count();
+                  $modulesUrl = route('client-projects.modules', $row->id);
 
-                    if ($totalModules == 0) {
-                        return '<a href="'.$modulesUrl.'" class="text-decoration-none text-success">
-                                    <small>No module yet! Add new</small>
-                                </a>';
+                  if ($totalModules == 0) {
+                      return '<a href="' . $modulesUrl . '" class="text-decoration-none">
+                                  <span class="badge bg-info text-dark">No module yet! Add new</span>
+                              </a>';
+                  }
+
+                  $percent = $row->progress ?? 0;
+                  $maxEndDate = $row->modules->max('estimated_end_date');
+                  $maxDeadline = $row->modules->max('deadline');
+
+                  $maxEndDateFormatted = $maxEndDate ? \Carbon\Carbon::parse($maxEndDate)->format('d M y') : '-';
+                  $maxDeadlineDate = $maxDeadline ? \Carbon\Carbon::parse($maxDeadline) : null;
+
+                  $deadlineBadge = '';
+                  if ($maxDeadlineDate) {
+                    $today = \Carbon\Carbon::today();
+
+                    if ($maxDeadlineDate->isSameDay($today)) {
+                      $deadlineBadge = '<span class="badge bg-warning text-dark">Today: ' . $maxDeadlineDate->format('d M y') . '</span>';
+                    } elseif ($maxDeadlineDate->isPast()) {
+                      $deadlineBadge = '<span class="badge bg-danger">Overdue: ' . $maxDeadlineDate->format('d M y') . '</span>';
+                    } elseif ($maxDeadlineDate->isFuture() && $today->diffInDays($maxDeadlineDate) <= 2) {
+                      $deadlineBadge = '<span class="badge bg-warning text-dark">Very Close: ' . $maxDeadlineDate->format('d M y') . '</span>';
+                    } else {
+                      $deadlineBadge = '<span class="badge bg-success">Deadline: ' . $maxDeadlineDate->format('d M y') . '</span>';
                     }
+                  }
 
-                    $percent = $row->progress ?? 0;
-                    $maxEndDate = $row->modules->max('estimated_end_date');
-                    $maxEndDateFormatted = $maxEndDate ? \Carbon\Carbon::parse($maxEndDate)->format('d M y') : '-';
+                  $endDateBadge = $percent < 100 && $maxEndDate
+                    ? '<br><span class="badge bg-secondary">End: ' . $maxEndDateFormatted . '</span>'
+                    : '';
 
-                    $endDateHtml = $percent < 100 ? '<br><small class="text-muted">End: '.$maxEndDateFormatted.'</small>' : '';
-
-                    return '
-                        <td class="project_progress">
-                            <a href="'.$modulesUrl.'" class="text-decoration-none text-dark">
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="'.$percent.'" aria-valuemin="0" aria-valuemax="100" style="width: '.$percent.'%"></div>
-                                </div>
-                                <small>'.$percent.'% Completed</small>'.$endDateHtml.'
-                            </a>
-                        </td>
-                    ';
+                  return '
+                                <td class="project_progress">
+                                    <a href="' . $modulesUrl . '" class="text-decoration-none text-dark">
+                                        <div class="progress progress-sm mb-1">
+                                            <div class="progress-bar bg-success" role="progressbar"
+                                                aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100"
+                                                style="width: ' . $percent . '%">
+                                            </div>
+                                        </div>
+                                        <small>' . $percent . '% Completed</small>
+                                        ' . $endDateBadge . '<br>' . $deadlineBadge . '
+                                    </a>
+                                </td>
+                            ';
                 })
 
                 ->addColumn('status', function($row) {
