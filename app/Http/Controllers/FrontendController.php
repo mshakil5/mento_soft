@@ -176,13 +176,16 @@ class FrontendController extends Controller
 
         $company = CompanyDetails::select('meta_title', 'meta_description', 'meta_keywords', 'meta_image', 'company_name')->first();
 
+        $metaData = Master::where('name', 'Home')->first();
+        // dd($metaData);
+
         $companyBusinessName = $company?->business_name ?? 'Mento Software';
 
         $this->seo(
-            $company?->meta_title ?? '',
-            $company?->meta_description ?? '',
-            $company?->meta_keywords ?? '',
-            $company?->meta_image ? asset('images/company/meta/' . $company->meta_image) : null
+            $metaData?->meta_title ?? '',
+            $metaData?->meta_description ?? '',
+            $metaData?->meta_keywords ?? '',
+            $metaData?->meta_image ? asset('images/meta/' . $company->meta_image) : null
         );
 
         return view('frontend.index', compact('landingPage', 'whyChooseUs', 'ourFlexible', 'services', 'products', 'companyBusinessName'));

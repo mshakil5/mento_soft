@@ -6,6 +6,7 @@ use App\Models\Master;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class MetaController extends Controller
 {
@@ -14,15 +15,18 @@ class MetaController extends Controller
     {
         
         $data = Master::select('id','name', 'softcode_id', 'meta_image','short_title','long_title', 'meta_title', 'meta_description', 'meta_keywords')->orderby('id','DESC')->where('softcode_id', 7)->get();
-
-
         return view('admin.meta.index', compact('data'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category' => 'required|string|max:255|unique:masters,name',
+            'category' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('masters', 'name')->whereNull('deleted_at'), 
+            ],
             'short_title' => 'nullable|string',
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
@@ -69,7 +73,14 @@ class MetaController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category' => 'required|string|max:255|unique:masters,name,' . $request->codeid,
+            'category' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('masters', 'name')
+                    ->ignore($request->codeid)    
+                    ->whereNull('deleted_at'),    
+            ],
             'short_title' => 'nullable|string',
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
@@ -114,8 +125,8 @@ class MetaController extends Controller
         }
 
 
-        if ($metadata->feature_image && file_exists(public_path('images/products/' . $metadata->feature_image))) {
-            unlink(public_path('images/products/' . $metadata->feature_image));
+        if ($metadata->feature_image && file_exists(public_path('images/meta/' . $metadata->feature_image))) {
+            unlink(public_path('images/meta/' . $metadata->feature_image));
         }
 
         $metadata->delete();
