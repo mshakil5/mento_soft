@@ -45,7 +45,12 @@
                                             ];
                                         @endphp
                                         <span class="badge {{ $statusClasses[$row['status']] ?? 'bg-secondary' }}">
-                                            {{ $row['status'] }}
+                                            @if ($row['status'] == 'Received')
+                                                Paid
+                                            @else
+                                                {{ $row['status'] }}
+                                            @endif
+
                                         </span>
                                     </td>
                                 </tr>
