@@ -55,7 +55,6 @@
                                         <option value="Faq">Faq</option>
                                         <option value="Terms">Terms</option>
                                         <option value="Privacy">Privacy</option>
-                                        <option value="Product-Details">Product-Details</option>
                                     </select>
                                     </div>
                                 </div>
