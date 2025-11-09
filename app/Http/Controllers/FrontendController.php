@@ -34,14 +34,13 @@ class FrontendController extends Controller
             $product = Product::find($request->product_id);
         }
 
-        $contact = Master::where('name', 'contact')->first();
-
+        $contact = Master::where('name', 'Contact Page')->where('softcode_id', 7)->first();
         if($contact){
             $this->seo(
                 $contact->meta_title,
                 $contact->meta_description,
                 $contact->meta_keywords,
-                $contact->meta_image ? asset('images/meta_image/' . $contact->meta_image) : null
+                $contact->meta_image ? asset('images/meta/' . $contact->meta_image) : null
             );
         }
         
@@ -50,14 +49,14 @@ class FrontendController extends Controller
 
     public function getQuotation()
     {
-        $quotation = Master::where('name', 'quotation')->first();
+        $quotation = Master::where('name', 'Quotation')->where('softcode_id', 7)->first();
 
         if($quotation){
             $this->seo(
                 $quotation->meta_title,
                 $quotation->meta_description,
                 $quotation->meta_keywords,
-                $quotation->meta_image ? asset('images/meta_image/' . $quotation->meta_image) : null
+                $quotation->meta_image ? asset('images/meta/' . $quotation->meta_image) : null
             );
         }
 
@@ -175,10 +174,7 @@ class FrontendController extends Controller
         }
 
         $company = CompanyDetails::select('meta_title', 'meta_description', 'meta_keywords', 'meta_image', 'company_name')->first();
-
-        $metaData = Master::where('name', 'Home')->first();
-        // dd($metaData);
-
+        $metaData = Master::where('name', 'Home')->where('softcode_id', 7)->first();
         $companyBusinessName = $company?->business_name ?? 'Mento Software';
 
         $this->seo(
@@ -206,13 +202,13 @@ class FrontendController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        $portfolio = Master::where('name', 'portfolio')->first();
+        $portfolio = Master::where('name', 'Portfolio')->where('softcode_id', 7)->first();
         if($portfolio){
             $this->seo(
                 $portfolio->meta_title,
                 $portfolio->meta_description,
                 $portfolio->meta_keywords,
-                $portfolio->meta_image ? asset('images/meta_image/' . $portfolio->meta_image) : null
+                $portfolio->meta_image ? asset('images/meta/' . $portfolio->meta_image) : null
             );
         }
 
@@ -316,18 +312,55 @@ class FrontendController extends Controller
     public function privacyPolicy()
     {
         $companyDetails = CompanyDetails::select('privacy_policy')->first();
+
+
+        $meta = Master::where('name', 'Privacy')->where('softcode_id', 7)->first();
+        if($meta){
+            $this->seo(
+                $meta->meta_title,
+                $meta->meta_description,
+                $meta->meta_keywords,
+                $meta->meta_image ? asset('images/meta/' . $meta->meta_image) : null
+            );
+        }
+
+
         return view('frontend.privacy', compact('companyDetails'));
     }
 
     public function termsAndConditions()
     {
         $companyDetails = CompanyDetails::select('terms_and_conditions')->first();
+        $meta = Master::where('name', 'Terms')->where('softcode_id', 7)->first();
+        if($meta){
+            $this->seo(
+                $meta->meta_title,
+                $meta->meta_description,
+                $meta->meta_keywords,
+                $meta->meta_image ? asset('images/meta/' . $meta->meta_image) : null
+            );
+        }
+
         return view('frontend.terms', compact('companyDetails'));
     }
 
     public function frequentlyAskedQuestions()
     {
         $faqQuestions = FaqQuestion::orderBy('id', 'asc')->get();
+
+        
+        $meta = Master::where('name', 'Faq')->where('softcode_id', 7)->first();
+        if($meta){
+            $this->seo(
+                $meta->meta_title,
+                $meta->meta_description,
+                $meta->meta_keywords,
+                $meta->meta_image ? asset('images/meta/' . $meta->meta_image) : null
+            );
+        }
+
+
+
         return view('frontend.faq', compact('faqQuestions'));
     }
 

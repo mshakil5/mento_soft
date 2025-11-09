@@ -49,8 +49,13 @@
                                     <select class="form-control category" id="category" name="category">
                                         <option value="">Select Category</option>
                                         <option value="Home">Home</option>
-                                        <option value="About">About</option>
-                                        <option value="Contact">Contact</option>
+                                        <option value="Contact Page">Contact</option>
+                                        <option value="Portfolio">Portfolio</option>
+                                        <option value="Quotation">Quotation</option>
+                                        <option value="Faq">Faq</option>
+                                        <option value="Terms">Terms</option>
+                                        <option value="Privacy">Privacy</option>
+                                        <option value="Product-Details">Product-Details</option>
                                     </select>
                                     </div>
                                 </div>
@@ -114,7 +119,7 @@
                             <thead>
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Title</th>
+                                    <th>Category</th>
                                     <th>Meta Title</th>
                                     <th>Image</th>
                                     <th>Description</th>
@@ -125,7 +130,7 @@
                                 @foreach ($data as $key => $data)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ $data->short_title }}</td>
+                                    <td>{{ $data->name }}</td>
                                     <td>{{ $data->meta_title }}</td>
                                     @php
                                         $imagePath = public_path('images/meta/' . $data->meta_image);
