@@ -444,16 +444,9 @@ $(document).ready(function() {
                 },
                 success: function(d){
                     if(d.success) {
-                        swal({
-                          text: "Deleted",
-                          icon: "success",
-                          button: {
-                              text: "OK",
-                              className: "swal-button--confirm"
-                          }
-                      }).then(() => {
-                          location.reload();
-                      });
+                    
+                        success(d.message);
+                        location.reload();
                     }
                 },
                 error:function(d){
