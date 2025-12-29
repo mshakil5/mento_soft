@@ -75,6 +75,7 @@ class LiabilityController extends Controller
         $transaction = new Transaction();
         $transaction->date = $request->input('date');
         $transaction->chart_of_account_id = $request->input('chart_of_account_id');
+        $transaction->liability_id = $request->input('chart_of_account_id');
         $transaction->table_type = 'Liabilities';
         $transaction->ref = $request->input('ref');
         $transaction->description = $request->input('description');
@@ -154,7 +155,7 @@ class LiabilityController extends Controller
         $transaction->at_amount = $request->input('at_amount');
         $transaction->transaction_type = $request->input('transaction_type');
         $transaction->payment_type = $request->input('payment_type');
-        $transaction->liablity_id = $request->input('chart_of_account_id');
+        $transaction->liability_id = $request->input('chart_of_account_id');
         $transaction->updated_by = Auth()->user()->id;
         $transaction->updated_ip = request()->ip();
 

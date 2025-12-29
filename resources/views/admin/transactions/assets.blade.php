@@ -70,34 +70,104 @@
     </div>
 </section>
 
-<div class="modal fade" id="chartModal">
+<style>
+    #chartModal .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    #chartModal .modal-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        border-radius: 12px 12px 0 0;
+        padding: 1.5rem;
+    }
+    #chartModal .modal-title {
+        font-weight: 700;
+        color: #334155;
+        letter-spacing: -0.025em;
+    }
+    #chartModal .modal-body {
+        padding: 2rem;
+    }
+    #chartModal .form-group label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    #chartModal .form-control {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        padding: 0.6rem 1rem;
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
+    }
+    #chartModal .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    #chartModal .modal-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+        padding: 1.25rem;
+        border-radius: 0 0 12px 12px;
+    }
+    .save-btn {
+        background-color: #2563eb;
+        border: none;
+        padding: 0.6rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+    .save-btn:hover {
+        background-color: #1d4ed8;
+    }
+    /* Sectioning styling */
+    .form-section-title {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        font-weight: 700;
+    }
+</style>
+
+<div class="modal fade" id="chartModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Asset</h4>
+            <div class="modal-header d-flex align-items-center">
+                <h4 class="modal-title">
+                    <i class="fas fa-file-invoice-dollar mr-2 text-primary"></i> Asset Management
+                </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span></button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <form class="form-horizontal" id="customer-form">
             
+            <form id="customer-form">
                 <div class="modal-body">
                     {{csrf_field()}}
-
                     <div id="alert-container1"></div>
-                    
+
+                    <div class="form-section-title">PRIMARY DETAILS</div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="date" class="control-label">Date</label>
-                                <input type="date" name="date" class="form-control " id="date" value="{{date('Y-m-d')}}">
+                                <label for="date">Date</label>
+                                <input type="date" name="date" class="form-control" id="date" value="{{date('Y-m-d')}}">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="chart_of_account_id" class="control-label">Chart of Account</label>
-                                <select class="form-control" id="chart_of_account_id" name="chart_of_account_id">
-                                    <option value="">Select chart of account</option>
+                                <label for="chart_of_account_id">Chart of Account</label>
+                                <select class="form-control custom-select" id="chart_of_account_id" name="chart_of_account_id">
+                                    <option value="">Select account...</option>
                                     @php
                                         use App\Models\ChartOfAccount;
                                         $accounts = ChartOfAccount::where('sub_account_head', 'Account Payable')->get(['account_name', 'id']);
@@ -105,7 +175,7 @@
                                         $assets = ChartOfAccount::where('account_head', 'Assets')->get();
                                     @endphp
                                     @foreach($assets as $asset)
-                                        <option value="{{ $asset->id }}" data-type="{{ $asset->sub_account_head }}">{{ $asset->account_name }}</option>
+                                        <option value="{{ $asset->id }}" data-type="{{ $asset->sub_account_head }}" data-accname="{{ $asset->account_name }}">{{ $asset->account_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -115,98 +185,110 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="ref" class="control-label">Reference</label>
-                                <input type="text" name="ref" class="form-control " id="ref">
+                                <label for="ref">Reference Number</label>
+                                <input type="text" name="ref" class="form-control" id="ref" placeholder="e.g. REF-001">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="transaction_type">Transaction Type</label>
+                                <select class="form-control custom-select" id="transaction_type" name="transaction_type">
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title mt-3">FINANCIAL BREAKDOWN</div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="amount">Base Amount</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" name="amount" class="form-control" id="amount" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="vat_rate">Tax (%)</label>
+                                <input type="number" name="vat_rate" class="form-control" id="vat_rate" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="vat_amount">Tax Amount</label>
+                                <input type="text" name="vat_amount" class="form-control bg-light" id="vat_amount" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-1">
+                            <div class="form-group p-3 bg-light rounded shadow-sm">
+                                <label for="at_amount" class="text-primary">Grand Total Amount</label>
+                                <input type="text" name="at_amount" class="form-control form-control-lg border-primary text-primary font-weight-bold" id="at_amount" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">PAYMENT DETAILS</div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" id="payment_type_container">
+                                <label for="payment_type">Payment Type</label>
+                                <select class="form-control custom-select" id="payment_type" name="payment_type">
+                                    <option value="">Select type...</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank">Bank</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 d-none" id="employeeDiv">
+                            <div class="form-group" id="employee_id_container">
+                                <label for="employee_id">Employee</label>
+                                <select class="form-control custom-select" id="employee_id" name="employee_id">
+                                    <option value="">Select Employee</option>
+                                    @foreach ($employees as $employee)
+                                        <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="transaction_type" class="control-label">Transaction Type</label>
-                                <select class="form-control" id="transaction_type" name="transaction_type">
+                            <div class="form-group d-none animated fadeIn" id="showpayable">
+                                <label for="payable_holder_id">Payable Holder Name</label>
+                                <select class="form-control" id="payable_holder_id" name="payable_holder_id">
+                                    <option value="">Select holder...</option>
+                                    @foreach($accounts as $account)
+                                        <option value="{{ $account->id }}">{{ $account->account_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group d-none animated fadeIn" id="showreceivable">
+                                <label for="recivible_holder_id">Receivable Holder Name</label>
+                                <select class="form-control" id="recivible_holder_id" name="recivible_holder_id">
+                                    <option value="">Select holder...</option>
+                                    @foreach($recivible as $rec)
+                                        <option value="{{ $rec->id }}">{{ $rec->account_name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="amount" class="control-label">Amount</label>
-                                <input type="text" name="amount" class="form-control " id="amount">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="vat_rate" class="control-label">Tax %</label>
-                                <input type="text" name="vat_rate" class="form-control " id="vat_rate">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="vat_amount" class="control-label">Tax Amount</label>
-                                <input type="text" name="vat_amount" class="form-control " id="vat_amount">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="at_amount" class="control-label">Total Amount</label>
-                                <input type="text" name="at_amount" class="form-control " id="at_amount">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group" id="payment_type_container">
-                            <label for="payment_type" class="control-label">Payment Type</label>
-                            <select class="form-control" id="payment_type" name="payment_type">
-                                <option value="">Select payment type</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Bank">Bank</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group d-none" id="showpayable" >
-                            <label for="payable_holder_id" class="control-label">Payable Holder Name</label>
-                            <select class="form-control" id="payable_holder_id" name="payable_holder_id">
-                                <option value="">Select payable holder</option>
-                                @foreach($accounts as $account)
-                                    <option value="{{ $account->id }}">{{ $account->account_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group d-none" id="showreceivable" >
-                            <label for="recivible_holder_id" class="control-label">Receivable Holder Name</label>
-                            <select class="form-control" id="recivible_holder_id" name="recivible_holder_id">
-                                <option value="">Select recivible holder</option>
-                                @foreach($recivible as $recivible)
-                                    <option value="{{ $recivible->id }}">{{ $recivible->account_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    </div>
-
                     <div class="form-group">
-                        <label for="description" class="control-label">Description</label>
-                        <textarea class="form-control" id="description" rows="3" placeholder="Description" name="description"></textarea>
+                        <label for="description">Memo / Description</label>
+                        <textarea class="form-control" id="description" rows="3" placeholder="Additional notes about this asset transaction..." name="description"></textarea>
                     </div>
-
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-primary submit-btn save-btn"> Save</button>
+                    <button type="button" class="btn btn-light font-weight-bold mr-2" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary submit-btn save-btn shadow-sm">
+                        <i class="fas fa-check-circle mr-1"></i> Save Asset
+                    </button>
                 </div>
             </form>
         </div>
@@ -266,8 +348,10 @@
         $('#chart_of_account_id').change(function() {
             var accountType = $(this).find(':selected').data('type');
             var transactionTypeDropdown = $('#transaction_type');
+            var accountName = $(this).find(':selected').data('accname') || "";
 
             transactionTypeDropdown.empty();
+            var $employeeDiv = $('#employeeDiv');
 
             if(accountType === 'Fixed Asset') {
                 transactionTypeDropdown.append('<option value="">Select transaction type</option>');
@@ -278,6 +362,20 @@
                 transactionTypeDropdown.append('<option value="">Select transaction type</option>');
                 transactionTypeDropdown.append('<option value="Received">Received</option>');
                 transactionTypeDropdown.append('<option value="Payment">Payment</option>');
+            }
+
+            if (accountName.toLowerCase().includes('employee')) {
+                // Show the div (remove d-none)
+                $employeeDiv.removeClass('d-none').hide().fadeIn();
+                // Optionally make the employee field required if shown
+                $('#employee_id').attr('required', true);
+            } else {
+                // Hide the div
+                $employeeDiv.fadeOut(function() {
+                    $(this).addClass('d-none');
+                });
+                // Clear selection and remove required attribute
+                $('#employee_id').val('').removeAttr('required');
             }
         });
     });
@@ -383,12 +481,15 @@
                     $('#at_amount').val(response.at_amount);
                     $('#payment_type').val(response.payment_type);
                     $('#description').val(response.description);
+                    $('#employee_id').val(response.employee_id);
 
                     $('#chart_of_account_id').val(response.chart_of_account_id);
 
                     var accountType = response.chart_of_account_type;
 
                     var transactionTypeDropdown = $('#transaction_type');
+                    var $employeeDiv = $('#employeeDiv');
+                    $employeeDiv.removeClass('d-none').hide().fadeIn();
 
                     transactionTypeDropdown.empty();
 

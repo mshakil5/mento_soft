@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('share_holder_id')->nullable();
             $table->string('payment_type')->nullable();
             $table->string('asset_id')->nullable();
-            $table->string('liablity_id')->nullable();
+            $table->string('employee_id')->nullable();
             $table->string('income_id')->nullable();
             $table->string('expense_id')->nullable();
             $table->string('equity_id')->nullable();
