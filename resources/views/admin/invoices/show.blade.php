@@ -212,7 +212,9 @@
                             <td style="width: 50%; text-align:left;">
                                 <b>{{ $company->business_name ? $company->business_name : $company->company_name }}</b><br>
                                 Registration Number: {{ $company->company_reg_number ?? '' }}<br>
-                                Vat Number: {{ $company->vat_number ?? '' }}<br>
+                                @if (isset($company->vat_number))
+                                Vat Number: {{ $company->vat_number ?? '' }} <br>  
+                                @endif 
                                 {{ $company->address1 ?? '' }}
                             </td>
                             <td style="width: 50%; text-align:right;">
