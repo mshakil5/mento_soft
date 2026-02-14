@@ -83,8 +83,8 @@
     @endcan
 
     @can('frontend-settings')
-    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('permissions.index') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('permissions.index') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('admin.metaData') || Route::is('permissions.index') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('admin.metaData') || Route::is('roles.index') || Route::is('permissions.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
             <p>
                 Settings <i class="fas fa-angle-left right"></i>
@@ -167,6 +167,12 @@
                 <a href="{{ route('permissions.index') }}" class="nav-link {{ Route::is('permissions.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-key"></i>
                     <p>Permissions</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.metaData') }}" class="nav-link {{ Route::is('admin.metaData') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-user-shield"></i>
+                    <p>Meta Data</p>
                 </a>
             </li>
         </ul>

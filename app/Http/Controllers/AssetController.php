@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\ChartOfAccount;
+use App\Models\User;
 use Carbon\Carbon;
 
 class AssetController extends Controller
@@ -46,7 +47,8 @@ class AssetController extends Controller
                 ->make(true);
         }
         $accounts = ChartOfAccount::where('account_head', 'Assets')->get();
-        return view('admin.transactions.assets', compact('accounts'));
+        $employees =  User::with('roles')->where('user_type', 1)->latest()->get();
+        return view('admin.transactions.assets', compact('accounts','employees'));
     }
 
     public function store(Request $request)
@@ -88,6 +90,7 @@ class AssetController extends Controller
         $transaction->liability_id = $request->input('payable_holder_id');
         $transaction->payment_type = $request->input('payment_type');
         $transaction->asset_id = $request->input('recivible_holder_id');
+        $transaction->employee_id = $request->input('employee_id');
         $transaction->created_by = Auth()->user()->id;
         $transaction->created_ip = request()->ip();
 
@@ -107,6 +110,7 @@ class AssetController extends Controller
         $responseData = [
             'id' => $transaction->id,
             'date' => $transaction->date,
+            'employee_id' => $transaction->employee_id,
             'chart_of_account_id' => $transaction->chart_of_account_id,
             'chart_of_account_type' => $chartOfAccount ? $chartOfAccount->sub_account_head : null,
             'ref' => $transaction->ref,
@@ -150,6 +154,7 @@ class AssetController extends Controller
 
         $transaction->date = $request->input('date');
         $transaction->chart_of_account_id = $request->input('chart_of_account_id');
+        $transaction->employee_id = $request->input('employee_id');
         $transaction->ref = $request->input('ref');
         $transaction->description = $request->input('description');
         $transaction->amount = $request->input('amount');

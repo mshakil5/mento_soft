@@ -396,10 +396,10 @@
                 return pid && pid != projectId;
             }).length > 0;
 
-            if (hasOtherProject) {
-                alert('You can only add items from the same project in one invoice.');
-                return;
-            }
+            // if (hasOtherProject) {
+            //     alert('You can only add items from the same project in one invoice.');
+            //     return;
+            // }
 
             var hasCustom = $('#invoiceItemsTable tbody tr').filter(function() {
                 var pid = $(this).data('project-id');

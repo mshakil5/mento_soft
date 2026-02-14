@@ -99,16 +99,50 @@ class LedgerController extends Controller
     public function employee($id, Request $request)
     {
         $data = Transaction::where('employee_id', $id)
-            ->whereIn('transaction_type', ['Current', 'Prepaid', 'Due Adjust', 'Received', 'Payment'])
-            ->orderBy('date', 'asc')
-            ->get();
+                ->whereIn('transaction_type', ['Current', 'Prepaid', 'Due Adjust', 'Received', 'Payment'])
+                ->select([
+                    'id', 
+                    'chart_of_account_id', 
+                    'tran_id', 
+                    'date', 
+                    'description', 
+                    'payment_type', 
+                    'ref', 
+                    'transaction_type', 
+                    'at_amount'
+                ])
+                ->where('table_type', 'Expenses')
+                ->orderBy('id', 'asc')
+                ->get();
 
         $employee = User::find($id);
         $employeeName = $employee?->name ?? 'Employee Not Found';
-
         $companyName = CompanyDetails::select('company_name')->first()->company_name ?? '';
 
-        return view('admin.ledger.employee', compact('data', 'employeeName', 'companyName'));
+        $assets = Transaction::where('employee_id', $id)
+                ->whereIn('transaction_type', ['Current', 'Prepaid', 'Due Adjust', 'Received', 'Payment'])
+                ->select([
+                    'id', 
+                    'chart_of_account_id', 
+                    'tran_id', 
+                    'date', 
+                    'description', 
+                    'payment_type', 
+                    'ref', 
+                    'transaction_type', 
+                    'at_amount'
+                ])
+                ->where('table_type', 'Assets')
+                ->orderBy('id', 'DESC')
+                ->get();
+
+                $totalPaidLoanAmout = $assets->whereIn('transaction_type', ['Payment'])->sum('at_amount');
+                $totalRcvLoanAmout = $assets->whereIn('transaction_type', ['Received'])->sum('at_amount');
+                $loanBalance = $totalPaidLoanAmout - $totalRcvLoanAmout;
+
+                // dd($loanBalance);
+
+        return view('admin.ledger.employee', compact('data', 'employeeName', 'companyName','assets','loanBalance'));
     }
 
     public function project($id, Request $request)

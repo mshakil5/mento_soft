@@ -45,6 +45,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\LedgerController;
+use App\Http\Controllers\MetaController;
 use App\Http\Controllers\ProjectModuleController;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], function () {
@@ -416,4 +417,17 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('ledger/service-details/{id}', [LedgerController::class, 'service']);
 
     Route::get('/clean-db', [HomeController::class, 'cleanDB']);
+
+
+        
+    Route::group(['prefix' => 'meta-data'], function () {
+        Route::get('/', [MetaController::class, 'index'])->name('admin.metaData');
+        Route::post('/', [MetaController::class, 'store']);
+        Route::get('/{id}/edit', [MetaController::class, 'edit']);
+        Route::post('/update', [MetaController::class, 'update'])->name('admin.meta.update');
+        Route::get('/{id}', [MetaController::class, 'delete']);
+    });
+
+
+
 });
