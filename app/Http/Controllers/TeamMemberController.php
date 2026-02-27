@@ -155,16 +155,22 @@ class TeamMemberController extends Controller
 
             $image = $request->file('image');
             $imageName = time() . '.webp';
-            $path = public_path('images/team-members/');
 
-            // Save image
+            $dir = public_path('images/team-members');
+
+            if (!file_exists($dir)) {
+                mkdir($dir, 0777, true);
+            }
+
+            $fullPath = $dir . DIRECTORY_SEPARATOR . $imageName;
+
             Image::make($image)
                 ->resize(400, 400, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 })
                 ->encode('webp', 85)
-                ->save($path . $imageName);
+                ->save($fullPath);
 
             $member->image = $imageName;
         }

@@ -6,7 +6,7 @@
 @endphp
 
 @if ($teamMembers->count() > 0)
-  <section class="default testimonial-section wow fadeIn d-none" id="testimonial">
+  <section class="default testimonial-section wow fadeIn" id="testimonial">
       <div class="container">
           <div class="row px-2">
               <div class="col-lg-12 text-center">
