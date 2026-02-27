@@ -278,12 +278,14 @@
         }).change();
 
         $("#chart_of_account_id").change(function() {
-            var selectedAccount = $(this).find("option:selected").text();
-            if (selectedAccount == "Wage") {
+            var selectedAccount = $(this).find("option:selected").text().trim();
+            
+            // Check if the selection is "Wage" OR "Salary"
+            if (selectedAccount === "Wage" || selectedAccount === "Salary") {
                 $("#showEmployee").removeClass('d-none').addClass('d-block');
             } else {
                 $("#showEmployee").removeClass('d-block').addClass('d-none');
-                $("#employee_id").val('');
+                $("#employee_id").val(''); // Reset the employee selection
             }
         });
 
