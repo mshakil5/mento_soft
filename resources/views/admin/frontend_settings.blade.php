@@ -83,8 +83,8 @@
     @endcan
 
     @can('frontend-settings')
-    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('admin.master') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('admin.metaData') || Route::is('permissions.index') ? 'menu-open' : '' }}">
-        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('admin.master') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('admin.metaData') || Route::is('roles.index') || Route::is('permissions.index') ? 'active' : '' }}">
+    <li class="nav-item dropdown {{ Route::is('admin.companyDetails') || Route::is('allMaster') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('roles.index') || Route::is('admin.metaData') || Route::is('permissions.index') ? 'menu-open' : '' }}">
+        <a href="#" class="nav-link dropdown-toggle {{ Route::is('admin.companyDetails') || Route::is('allMaster') || Route::is('admin.aboutUs') || Route::is('admin.privacy-policy') || Route::is('admin.terms-and-conditions') || Route::is('allFaq') || Route::is('allcontactemail') || Route::is('allslider') || Route::is('client-reviews.index') || Route::is('admin.company.seo-meta') || Route::is('team-members.index') || Route::is('admin.mail-footer') || Route::is('admin.metaData') || Route::is('roles.index') || Route::is('permissions.index') ? 'active' : '' }}">
             <i class="nav-icon fas fa-cog"></i>
             <p>
                 Settings <i class="fas fa-angle-left right"></i>
@@ -98,7 +98,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('admin.master') }}" class="nav-link {{ Route::is('admin.master') ? 'active' : '' }}">
+                <a href="{{ route('allMaster') }}" class="nav-link {{ Route::is('allMaster') ? 'active' : '' }}">
                     <i class="fas fa-building nav-icon"></i>
                     <p>Master</p>
                 </a>
