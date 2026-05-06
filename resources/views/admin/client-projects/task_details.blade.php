@@ -52,12 +52,10 @@
                     </div>
                     <div class="card-footer">
                         <form id="taskMessageForm">
-                            <div class="input-group">
-                                <input type="text" name="message" placeholder="Type Message ..." class="form-control" required>
-                                <span class="input-group-append">
-                                    <button type="submit" class="btn btn-primary">Send</button>
-                                </span>
+                            <div class="form-group">
+                                <textarea name="message" class="form-control summernote" placeholder="Type Message..." required></textarea>
                             </div>
+                            <button type="submit" class="btn btn-primary">Send</button>
                         </form>
                     </div>
                 </div>
@@ -84,18 +82,23 @@
       var csrfToken = $('meta[name="csrf-token"]').attr('content');
       var taskId = {{ $task->id }};
 
-      $('#taskMessageForm').on('submit', function(e){
-          e.preventDefault();
-          var message = $(this).find('input[name="message"]').val().trim();
-          if (!message) return;
+    $('#taskMessageForm').on('submit', function(e){
+        e.preventDefault();
 
-          $.post('/admin/tasks/' + taskId + '/messages', { message: message, _token: csrfToken }, function(res) {
-              $('#taskMessages').html(res.html);
-              $('#taskMessageForm input[name="message"]').val('');
-              var chat = $('#taskMessages');
-              chat.scrollTop(chat[0].scrollHeight);
-          });
-      });
+        var message = $('.summernote').summernote('code').trim();
+        if (!message || message === '<p><br></p>') return;
+
+        $.post('/admin/tasks/' + taskId + '/messages', { 
+            message: message, 
+            _token: csrfToken 
+        }, function(res) {
+            $('#taskMessages').html(res.html);
+            $('.summernote').summernote('reset');
+
+            var chat = $('#taskMessages');
+            chat.scrollTop(chat[0].scrollHeight);
+        });
+    });
   });
 </script>
 @endsection

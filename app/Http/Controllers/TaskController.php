@@ -303,7 +303,7 @@ class TaskController extends Controller
     public function store(Request $request, ProjectTask $task)
     {
         $request->validate([
-            'message' => 'required|string|max:1000'
+            'message' => 'required|string'
         ]);
 
         $message = $task->messages()->create([

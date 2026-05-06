@@ -13,7 +13,7 @@
         {{ substr($msg->sender->name ?? '', 0, 1) }}
     </div>
     <div class="direct-chat-text">
-        {{ $msg->message }}
+        {!! $msg->message !!}
     </div>
 </div>
 @endforeach
