@@ -43,12 +43,10 @@
                     </div>
                 </div>
 
-                <div class="card direct-chat direct-chat-primary w-100" style="max-height:400px; overflow-y:auto;">
+                <div class="card direct-chat direct-chat-primary w-100">
                     <div class="card-header"><h3 class="card-title">Conversation</h3></div>
-                    <div class="card-body">
-                        <div class="direct-chat-messages" id="taskMessages">
-                            {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
-                        </div>
+                    <div class="card-body" id="taskMessages" style="max-height:40vh; overflow-y:auto;">
+                        {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
                     </div>
                     <div class="card-footer">
                         <form id="taskMessageForm">
