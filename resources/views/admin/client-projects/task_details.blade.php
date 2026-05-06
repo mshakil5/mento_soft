@@ -43,19 +43,17 @@
                     </div>
                 </div>
 
-                <div class="card direct-chat direct-chat-primary w-100" style="max-height:400px; overflow-y:auto;">
+                <div class="card direct-chat direct-chat-primary w-100">
                     <div class="card-header"><h3 class="card-title">Conversation</h3></div>
-                    <div class="card-body">
-                        <div class="direct-chat-messages" id="taskMessages">
-                            {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
-                        </div>
+                    <div class="card-body" style="height:300px; overflow-y:auto;" id="taskMessages">
+                        {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
                     </div>
                     <div class="card-footer">
                         <form id="taskMessageForm">
-                            <div class="form-group">
+                            <div class="form-group mb-2">
                                 <textarea name="message" class="form-control summernote" placeholder="Type Message..." required></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary">Send</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Send</button>
                         </form>
                     </div>
                 </div>
@@ -95,8 +93,8 @@
             $('#taskMessages').html(res.html);
             $('.summernote').summernote('reset');
 
-            var chat = $('#taskMessages');
-            chat.scrollTop(chat[0].scrollHeight);
+            var chat = document.getElementById('taskMessages');
+            chat.scrollTop = chat.scrollHeight;
         });
     });
   });

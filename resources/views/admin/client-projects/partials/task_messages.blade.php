@@ -4,7 +4,7 @@
         <span class="direct-chat-name {{ $msg->user_id == auth()->id() ? 'float-right' : 'float-left' }}">
             {{ $msg->sender->name ?? '' }}
         </span>
-        <span class="direct-chat-timestamp {{ $msg->user_id == auth()->id() ? 'float-left' : 'float-right' }}">
+        <span class="direct-chat-timestamp {{ $msg->user_id == auth()->id() ? 'float-right' : 'float-left' }}">
             {{ $msg->created_at->format('d M, h:i a') }}
         </span>
     </div>
