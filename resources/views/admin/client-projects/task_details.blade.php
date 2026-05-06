@@ -48,7 +48,7 @@
                     <div class="card-body" style="height:300px; overflow-y:auto;" id="taskMessages">
                         {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer" style="margin-top:10px;">
                         <form id="taskMessageForm">
                             <div class="form-group mb-2">
                                 <textarea name="message" class="form-control summernote" placeholder="Type Message..." required></textarea>
@@ -90,11 +90,11 @@
             message: message, 
             _token: csrfToken 
         }, function(res) {
-            $('#taskMessages').html(res.html);
-            $('.summernote').summernote('reset');
+        $('#taskMessages').html(res.html);
+        $('.summernote').summernote('reset');
 
-            var chat = document.getElementById('taskMessages');
-            chat.scrollTop = chat.scrollHeight;
+        var chat = document.getElementById('taskMessages');
+        chat.scrollTop = chat.scrollHeight;
         });
     });
   });
