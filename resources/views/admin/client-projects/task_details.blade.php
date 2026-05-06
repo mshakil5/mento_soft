@@ -43,17 +43,19 @@
                     </div>
                 </div>
 
-                <div class="card direct-chat direct-chat-primary w-100">
+                <div class="card direct-chat direct-chat-primary w-100" style="max-height:400px; overflow-y:auto;">
                     <div class="card-header"><h3 class="card-title">Conversation</h3></div>
-                    <div class="card-body" style="height:300px; overflow-y:auto;" id="taskMessages">
-                        {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
+                    <div class="card-body">
+                        <div class="direct-chat-messages" id="taskMessages">
+                            {!! view('admin.client-projects.partials.task_messages', ['messages' => $task->messages->sortBy('created_at')])->render() !!}
+                        </div>
                     </div>
-                    <div class="card-footer" style="margin-top:10px;">
+                    <div class="card-footer">
                         <form id="taskMessageForm">
-                            <div class="form-group mb-2">
+                            <div class="form-group">
                                 <textarea name="message" class="form-control summernote" placeholder="Type Message..." required></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-sm">Send</button>
+                            <button type="submit" class="btn btn-primary">Send</button>
                         </form>
                     </div>
                 </div>
@@ -90,11 +92,11 @@
             message: message, 
             _token: csrfToken 
         }, function(res) {
-        $('#taskMessages').html(res.html);
-        $('.summernote').summernote('reset');
+            $('#taskMessages').html(res.html);
+            $('.summernote').summernote('reset');
 
-        var chat = document.getElementById('taskMessages');
-        chat.scrollTop = chat.scrollHeight;
+            var chat = $('#taskMessages');
+            chat.scrollTop(chat[0].scrollHeight);
         });
     });
   });
