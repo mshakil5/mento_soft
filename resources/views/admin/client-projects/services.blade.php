@@ -142,6 +142,18 @@
                                       <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
                                   </div>
                               </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                      <label>VAT% </label>
+                                      <input type="number" step="0.01" class="form-control" id="vat_percent" name="vat_percent">
+                                  </div>
+                              </div>
+                              <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>VAT Amount</label>
+                                        <input type="number" step="0.01" class="form-control" id="vat_amount" name="vat_amount" readonly>
+                                    </div>
+                                </div>
                                 <div class="col-md-6" id="service_renewal_date_div">
                                     <div class="form-group">
                                         <label>Third Party Service Renewal Date</label>
@@ -277,6 +289,24 @@
           $("#end_date").val(formattedDate);
       }
 
+        // --- VAT Auto Calculation ---
+        function calculateVat() {
+            var amount = parseFloat($('#amount').val()) || 0;
+            var vatPercent = parseFloat($('#vat_percent').val()) || 0;
+            
+            // Calculate VAT Amount
+            var vatAmount = (amount * vatPercent) / 100;
+            
+            // Update the vat_amount field, formatted to 2 decimal places
+            $('#vat_amount').val(vatAmount.toFixed(2));
+        }
+
+        // Trigger calculation when typing in amount or vat_percent
+        $('#amount, #vat_percent').on('input keyup', function() {
+            calculateVat();
+        });
+
+
       $("#start_date, #cycle_type").change(function() {
           calculateEndDate();
       });
@@ -305,6 +335,8 @@
           form_data.append("start_date", $("#start_date").val());
           form_data.append("end_date", $("#end_date").val());
           form_data.append("service_renewal_date", $("#service_renewal_date").val());
+          form_data.append("vat_percent", $("#vat_percent").val());
+          form_data.append("vat_amount", $("#vat_amount").val());
           form_data.append("amount", $("#amount").val());
           form_data.append("note", $("#note").val());
           form_data.append("cycle_type", $("#cycle_type").val());
@@ -398,6 +430,8 @@
           $("#service_renewal_date").val(data.service_renewal_date);
           $("#end_date").val(data.end_date);
           $("#amount").val(data.amount);
+          $("#vat_percent").val(data.vat_percent);
+          $("#vat_amount").val(data.vat_amount);
           $("#note").val(data.note);
           $("#codeid").val(data.id);
           $("#type").val(data.type);
@@ -414,6 +448,8 @@
           $("#addBtn").val('Update').html('Update');
           $("#addThisFormContainer").show(300);
           $("#newBtnSection").hide(100);
+            // Trigger calculation in case user wants to edit the amount/VAT instantly
+            calculateVat();
       }
 
       function clearform(){

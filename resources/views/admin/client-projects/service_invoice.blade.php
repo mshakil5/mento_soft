@@ -89,10 +89,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $subtotal = 0; @endphp
+                    @php 
+                        $subtotal = 0; 
+                        $vatamount = 0; 
+                        $netamount = 0; 
+                    @endphp
                     @foreach ($services as $index => $service)
                         @php 
                             $subtotal += $service->amount; 
+                            $vatamount += $service->vat_amount; 
+                            $netamount += $service->amount + $service->vat_amount; 
                             $dateRange = $service->start_date && $service->end_date 
                                 ? Carbon::parse($service->start_date)->format('d M Y') . ' - ' . Carbon::parse($service->end_date)->format('d M Y') 
                                 : '';
@@ -120,11 +126,11 @@
                             </tr>
                             <tr>
                                 <td>VAT</td>
-                                <td class="text-right" style="padding-right: 8px;">£0.00</td>
+                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($vatamount, 2) }}</td>
                             </tr>
                             <tr>
                                 <td>Total</td>
-                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($subtotal, 2) }}</td>
+                                <td class="text-right" style="padding-right: 8px;">£{{ number_format($netamount, 2) }}</td>
                             </tr>
                         </table>
                     </td>

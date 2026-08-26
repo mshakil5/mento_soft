@@ -374,24 +374,24 @@ class ProjectServiceController extends Controller
                         </div>';
                     }
 
-                  $hasNotRenewed = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
-                      ->where('client_id', $row->client_id)
-                      ->where('client_project_id', $row->client_project_id)
-                      ->where('amount', $row->amount)
-                      ->where('cycle_type', $row->cycle_type)
-                      ->where('is_auto', $row->is_auto)
-                      ->where('type', $row->type)
-                      ->where('status', 1)
-                      ->where('is_renewed', 0)
-                      ->where('bill_paid', 1)
-                          ->where(function($q) use ($row) {
-        if($row->cycle_type == 1) {
-            $q->where('start_date', '<=', now()->addDays(10));
-        } elseif($row->cycle_type == 2) {
-            $q->where('start_date', '<=', now()->addMonths(3));
-        }
-    })
-                      ->exists();
+                    $hasNotRenewed = ProjectServiceDetail::where('project_service_id', $row->project_service_id)
+                        ->where('client_id', $row->client_id)
+                        ->where('client_project_id', $row->client_project_id)
+                        ->where('amount', $row->amount)
+                        ->where('cycle_type', $row->cycle_type)
+                        ->where('is_auto', $row->is_auto)
+                        ->where('type', $row->type)
+                        ->where('status', 1)
+                        ->where('is_renewed', 0)
+                        ->where('bill_paid', 1)
+                        ->where(function($q) use ($row) {
+                            if($row->cycle_type == 1) {
+                                $q->where('start_date', '<=', now()->addDays(10));
+                            } elseif($row->cycle_type == 2) {
+                                $q->where('start_date', '<=', now()->addMonths(3));
+                            }
+                        })
+                        ->exists();
 
                   $btnClass = $hasNotRenewed ? 'btn-danger' : 'btn-secondary';
                   $iconClass = $hasNotRenewed ? 'text-white' : 'text-light';
@@ -998,6 +998,8 @@ class ProjectServiceController extends Controller
             'start_date'            => 'required|date',
             'service_renewal_date'  => 'nullable|date',
             'amount'                => 'required|numeric|min:0',
+            'vat_amount'            => 'required|numeric|min:0',
+            'vat_percent'           => 'required|numeric|min:0',
             'note'                  => 'nullable|string',
             'cycle_type'            => 'required|in:1,2', // 1=Monthly, 2=Yearly
             'is_auto'               => 'nullable|boolean',
@@ -1043,6 +1045,8 @@ class ProjectServiceController extends Controller
                     'end_date'              => $currentEnd,
                     'due_date'              => $dueDate,
                     'amount'                => $data['amount'],
+                    'vat_amount'            => $data['vat_amount'],
+                    'vat_percent'           => $data['vat_percent'],
                     'note'                  => $data['note'] ?? null,
                     'status'                => true,
                     'type'                  => $data['type'],
@@ -1064,8 +1068,10 @@ class ProjectServiceController extends Controller
                     'payment_type'              => 'Bank',
                     'description'               => $detail->note
                         ?? "Due for {$service->name} from {$currentStart->toDateString()} to {$currentEnd->toDateString()}",
+                    'vat_rate'       => $detail->vat_percent,
+                    'vat_amount'       => $detail->vat_amount,
                     'amount'       => $detail->amount,
-                    'at_amount'    => $detail->amount,
+                    'at_amount'    => $detail->amount + $detail->vat_amount,
                     'created_by'   => auth()->id(),
                     'created_ip'   => $request->ip(),
                 ]);
@@ -1099,6 +1105,8 @@ class ProjectServiceController extends Controller
                         'end_date'              => $currentEnd,
                         'due_date'              => $dueDate,
                         'amount'                => $data['amount'],
+                        'vat_percent'           => $data['vat_percent'],
+                        'vat_amount'            => $data['vat_amount'],
                         'note'                  => $data['note'] ?? null,
                         'status'                => true,
                         'next_created' => $isLast ? 0 : 1,
@@ -1123,8 +1131,10 @@ class ProjectServiceController extends Controller
                         'payment_type'              => 'Bank',
                         'description'               => $detail->note
                             ?? "Due for {$service->name} from {$currentStart->toDateString()} to {$currentEnd->toDateString()}",
+                        'vat_rate'       => $detail->vat_percent,
+                        'vat_amount'       => $detail->vat_amount,
                         'amount'       => $detail->amount,
-                        'at_amount'    => $detail->amount,
+                        'at_amount'    => $detail->amount + $detail->vat_amount,
                         'created_by'   => auth()->id(),
                         'created_ip'   => $request->ip(),
                     ]);
@@ -1202,6 +1212,8 @@ class ProjectServiceController extends Controller
               $child->project_service_id = $request->service_type_id;
               $child->client_id = $request->client_id;
               $child->client_project_id = $request->client_project_id;
+              $child->vat_percent = $request->vat_percent;
+              $child->vat_amount = $request->vat_amount;
               $child->amount = $request->amount;
               $child->note = $request->note;
               $child->type = $request->type;
@@ -1214,6 +1226,7 @@ class ProjectServiceController extends Controller
                   $transaction->client_project_id = $request->client_project_id;
                   $transaction->description = $request->note ?? '';
                   $transaction->amount = $child->amount;
+                  $transaction->vat_rate = $child->vat_percent;
                   $transaction->at_amount = $child->amount;
                   $transaction->updated_by = auth()->id();
                   $transaction->updated_ip = $request->ip();

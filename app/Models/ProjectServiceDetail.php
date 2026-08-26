@@ -11,16 +11,27 @@ class ProjectServiceDetail extends Model
 
     protected $guarded = [];
 
+
     protected static function boot()
     {
-      parent::boot();
+        parent::boot();
 
-      static::deleting(function ($model) {
-        if (auth()->check()) {
-          $model->deleted_by = auth()->id();
-          $model->save();
-        }
-      });
+        // 1. Your existing deleting logic
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                $model->save();
+            }
+        });
+
+        // 2. NEW: Auto-calculate vat_amount before saving
+        static::saving(function ($model) {
+            $amount = $model->amount ?? 0;
+            $vatPercent = $model->vat_percent ?? 0;
+            
+            // Calculate the VAT amount
+            $model->vat_amount = ($amount * $vatPercent) / 100;
+        });
     }
 
     protected $casts = [
